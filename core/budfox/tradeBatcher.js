@@ -36,7 +36,7 @@ let util = require('../util');
 let log = require('../log');
 
 let TradeBatcher = function(tid) {
-  if(!_.isString(tid))
+  if (!_.isString(tid))
     throw new Error('tid is not a string');
 
   _.bindAll(this);
@@ -48,16 +48,16 @@ util.makeEventEmitter(TradeBatcher);
 
 TradeBatcher.prototype.write = function(batch) {
 
-  if(!_.isArray(batch))
+  if (!_.isArray(batch))
     throw new Error('batch is not an array');
 
-  if(_.isEmpty(batch))
+  if (_.isEmpty(batch))
     return log.debug('Trade fetch came back empty.');
 
   let filterBatch = this.filter(batch);
 
   let amount = _.size(filterBatch);
-  if(!amount)
+  if (!amount)
     return log.debug('No new trades.');
 
   let momentBatch = this.convertDates(filterBatch);
@@ -72,7 +72,7 @@ TradeBatcher.prototype.write = function(batch) {
     'UTC to',
     last.date.format('YYYY-MM-DD HH:mm:ss'),
     'UTC.',
-    '(' + first.date.from(last.date, true) + ')'
+    '(' + first.date.from(last.date, true) + ')',
   );
 
   this.emit('new batch', {
@@ -81,13 +81,13 @@ TradeBatcher.prototype.write = function(batch) {
     end: last.date,
     last: last,
     first: first,
-    data: momentBatch
+    data: momentBatch,
   });
 
   this.last = last[this.tid];
 
   // we overwrote those, get unix ts back
-  if(this.tid === 'date')
+  if (this.tid === 'date')
     this.last = this.last.unix();
 
 };
@@ -96,7 +96,7 @@ TradeBatcher.prototype.filter = function(batch) {
   // make sure we're not trying to count
   // beyond infinity
   let lastTid = _.last(batch)[this.tid];
-  if(lastTid === lastTid + 1)
+  if (lastTid === lastTid + 1)
     util.die('trade tid is max int, Gekko can\'t process..');
 
   // remove trades that have zero amount

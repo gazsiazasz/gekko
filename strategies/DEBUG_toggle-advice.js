@@ -1,6 +1,6 @@
 let settings = {
   wait: 0,
-  each: 6
+  each: 6,
 };
 
 // -------
@@ -19,15 +19,15 @@ let method = {
   },
   check: function(candle) {
 
-    if(settings.wait > i)
+    if (settings.wait > i)
       return;
 
     log.info('iteration:', i);
 
-    if(i % settings.each === 0) {
+    if (i % settings.each === 0) {
       log.debug('trigger SHORT');
       this.advice('short');
-    } else if(i % settings.each === settings.each / 2) {
+    } else if (i % settings.each === settings.each / 2) {
       log.debug('trigger LONG');
       this.advice('long');
     }
@@ -39,7 +39,7 @@ let method = {
 
     i++;
 
-  }
+  },
 };
 
 module.exports = method;

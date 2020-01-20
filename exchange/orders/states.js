@@ -28,7 +28,7 @@ let states = {
   // Order was rejected by the exchange
   REJECTED: 'REJECTED',
 
-  ERROR: 'ERROR'
+  ERROR: 'ERROR',
 };
 
 module.exports = states;

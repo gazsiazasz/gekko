@@ -20,17 +20,16 @@ let bindAll = exchangeUtils.bindAll;
 let isValidOrder = exchangeUtils.isValidOrder;
 
 
-
 class Broker {
   constructor(config) {
     this.config = config;
 
-    if(config.private) {
-      if(this.cantTrade()) {
+    if (config.private) {
+      if (this.cantTrade()) {
         throw new Error(this.cantTrade());
       }
     } else {
-      if(this.cantMonitor()) {
+      if (this.cantMonitor()) {
         throw new Error(this.cantMonitor());
       }
     }
@@ -39,7 +38,7 @@ class Broker {
       // contains current open orders
       open: [],
       // contains all closed orders
-      closed: []
+      closed: [],
     };
 
     let slug = config.exchange.toLowerCase();
@@ -55,7 +54,7 @@ class Broker {
         _.last(p.pair) === config.asset.toUpperCase();
     });
 
-    if(config.customInterval) {
+    if (config.customInterval) {
       this.interval = config.customInterval;
       this.api.interval = config.customInterval;
       console.log(new Date, '[GB] setting custom interval to', config.customInterval);
@@ -65,7 +64,7 @@ class Broker {
 
     this.market = config.currency.toUpperCase() + config.asset.toUpperCase();
 
-    if(config.private) {
+    if (config.private) {
       this.portfolio = new Portfolio(config, this.api);
     }
 
@@ -81,12 +80,12 @@ class Broker {
   }
 
   sync(callback) {
-    if(!this.private) {
+    if (!this.private) {
       this.setTicker();
       return;
     }
 
-    if(this.cantTrade()) {
+    if (this.cantTrade()) {
       throw new errors.ExchangeError(this.cantTrade());
     }
 
@@ -100,15 +99,15 @@ class Broker {
       this.portfolio.setFee.bind(this.portfolio),
       next => setTimeout(next, this.interval),
       this.portfolio.setBalances.bind(this.portfolio),
-      next => setTimeout(next, this.interval)
+      next => setTimeout(next, this.interval),
     ], callback);
   }
 
   setTicker(callback) {
     this.api.getTicker((err, ticker) => {
 
-      if(err) {
-        if(err.message) {
+      if (err) {
+        if (err.message) {
           console.log(this.api.name, err.message);
           throw err;
         } else {
@@ -119,7 +118,7 @@ class Broker {
 
       this.ticker = ticker;
 
-      if(_.isFunction(callback))
+      if (_.isFunction(callback))
         callback();
     });
   }
@@ -129,24 +128,24 @@ class Broker {
       market: this.marketConfig,
       api: this.api,
       amount,
-      price
+      price,
     });
   }
 
   createOrder(type, side, amount, parameters, handler) {
-    if(!this.config.private)
+    if (!this.config.private)
       throw new Error('Client not authenticated');
 
-    if(side !== 'buy' && side !== 'sell')
+    if (side !== 'buy' && side !== 'sell')
       throw new Error('Unknown side ' + side);
 
-    if(!orders[type])
+    if (!orders[type])
       throw new Error('Unknown order type');
 
     let order = new orders[type]({
       api: this.api,
       marketConfig: this.marketConfig,
-      capabilities: this.capabilities
+      capabilities: this.capabilities,
     });
 
     // todo: figure out a smarter generic way
@@ -167,12 +166,12 @@ class Broker {
     return order;
   }
 
-  createTrigger({type, onTrigger, props}) {
+  createTrigger({ type, onTrigger, props }) {
     return new Trigger({
       api: this.api,
       type,
       onTrigger,
-      props
+      props,
     });
   }
 }

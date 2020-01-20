@@ -18,10 +18,10 @@ method.check = function(candle) {
   let adx = this.tulipIndicators.myadx.result.result;
   // console.dir(adx)
 
-  if(this.settings.thresholds.down > adx && this.trend !== 'short') {
+  if (this.settings.thresholds.down > adx && this.trend !== 'short') {
     this.trend = 'short';
     this.advice('short');
-  } else if(this.settings.thresholds.up < adx && this.trend !== 'long'){
+  } else if (this.settings.thresholds.up < adx && this.trend !== 'long') {
     this.trend = 'long';
     this.advice('long');
   }

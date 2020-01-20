@@ -24,18 +24,18 @@ module.exports = function() {
   let adapter = _config.adapter;
   _config[adapter] = getTOML(configDir + 'adapters/' + adapter + '.toml');
 
-  if(_config.tradingAdvisor.enabled) {
+  if (_config.tradingAdvisor.enabled) {
     // also load the strat
     let strat = _config.tradingAdvisor.method;
     let stratFile = configDir + 'strategies/' + strat + '.toml';
-    if(!fs.existsSync(stratFile))
+    if (!fs.existsSync(stratFile))
       util.die('Cannot find the strategy config file for ' + strat);
     _config[strat] = getTOML(stratFile);
   }
 
   let mode = util.gekkoMode();
 
-  if(mode === 'backtest')
+  if (mode === 'backtest')
     _config.backtest = getTOML(configDir + 'backtest.toml');
 
   return _config;

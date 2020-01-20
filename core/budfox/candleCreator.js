@@ -52,7 +52,7 @@ let CandleCreator = function() {
   _.bindAll(this);
 
   // TODO: remove fixed date
-  this.threshold = moment("1970-01-01", "YYYY-MM-DD");
+  this.threshold = moment('1970-01-01', 'YYYY-MM-DD');
 
   // This also holds the leftover between fetches
   this.buckets = {};
@@ -63,7 +63,7 @@ util.makeEventEmitter(CandleCreator);
 CandleCreator.prototype.write = function(batch) {
   let trades = batch.data;
 
-  if(_.isEmpty(trades))
+  if (_.isEmpty(trades))
     return;
 
   trades = this.filter(trades);
@@ -72,7 +72,7 @@ CandleCreator.prototype.write = function(batch) {
 
   candles = this.addEmptyCandles(candles);
 
-  if(_.isEmpty(candles))
+  if (_.isEmpty(candles))
     return;
 
   // the last candle is not complete
@@ -94,7 +94,7 @@ CandleCreator.prototype.fillBuckets = function(trades) {
   _.each(trades, function(trade) {
     let minute = trade.date.format('YYYY-MM-DD HH:mm');
 
-    if(!(minute in this.buckets))
+    if (!(minute in this.buckets))
       this.buckets[minute] = [];
 
     this.buckets[minute].push(trade);
@@ -137,7 +137,7 @@ CandleCreator.prototype.calculateCandle = function(trades) {
     close: f(_.last(trades).price),
     vwp: 0,
     volume: 0,
-    trades: _.size(trades)
+    trades: _.size(trades),
   };
 
   _.each(trades, function(trade) {
@@ -159,7 +159,7 @@ CandleCreator.prototype.calculateCandle = function(trades) {
 // - trades, volume are 0
 CandleCreator.prototype.addEmptyCandles = function(candles) {
   let amount = _.size(candles);
-  if(!amount)
+  if (!amount)
     return candles;
 
   // iterator
@@ -171,12 +171,12 @@ CandleCreator.prototype.addEmptyCandles = function(candles) {
     return +candle.start;
   });
 
-  while(start < end) {
+  while (start < end) {
     start.add(1, 'm');
     i = +start;
     j++;
 
-    if(_.contains(minutes, i))
+    if (_.contains(minutes, i))
       continue; // we have a candle for this minute
 
     let lastPrice = candles[j].close;
@@ -189,7 +189,7 @@ CandleCreator.prototype.addEmptyCandles = function(candles) {
       close: lastPrice,
       vwp: lastPrice,
       volume: 0,
-      trades: 0
+      trades: 0,
     });
   }
   return candles;

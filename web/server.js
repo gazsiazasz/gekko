@@ -34,7 +34,7 @@ wss.on('connection', ws => {
 
 setInterval(() => {
   wss.clients.forEach(ws => {
-    if(!ws.isAlive) {
+    if (!ws.isAlive) {
       console.log(new Date, '[WS] stale websocket client, terminiating..');
       return ws.terminate();
     }
@@ -46,19 +46,19 @@ setInterval(() => {
 
 // broadcast function
 let broadcast = data => {
-  if(_.isEmpty(data)) {
+  if (_.isEmpty(data)) {
     return;
   }
 
   let payload = JSON.stringify(data);
 
   wss.clients.forEach(ws => {
-    ws.send(payload, err => {
-      if(err) {
-        console.log(new Date, '[WS] unable to send data to client:', err);
-      }
-    });
-  }
+      ws.send(payload, err => {
+        if (err) {
+          console.log(new Date, '[WS] unable to send data to client:', err);
+        }
+      });
+    },
   );
 };
 cache.set('broadcast', broadcast);
@@ -118,18 +118,16 @@ server.timeout = config.api.timeout || 120000;
 server.on('request', app.callback());
 server.listen(config.api.port, config.api.host, '::', () => {
   let host = `${config.ui.host}:${config.ui.port}${config.ui.path}`;
-
   let location = (config.ui.ssl) ? `https://${host}` : `http://${host}`;
 
-  console.log('Serving Gekko UI on ' + location +  '\n');
-
+  console.log('Serving Gekko UI on ' + location + '\n');
 
   // only open a browser when running `node gekko`
   // this prevents opening the browser during development
-  if(!isDevServer && !config.headless) {
+  if (!isDevServer && !config.headless) {
     opn(location)
       .catch(err => {
         console.log('Something went wrong when trying to open your web browser. UI is running on ' + location + '.');
-    });
+      });
   }
 });

@@ -11,23 +11,23 @@ let dirs = utils.dirs();
 let TradeBatcher = require(dirs.budfox + 'tradeBatcher');
 
 let trades_tid_1 = [
-  {tid: 1, price: 10, amount: 1, date: 1466115793},
-  {tid: 2, price: 10, amount: 1, date: 1466115794},
-  {tid: 3, price: 10, amount: 1, date: 1466115795}
+  { tid: 1, price: 10, amount: 1, date: 1466115793 },
+  { tid: 2, price: 10, amount: 1, date: 1466115794 },
+  { tid: 3, price: 10, amount: 1, date: 1466115795 },
 ];
 
 let trades_tid_2 = [
-  {tid: 2, price: 10, amount: 1, date: 1466115794},
-  {tid: 3, price: 10, amount: 1, date: 1466115795},
-  {tid: 4, price: 10, amount: 1, date: 1466115796},
-  {tid: 5, price: 10, amount: 1, date: 1466115797}
+  { tid: 2, price: 10, amount: 1, date: 1466115794 },
+  { tid: 3, price: 10, amount: 1, date: 1466115795 },
+  { tid: 4, price: 10, amount: 1, date: 1466115796 },
+  { tid: 5, price: 10, amount: 1, date: 1466115797 },
 ];
 
 let empty_trades = [
-  {tid: 2, price: 10, amount: 0, date: 1466115794},
-  {tid: 3, price: 10, amount: 0, date: 1466115795},
-  {tid: 4, price: 10, amount: 0, date: 1466115796},
-  {tid: 5, price: 10, amount: 0, date: 1466115797}
+  { tid: 2, price: 10, amount: 0, date: 1466115794 },
+  { tid: 3, price: 10, amount: 0, date: 1466115795 },
+  { tid: 4, price: 10, amount: 0, date: 1466115796 },
+  { tid: 5, price: 10, amount: 0, date: 1466115797 },
 ];
 
 describe('budfox/tradeBatcher', function() {
@@ -35,7 +35,7 @@ describe('budfox/tradeBatcher', function() {
 
   it('should throw when not passed a number', function() {
     expect(function() {
-      new TradeBatcher()
+      new TradeBatcher();
     }).to.throw('tid is not a string');
   });
 
@@ -46,7 +46,7 @@ describe('budfox/tradeBatcher', function() {
   it('should throw when not fed an array', function() {
     let trade = _.first(trades_tid_1);
     expect(
-      tb.write.bind(tb, trade)
+      tb.write.bind(tb, trade),
     ).to.throw('batch is not an array');
   });
 
@@ -55,7 +55,7 @@ describe('budfox/tradeBatcher', function() {
 
     let spy = sinon.spy();
     tb.on('new batch', spy);
-    tb.write( trades_tid_1 );
+    tb.write(trades_tid_1);
     expect(spy.callCount).to.equal(1);
   });
 
@@ -64,8 +64,8 @@ describe('budfox/tradeBatcher', function() {
 
     let spy = sinon.spy();
     tb.on('new batch', spy);
-    tb.write( trades_tid_1 );
-    tb.write( trades_tid_1 );
+    tb.write(trades_tid_1);
+    tb.write(trades_tid_1);
     expect(spy.callCount).to.equal(1);
   });
 
@@ -75,7 +75,7 @@ describe('budfox/tradeBatcher', function() {
     let spy = sinon.spy();
     tb.on('new batch', spy);
 
-    tb.write( trades_tid_1 );
+    tb.write(trades_tid_1);
 
     let transformedTrades = _.map(_.cloneDeep(trades_tid_1), function(trade) {
       trade.date = moment.unix(trade.date).utc();
@@ -88,7 +88,7 @@ describe('budfox/tradeBatcher', function() {
       start: _.first(transformedTrades).date,
       end: _.last(transformedTrades).date,
       first: _.first(transformedTrades),
-      last: _.last(transformedTrades)
+      last: _.last(transformedTrades),
     };
 
     let tbResult = _.first(_.first(spy.args));
@@ -110,8 +110,8 @@ describe('budfox/tradeBatcher', function() {
     let spy = sinon.spy();
     tb.on('new batch', spy);
 
-    tb.write( trades_tid_1 );
-    tb.write( trades_tid_2 );
+    tb.write(trades_tid_1);
+    tb.write(trades_tid_2);
 
     expect(spy.callCount).to.equal(2);
 

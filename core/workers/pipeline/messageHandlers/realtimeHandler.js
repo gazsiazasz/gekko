@@ -6,19 +6,17 @@ module.exports = cb => {
   return {
     message: message => {
 
-      if(message.type === 'error') {
+      if (message.type === 'error') {
         cb(message.error);
-      }
-
-      else
+      } else
         cb(null, message);
 
     },
     exit: status => {
-      if(status !== 0)
+      if (status !== 0)
         cb('Child process has died.');
       else
         cb(null, { done: true });
-    }
-  }
+    },
+  };
 };

@@ -40,10 +40,10 @@ class LimitOrder extends BaseOrder {
     this.price = this.api.roundPrice(price);
 
     // note: this assumes ticker data to be up to date
-    if(this.postOnly) {
-      if(side === 'buy' && this.price > this.data.ticker.ask)
+    if (this.postOnly) {
+      if (side === 'buy' && this.price > this.data.ticker.ask)
         throw new Error('Order crosses the book');
-      else if(side === 'sell' && this.price < this.data.ticker.bid)
+      else if (side === 'sell' && this.price < this.data.ticker.bid)
         throw new Error('Order crosses the book');
     }
 
@@ -51,12 +51,12 @@ class LimitOrder extends BaseOrder {
       side: this.side,
       amount: this.api.roundAmount(this.amount - alreadyFilled),
       price: this.price,
-      alreadyFilled: this.filled
+      alreadyFilled: this.filled,
     });
   }
 
   handleCreate(err, id) {
-    if(err)
+    if (err)
       throw err;
 
     this.status = states.OPEN;
@@ -64,16 +64,16 @@ class LimitOrder extends BaseOrder {
 
     this.id = id;
 
-    if(this.cancelling)
+    if (this.cancelling)
       return this.cancel();
 
-    if(this.movingAmount)
+    if (this.movingAmount)
       return this.moveAmount();
 
-    if(this.movingPrice)
+    if (this.movingPrice)
       return this.movePrice();
 
-    this.timeout = setTimeout(this.checkOrder, this.checkInterval)
+    this.timeout = setTimeout(this.checkOrder, this.checkInterval);
   }
 
   checkOrder() {
@@ -82,36 +82,36 @@ class LimitOrder extends BaseOrder {
   }
 
   handleCheck(err, result) {
-    if(this.cancelling || this.status === states.CANCELLED)
+    if (this.cancelling || this.status === states.CANCELLED)
       return;
 
     this.checking = false;
 
-    if(err)
+    if (err)
       throw err;
 
-    if(result.open) {
-      if(result.filledAmount !== this.filledAmount) {
+    if (result.open) {
+      if (result.filledAmount !== this.filledAmount) {
         this.filledAmount = result.filledAmount;
 
         // note: doc event API
         this.emit('fill', this.filledAmount);
       }
 
-      if(this.cancelling)
+      if (this.cancelling)
         return this.cancel();
 
-      if(this.movingAmount)
+      if (this.movingAmount)
         return this.moveAmount();
 
-      if(this.movingPrice)
+      if (this.movingPrice)
         return this.movePrice();
 
       this.timeout = setTimeout(this.checkOrder, this.checkInterval);
       return;
     }
 
-    if(!result.executed) {
+    if (!result.executed) {
       // not open and not executed means it never hit the book
       this.rejected();
       return;
@@ -121,17 +121,17 @@ class LimitOrder extends BaseOrder {
   }
 
   movePrice(price) {
-    if(this.completed)
+    if (this.completed)
       return;
 
-    if(!price)
+    if (!price)
       price = this.movePriceTo;
 
-    if(this.price === this.api.roundPrice(price))
+    if (this.price === this.api.roundPrice(price))
       // effectively nothing changed
       return;
 
-    if(
+    if (
       this.status === states.SUBMITTED ||
       this.status === states.MOVING ||
       this.checking
@@ -150,33 +150,33 @@ class LimitOrder extends BaseOrder {
     this.status = states.MOVING;
 
     this.api.cancelOrder(this.id, (err, filled) => {
-      if(err)
+      if (err)
         throw err;
 
-      if(filled)
+      if (filled)
         return this.filled(this.price);
 
       this.submit({
         side: this.side,
         amount: this.amount,
         price: this.price,
-        alreadyFilled: this.filled
+        alreadyFilled: this.filled,
       });
     });
   }
 
   moveAmount(amount) {
-    if(this.completed)
+    if (this.completed)
       return;
 
-    if(!amount)
+    if (!amount)
       amount = this.moveAmountTo;
 
-    if(this.amount === this.api.roundAmount(amount))
+    if (this.amount === this.api.roundAmount(amount))
       // effectively nothing changed
       return;
 
-    if(
+    if (
       this.status === states.SUBMITTED ||
       this.status === states.MOVING ||
       this.checking
@@ -195,26 +195,26 @@ class LimitOrder extends BaseOrder {
     this.emitStatus();
 
     this.api.cancelOrder(this.id, (err, filled) => {
-      if(err)
+      if (err)
         throw err;
 
-      if(filled)
+      if (filled)
         return this.filled(this.price);
 
       this.submit({
         side: this.side,
         amount: this.amount,
         price: this.price,
-        alreadyFilled: this.filled
+        alreadyFilled: this.filled,
       });
     });
   }
 
   cancel() {
-    if(this.completed)
+    if (this.completed)
       return;
 
-    if(
+    if (
       this.status === states.SUBMITTED ||
       this.status === states.MOVING ||
       this.checking
@@ -226,12 +226,12 @@ class LimitOrder extends BaseOrder {
     clearTimeout(this.timeout);
 
     this.api.cancelOrder(this.id, (err, filled) => {
-      if(err)
+      if (err)
         throw err;
 
       this.cancelling = false;
 
-      if(filled)
+      if (filled)
         return this.filled(this.price);
 
       this.status = states.CANCELLED;

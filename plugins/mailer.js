@@ -1,4 +1,4 @@
-let email = require("emailjs");
+let email = require('emailjs');
 let _ = require('lodash');
 let log = require('../core/log.js');
 let util = require('../core/util.js');
@@ -17,16 +17,16 @@ let Mailer = function(done) {
 
 Mailer.prototype.setup = function(done) {
   let setupMail = function(err, result) {
-    if(result) {
+    if (result) {
       console.log('Got it.');
       mailConfig.password = result.password;
     }
 
-    if(_.isEmpty(mailConfig.to))
+    if (_.isEmpty(mailConfig.to))
       mailConfig.to = mailConfig.email;
-    if(_.isEmpty(mailConfig.from))
+    if (_.isEmpty(mailConfig.from))
       mailConfig.from = mailConfig.email;
-    if(_.isEmpty(mailConfig.user) && mailConfig.smtpauth)
+    if (_.isEmpty(mailConfig.user) && mailConfig.smtpauth)
       mailConfig.user = mailConfig.email;
 
     this.server = email.server.connect({
@@ -35,25 +35,25 @@ Mailer.prototype.setup = function(done) {
       host: mailConfig.server,
       ssl: mailConfig.ssl,
       port: mailConfig.port,
-      tls: mailConfig.tls
+      tls: mailConfig.tls,
     });
 
-    if(mailConfig.sendMailOnStart) {
+    if (mailConfig.sendMailOnStart) {
       this.mail(
-        "Gekko has started",
+        'Gekko has started',
         [
-          "I've just started watching ",
+          'I\'ve just started watching ',
           config.watch.exchange,
           ' ',
           config.watch.currency,
           '/',
           config.watch.asset,
-          ". I'll let you know when I got some advice"
+          '. I\'ll let you know when I got some advice',
         ].join(''),
         _.bind(function(err) {
           this.checkResults(err);
           this.done();
-        }, this)
+        }, this),
       );
     } else
       this.done();
@@ -61,7 +61,7 @@ Mailer.prototype.setup = function(done) {
     log.debug('Setup email adviser.');
   };
 
-  if(!mailConfig.password) {
+  if (!mailConfig.password) {
     // ask for the mail password
     let prompt = require('prompt-lite');
     prompt.start();
@@ -71,10 +71,10 @@ Mailer.prototype.setup = function(done) {
       '[ http://github.com/askmike/gekko ], you can take my word but always',
       'check the code yourself.',
       '\n\n\tWARNING: If you have not downloaded Gekko from the github page above we',
-      'CANNOT guarantuee that your email address & password are safe!\n'
+      'CANNOT guarantuee that your email address & password are safe!\n',
     ].join('\n\t');
     log.warn(warning);
-    prompt.get({name: 'password', hidden: true}, _.bind(setupMail, this));
+    prompt.get({ name: 'password', hidden: true }, _.bind(setupMail, this));
   } else {
     setupMail.call(this);
   }
@@ -86,7 +86,7 @@ Mailer.prototype.mail = function(subject, content, done) {
     text: content,
     from: mailConfig.from,
     to: mailConfig.to,
-    subject: mailConfig.tag + subject
+    subject: mailConfig.tag + subject,
   }, done || this.checkResults);
 };
 
@@ -98,7 +98,7 @@ Mailer.prototype.processCandle = function(candle, done) {
 
 Mailer.prototype.processAdvice = function(advice) {
 
-  if (advice.recommendation === "soft" && mailConfig.muteSoft) return;
+  if (advice.recommendation === 'soft' && mailConfig.muteSoft) return;
 
   let text = [
     'Gekko is watching ',
@@ -110,7 +110,7 @@ Mailer.prototype.processAdvice = function(advice) {
     ' price is ',
     config.watch.currency,
     ' ',
-    this.price
+    this.price,
   ].join('');
 
   let subject = 'New advice: go ' + advice.recommendation;
@@ -122,14 +122,14 @@ Mailer.prototype.processStratNotification = function({ content }) {
   let subject = `New notification from ${config.tradingAdvisor.method}`;
   let text = [
     'Gekko received new notification :\n\n',
-    content
+    content,
   ].join('');
 
   this.mail(subject, text);
 };
 
 Mailer.prototype.checkResults = function(err) {
-  if(err)
+  if (err)
     log.warn('error sending email', err);
   else
     log.info('Send advice via email.');

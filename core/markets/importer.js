@@ -12,18 +12,18 @@ let daterange = config.importer.daterange;
 let from = moment.utc(daterange.from);
 
 let to = (daterange.to) ? moment.utc(daterange.to) : moment().utc();
-if(!daterange.to) {
+if (!daterange.to) {
   log.debug(
     'No end date specified for importing, setting to',
-    to.format()
+    to.format(),
   );
 }
 log.debug(to.format());
 
-if(!from.isValid())
+if (!from.isValid())
   util.die('invalid `from`');
 
-if(!to.isValid())
+if (!to.isValid())
   util.die('invalid `to`');
 
 let TradeBatcher = require(dirs.budfox + 'tradeBatcher');
@@ -31,12 +31,12 @@ let CandleManager = require(dirs.budfox + 'candleManager');
 let exchangeChecker = require(dirs.gekko + 'exchange/exchangeChecker');
 
 let error = exchangeChecker.cantFetchFullHistory(config.watch);
-if(error)
+if (error)
   util.die(error, true);
 
 let fetcher = require(dirs.importers + config.watch.exchange);
 
-if(to <= from)
+if (to <= from)
   util.die('This daterange does not make sense.');
 
 let Market = function() {
@@ -47,41 +47,41 @@ let Market = function() {
   this.candleManager = new CandleManager;
   this.fetcher = fetcher({
     to: to,
-    from: from
+    from: from,
   });
 
   this.done = false;
 
   this.fetcher.bus.on(
     'trades',
-    this.processTrades
+    this.processTrades,
   );
 
   this.fetcher.bus.on(
     'done',
     function() {
       this.done = true;
-    }.bind(this)
+    }.bind(this),
   );
 
   this.tradeBatcher.on(
     'new batch',
-    this.candleManager.processTrades
+    this.candleManager.processTrades,
   );
 
   this.candleManager.on(
     'candles',
-    this.pushCandles
+    this.pushCandles,
   );
 
-  Readable.call(this, {objectMode: true});
+  Readable.call(this, { objectMode: true });
 
   this.get();
 };
 
 let Readable = require('stream').Readable;
 Market.prototype = Object.create(Readable.prototype, {
-  constructor: { value: Market }
+  constructor: { value: Market },
 });
 
 Market.prototype._read = _.noop;
@@ -97,16 +97,16 @@ Market.prototype.get = function() {
 Market.prototype.processTrades = function(trades) {
   this.tradeBatcher.write(trades);
 
-  if(this.done) {
+  if (this.done) {
     log.info('Done importing!');
     this.emit('end');
     return;
   }
 
-  if(_.size(trades) && gekkoEnv === 'child-process') {
+  if (_.size(trades) && gekkoEnv === 'child-process') {
     let lastAtTS = _.last(trades).date;
     let lastAt = moment.unix(lastAtTS).utc().format();
-    process.send({event: 'marketUpdate', payload: lastAt});
+    process.send({ event: 'marketUpdate', payload: lastAt });
   }
 
   setTimeout(this.get, 1000);

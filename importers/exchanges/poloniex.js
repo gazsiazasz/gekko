@@ -14,18 +14,18 @@ let batchSize = 60 * 2; // 2 hour
 let overlapSize = 10; // 10 minutes
 
 // Helper methods
-function joinCurrencies(currencyA, currencyB){
-    return currencyA + '_' + currencyB;
+function joinCurrencies(currencyA, currencyB) {
+  return currencyA + '_' + currencyB;
 }
 
 // patch getTrades..
 Fetcher.prototype.getTrades = function(range, callback) {
   let handle = (err, result) => {
-    if(err) {
+    if (err) {
       return callback(err);
     }
 
-    if(_.size(result) === 50000) {
+    if (_.size(result) === 50000) {
       // to many trades..
       util.die('too many trades..');
     }
@@ -35,7 +35,7 @@ Fetcher.prototype.getTrades = function(range, callback) {
         tid: trade.tradeID,
         amount: +trade.amount,
         date: moment.utc(trade.date).format('X'),
-        price: +trade.rate
+        price: +trade.rate,
       };
     });
 
@@ -43,7 +43,7 @@ Fetcher.prototype.getTrades = function(range, callback) {
   };
 
   let params = {
-    currencyPair: joinCurrencies(this.currency, this.asset)
+    currencyPair: joinCurrencies(this.currency, this.asset),
   };
 
   params.start = range.from.unix();
@@ -68,15 +68,15 @@ let fetch = () => {
     'Requesting data from',
     iterator.from.format('YYYY-MM-DD HH:mm:ss') + ',',
     'to',
-    iterator.to.format('YYYY-MM-DD HH:mm:ss')
+    iterator.to.format('YYYY-MM-DD HH:mm:ss'),
   );
 
-  if(util.gekkoEnv === 'child-process') {
+  if (util.gekkoEnv === 'child-process') {
     let msg = ['Requesting data from',
       iterator.from.format('YYYY-MM-DD HH:mm:ss') + ',',
       'to',
       iterator.to.format('YYYY-MM-DD HH:mm:ss')].join('');
-    process.send({type: 'log', log: msg});
+    process.send({ type: 'log', log: msg });
   }
   fetcher.getTrades(iterator, handleFetch);
 };
@@ -85,9 +85,9 @@ let handleFetch = trades => {
   iterator.from.add(batchSize, 'minutes').subtract(overlapSize, 'minutes');
   iterator.to.add(batchSize, 'minutes').subtract(overlapSize, 'minutes');
 
-  if(!_.size(trades)) {
+  if (!_.size(trades)) {
     // fix https://github.com/askmike/gekko/issues/952
-    if(iterator.to.clone().add(batchSize * 4, 'minutes') > end) {
+    if (iterator.to.clone().add(batchSize * 4, 'minutes') > end) {
       fetcher.emit('done');
     }
 
@@ -96,28 +96,28 @@ let handleFetch = trades => {
 
   let last = moment.unix(_.last(trades).date);
 
-  if(last > end) {
+  if (last > end) {
     fetcher.emit('done');
 
     let endUnix = end.unix();
     trades = _.filter(
       trades,
-      t => t.date <= endUnix
+      t => t.date <= endUnix,
     );
   }
 
   fetcher.emit('trades', trades);
 };
 
-module.exports = function (daterange) {
+module.exports = function(daterange) {
   iterator = {
     from: daterange.from.clone(),
-    to: daterange.from.clone().add(batchSize, 'minutes')
+    to: daterange.from.clone().add(batchSize, 'minutes'),
   };
   end = daterange.to.clone();
 
   return {
     bus: fetcher,
-    fetch: fetch
-  }
+    fetch: fetch,
+  };
 };

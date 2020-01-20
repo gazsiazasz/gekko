@@ -44,11 +44,11 @@ method.check = function(candle) {
   let result = this.tulipIndicators.mymacd.result;
   let macddiff = result['macd'] - result['macdSignal'];
 
-  if(this.settings.thresholds.down > macddiff && this.trend !== 'short') {
+  if (this.settings.thresholds.down > macddiff && this.trend !== 'short') {
     this.trend = 'short';
     this.advice('short');
 
-  } else if(this.settings.thresholds.up < macddiff && this.trend !== 'long'){
+  } else if (this.settings.thresholds.up < macddiff && this.trend !== 'long') {
     this.trend = 'long';
     this.advice('long');
 

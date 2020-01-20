@@ -7,7 +7,11 @@ let adviceLoggerConfig = config.adviceLogger;
 
 let Actor = function() {
   this.price = 'N/A';
-  this.marketTime = {format: function() {return 'N/A'}};
+  this.marketTime = {
+    format: function() {
+      return 'N/A';
+    },
+  };
   _.bindAll(this);
 };
 
@@ -25,7 +29,7 @@ Actor.prototype.processAdvice = function(advice) {
   log.info('\t Position:', advice.recommendation);
   log.info('\t Market price:', this.price);
   log.info('\t Based on market time:', this.marketTime.format('YYYY-MM-DD HH:mm:ss'));
-  console.log()
+  console.log();
 };
 
 Actor.prototype.finalize = function(advice, done) {

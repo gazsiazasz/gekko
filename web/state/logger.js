@@ -14,25 +14,25 @@ let Logger = function(id) {
 };
 
 Logger.prototype.write = function(line) {
-  if(!this.writing) {
+  if (!this.writing) {
     this.writing = true;
     fs.appendFile(
       BASEPATH + this.fileName,
       line + '\n',
-      this.handleWriteCallback
+      this.handleWriteCallback,
     );
   } else
     this.queue.push(line);
 };
 
 Logger.prototype.handleWriteCallback = function(err) {
-  if(err)
+  if (err)
     console.error(`ERROR WRITING LOG FILE ${this.fileName}:`, err);
 
   this.writing = false;
 
-  if(_.size(this.queue))
-    this.write(this.queue.shift())
+  if (_.size(this.queue))
+    this.write(this.queue.shift());
 };
 
 module.exports = Logger;

@@ -31,11 +31,11 @@ CandleUploader.prototype.rawUpload = function(candles, count, next) {
     data: {
       apiKey: config.candleUploader.apiKey,
       watch: config.watch,
-      candles: candles
-    }
+      candles: candles,
+    },
   })
     .then(r => {
-      if(r.data.success === false) {
+      if (r.data.success === false) {
         console.log('error uploading:', r.data);
       }
       console.log(new Date, 'uploaded', amount, 'candles');
@@ -47,7 +47,7 @@ CandleUploader.prototype.rawUpload = function(candles, count, next) {
 
       count++;
 
-      if(count > 10) {
+      if (count > 10) {
         console.log('FINAL error uploading:', e.message);
         return next();
       }
@@ -58,7 +58,7 @@ CandleUploader.prototype.rawUpload = function(candles, count, next) {
 
 CandleUploader.prototype.upload = function() {
   let amount = this.candles.length;
-  if(!amount) {
+  if (!amount) {
     return this.schedule();
   }
 

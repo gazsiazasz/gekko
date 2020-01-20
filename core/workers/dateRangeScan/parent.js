@@ -15,7 +15,7 @@ module.exports = function(config, done) {
     return done(false, ranges);
   });
   task.on('exit', code => {
-    if(code !== 0)
+    if (code !== 0)
       done('ERROR, unable to scan dateranges, please check the console.');
   });
 };

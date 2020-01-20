@@ -16,30 +16,30 @@ let silent = config.silent;
 
 let sendToParent = function() {
   let send = method => (...args) => {
-    process.send({log: method, message: args.join(' ')});
+    process.send({ log: method, message: args.join(' ') });
   };
 
   return {
     error: send('error'),
     warn: send('warn'),
     info: send('info'),
-    write: send('write')
-  }
+    write: send('write'),
+  };
 };
 
 let Log = function() {
   _.bindAll(this);
   this.env = util.gekkoEnv();
 
-  if(this.env === 'standalone')
+  if (this.env === 'standalone')
     this.output = console;
-  else if(this.env === 'child-process')
+  else if (this.env === 'child-process')
     this.output = sendToParent();
 };
 
 Log.prototype = {
   _write: function(method, args, name) {
-    if(!name)
+    if (!name)
       name = method.toUpperCase();
 
     let message = moment().format('YYYY-MM-DD HH:mm:ss');
@@ -61,17 +61,17 @@ Log.prototype = {
     let args = _.toArray(arguments);
     let message = fmt.apply(null, args);
     this.output.info(message);
-  }
+  },
 };
 
-if(debug)
+if (debug)
   Log.prototype.debug = function() {
     this._write('info', arguments, 'DEBUG');
   };
 else
   Log.prototype.debug = _.noop;
 
-if(silent) {
+if (silent) {
   Log.prototype.debug = _.noop;
   Log.prototype.info = _.noop;
   Log.prototype.warn = _.noop;

@@ -10,19 +10,19 @@ let Actor = function() {
   this.commands = [{
     'handler': 'advice',
     'callback': this.sayAdvice,
-    'description': "Advice on what position to take, depending on the current trend"
+    'description': 'Advice on what position to take, depending on the current trend',
   }, {
     'handler': 'price',
     'callback': this.sayPrice,
-    'description': "The current price of the asset in the configured currency"
+    'description': 'The current price of the asset in the configured currency',
   }, {
     'handler': 'donate',
     'callback': this.sayDonate,
-    'description': "Where to send all of that extra coin that's weighing you down"
+    'description': 'Where to send all of that extra coin that\'s weighing you down',
   }, {
     'handler': 'help',
     'callback': this.sayHelp,
-    'description': "You are here"
+    'description': 'You are here',
   }];
 
   this.advice = null;
@@ -57,9 +57,9 @@ Actor.prototype = {
     let message;
 
     if (this.advice !== null) {
-      message = ["We think you should", this.advice + ".", "(" + this.adviceTime.fromNow() + ")"];
+      message = ['We think you should', this.advice + '.', '(' + this.adviceTime.fromNow() + ')'];
     } else {
-      message = ["We don't have any advice for you quite yet."];
+      message = ['We don\'t have any advice for you quite yet.'];
     }
 
     this.room.speak(message.join(' '));
@@ -69,20 +69,20 @@ Actor.prototype = {
     let message;
 
     if (this.price !== null) {
-      message = ["The price at the moment is", this.price + ".", "(" + this.priceTime.fromNow() + ")"];
+      message = ['The price at the moment is', this.price + '.', '(' + this.priceTime.fromNow() + ')'];
     } else {
-      message = ["We don't know the price right now."];
+      message = ['We don\'t know the price right now.'];
     }
 
     this.room.speak(message.join(' '));
   },
 
   sayDonate: function() {
-    this.room.speak("If you'd like to donate a few coins, you can send them here: 13r1jyivitShUiv9FJvjLH7Nh1ZZptumwW");
+    this.room.speak('If you\'d like to donate a few coins, you can send them here: 13r1jyivitShUiv9FJvjLH7Nh1ZZptumwW');
   },
 
   sayHelp: function() {
-    this.room.speak("I listen for the following inquiries...", this.pasteDescriptions);
+    this.room.speak('I listen for the following inquiries...', this.pasteDescriptions);
   },
 
   pasteDescriptions: function() {
@@ -115,18 +115,18 @@ Actor.prototype = {
 
   textHasCommandForBot: function(text, nickname, handler) {
     let normalizedText = text.toLowerCase(),
-        normalizedNickname = nickname.toLowerCase(),
-        normalizedHandler = handler.toLowerCase();
+      normalizedNickname = nickname.toLowerCase(),
+      normalizedHandler = handler.toLowerCase();
 
     let nicknameWasMentioned = normalizedText.indexOf(normalizedNickname) >= 0,
-        handlerWasMentioned = normalizedText.indexOf(normalizedHandler) >= 0;
+      handlerWasMentioned = normalizedText.indexOf(normalizedHandler) >= 0;
 
     return nicknameWasMentioned && handlerWasMentioned;
   },
 
   whoAmI: function(user) {
     this.user = user;
-  }
+  },
 };
 
 module.exports = Actor;

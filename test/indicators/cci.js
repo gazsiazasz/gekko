@@ -31,29 +31,29 @@ describe('indicators/CCI', function() {
 
   it('should correctly calculate CCI with period 8', function() {
     let cci = new CCI({ history: 8, constant: 0.015 });
-	_.each(close,function(p,i) {
-      cci.update({high: high[i], low: low[i] , close: close[i]});
-	  //when i<history, cci.results returns false
-	  if (typeof(cci.result) == 'boolean') cci.result = 0;
-	  expect(cci.result.toFixed(6)).to.equal(verified_cci8results[i].toFixed(6));
-	});
+    _.each(close, function(p, i) {
+      cci.update({ high: high[i], low: low[i], close: close[i] });
+      //when i<history, cci.results returns false
+      if (typeof (cci.result) == 'boolean') cci.result = 0;
+      expect(cci.result.toFixed(6)).to.equal(verified_cci8results[i].toFixed(6));
+    });
   });
 
   it('should correctly calculate CCI with period 10', function() {
-     let cci = new CCI({ history: 10, constant: 0.015 });
-	_.each(close,function(p,i) {
-      cci.update({high: high[i], low: low[i] , close: close[i]});
-	  if (typeof(cci.result) == 'boolean') cci.result = 0;
-	  expect(cci.result.toFixed(6)).to.equal(verified_cci10results[i].toFixed(6));
-	})
+    let cci = new CCI({ history: 10, constant: 0.015 });
+    _.each(close, function(p, i) {
+      cci.update({ high: high[i], low: low[i], close: close[i] });
+      if (typeof (cci.result) == 'boolean') cci.result = 0;
+      expect(cci.result.toFixed(6)).to.equal(verified_cci10results[i].toFixed(6));
+    });
   });
 
   it('should correctly calculate CCI with period 12', function() {
-     let cci = new CCI({ history: 12, constant: 0.015 });
-	_.each(close,function(p,i) {
-      cci.update({high: high[i], low: low[i] , close: close[i]});
-	  if (typeof(cci.result) == 'boolean') cci.result = 0;
-	  expect(cci.result.toFixed(6)).to.equal(verified_cci12results[i].toFixed(6));
-	})
+    let cci = new CCI({ history: 12, constant: 0.015 });
+    _.each(close, function(p, i) {
+      cci.update({ high: high[i], low: low[i], close: close[i] });
+      if (typeof (cci.result) == 'boolean') cci.result = 0;
+      expect(cci.result.toFixed(6)).to.equal(verified_cci12results[i].toFixed(6));
+    });
   });
 });

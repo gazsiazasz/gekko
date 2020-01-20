@@ -25,10 +25,10 @@ Reader.prototype.mostRecentWindow = function(from, to, next) {
     WHERE start <= ${to} AND start >= ${from}
     ORDER BY start DESC
   `, function(err, rows) {
-    if(err) {
+    if (err) {
 
       // bail out if the table does not exist
-      if(err.message.split(':')[1] === ' no such table')
+      if (err.message.split(':')[1] === ' no such table')
         return next(false);
 
       log.error(err);
@@ -36,17 +36,15 @@ Reader.prototype.mostRecentWindow = function(from, to, next) {
     }
 
     // no candles are available
-    if(rows.length === 0) {
+    if (rows.length === 0) {
       return next(false);
     }
 
-    if(rows.length === maxAmount) {
-
+    if (rows.length === maxAmount) {
       // full history is available!
-
       return next({
         from: from,
-        to: to
+        to: to,
       });
     }
 
@@ -59,22 +57,22 @@ Reader.prototype.mostRecentWindow = function(from, to, next) {
 
     // if there was no gap in the records, but
     // there were not enough records.
-    if(gapIndex === -1) {
+    if (gapIndex === -1) {
       let leastRecent = _.last(rows).start;
       return next({
         from: leastRecent,
-        to: mostRecent
+        to: mostRecent,
       });
     }
 
     // else return mostRecent and the
     // the minute before the gap
     return next({
-      from: rows[ gapIndex - 1 ].start,
-      to: mostRecent
+      from: rows[gapIndex - 1].start,
+      to: mostRecent,
     });
 
-  })
+  });
 };
 
 Reader.prototype.tableExists = function(name, next) {
@@ -82,7 +80,7 @@ Reader.prototype.tableExists = function(name, next) {
   this.db.all(`
     SELECT name FROM sqlite_master WHERE type='table' AND name='${sqliteUtil.table(name)}';
   `, function(err, rows) {
-    if(err) {
+    if (err) {
       console.error(err);
       return util.die('DB error at `get`');
     }
@@ -92,7 +90,7 @@ Reader.prototype.tableExists = function(name, next) {
 };
 
 Reader.prototype.get = function(from, to, what, next) {
-  if(what === 'full')
+  if (what === 'full')
     what = '*';
 
   this.db.all(`
@@ -100,7 +98,7 @@ Reader.prototype.get = function(from, to, what, next) {
     WHERE start <= ${to} AND start >= ${from}
     ORDER BY start ASC
   `, function(err, rows) {
-    if(err) {
+    if (err) {
       console.error(err);
       return util.die('DB error at `get`');
     }
@@ -114,7 +112,7 @@ Reader.prototype.count = function(from, to, next) {
     SELECT COUNT(*) as count from ${sqliteUtil.table('candles')}
     WHERE start <= ${to} AND start >= ${from}
   `, function(err, res) {
-    if(err) {
+    if (err) {
       console.error(err);
       return util.die('DB error at `get`');
     }
@@ -127,7 +125,7 @@ Reader.prototype.countTotal = function(next) {
   this.db.all(`
     SELECT COUNT(*) as count from ${sqliteUtil.table('candles')}
   `, function(err, res) {
-    if(err) {
+    if (err) {
       console.error(err);
       return util.die('DB error at `get`');
     }
@@ -152,7 +150,7 @@ Reader.prototype.getBoundry = function(next) {
       LIMIT 1
     ) as 'last'
   `, function(err, rows) {
-    if(err) {
+    if (err) {
       console.error(err);
       return util.die('DB error at `get`');
     }

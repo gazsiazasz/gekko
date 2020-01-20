@@ -9,11 +9,11 @@ let config = util.getConfig();
 let slug = config.watch.exchange.toLowerCase();
 let exchange = exchangeChecker.getExchangeCapabilities(slug);
 
-if(!exchange)
+if (!exchange)
   util.die(`Unsupported exchange: ${slug}`);
 
 let error = exchangeChecker.cantMonitor(config.watch);
-if(error)
+if (error)
   util.die(error, true);
 
 module.exports = require(dirs.budfox + 'budfox');

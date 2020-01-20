@@ -13,13 +13,13 @@ let util = require(__dirname + '/../util');
 let dirs = util.dirs();
 
 let Heart = require(dirs.budfox + 'heart');
-let MarketDataProvider =  require(dirs.budfox + 'marketDataProvider');
+let MarketDataProvider = require(dirs.budfox + 'marketDataProvider');
 let CandleManager = require(dirs.budfox + 'candleManager');
 
 let BudFox = function(config) {
   _.bindAll(this);
 
-  Readable.call(this, {objectMode: true});
+  Readable.call(this, { objectMode: true });
 
   // BudFox internal modules:
 
@@ -32,31 +32,31 @@ let BudFox = function(config) {
   // relay a marketUpdate event
   this.marketDataProvider.on(
     'marketUpdate',
-    e => this.emit('marketUpdate', e)
+    e => this.emit('marketUpdate', e),
   );
 
   // relay a marketStart event
   this.marketDataProvider.on(
     'marketStart',
-    e => this.emit('marketStart', e)
+    e => this.emit('marketStart', e),
   );
 
   // Output the candles
   this.candleManager.on(
     'candles',
-    this.pushCandles
+    this.pushCandles,
   );
 
   // on every `tick` retrieve trade data
   this.heart.on(
     'tick',
-    this.marketDataProvider.retrieve
+    this.marketDataProvider.retrieve,
   );
 
   // on new trade data create candles
   this.marketDataProvider.on(
     'trades',
-    this.candleManager.processTrades
+    this.candleManager.processTrades,
   );
 
   this.heart.pump();
@@ -65,10 +65,11 @@ let BudFox = function(config) {
 let Readable = require('stream').Readable;
 
 BudFox.prototype = Object.create(Readable.prototype, {
-  constructor: { value: BudFox }
+  constructor: { value: BudFox },
 });
 
-BudFox.prototype._read = function noop() {};
+BudFox.prototype._read = function noop() {
+};
 
 BudFox.prototype.pushCandles = function(candles) {
   _.each(candles, this.push);

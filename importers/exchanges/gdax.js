@@ -25,15 +25,18 @@ Fetcher.prototype.getTrades = function(sinceTid, callback) {
       return {
         tid: trade.trade_id,
         amount: parseFloat(trade.size),
-        date: moment.utc(trade.time).format("X"),
-        price: parseFloat(trade.price)
+        date: moment.utc(trade.time).format('X'),
+        price: parseFloat(trade.price),
       };
     });
 
     callback(null, result.reverse());
   };
 
-  let fetch = cb => this.gdax_public.getProductTrades(this.pair, { after: sinceTid, limit: BATCH_SIZE }, this.processResponse('getTrades', cb));
+  let fetch = cb => this.gdax_public.getProductTrades(this.pair, {
+    after: sinceTid,
+    limit: BATCH_SIZE,
+  }, this.processResponse('getTrades', cb));
   retry(null, fetch, handle);
 };
 
@@ -64,7 +67,10 @@ Fetcher.prototype.findFirstTrade = function(sinceTs, callback) {
     }
 
     setTimeout(() => {
-      let fetch = cb => this.gdax_public.getProductTrades(this.pair, { after: nextScanId, limit: 1 }, this.processResponse('getTrades', cb));
+      let fetch = cb => this.gdax_public.getProductTrades(this.pair, {
+        after: nextScanId,
+        limit: 1,
+      }, this.processResponse('getTrades', cb));
       retry(null, fetch, handle);
     }, QUERY_DELAY);
   };
@@ -93,7 +99,7 @@ let retryForever = {
   forever: true,
   factor: 1.2,
   minTimeout: 10 * 1000,
-  maxTimeout: 120 * 1000
+  maxTimeout: 120 * 1000,
 };
 
 let fetch = () => {
@@ -156,13 +162,13 @@ let handleFetch = (err, trades) => {
   batch = [];
 };
 
-module.exports = function (daterange) {
+module.exports = function(daterange) {
 
   from = daterange.from.utc().clone();
   end = daterange.to.utc().clone();
 
   return {
     bus: fetcher,
-    fetch: fetch
-  }
+    fetch: fetch,
+  };
 };

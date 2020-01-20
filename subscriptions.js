@@ -7,107 +7,107 @@ let subscriptions = [
   {
     emitter: 'market',
     event: 'candle',
-    handler: 'processCandle'
+    handler: 'processCandle',
   },
   {
     emitter: 'market',
     event: 'marketUpdate',
-    handler: 'processMarketUpdate'
+    handler: 'processMarketUpdate',
   },
   {
     emitter: 'market',
     event: 'marketStart',
-    handler: 'processMarketStart'
+    handler: 'processMarketStart',
   },
   {
     emitter: 'tradingAdvisor',
     event: 'stratWarmupCompleted',
-    handler: 'processStratWarmupCompleted'
+    handler: 'processStratWarmupCompleted',
   },
   {
     emitter: 'tradingAdvisor',
     event: 'advice',
-    handler: 'processAdvice'
+    handler: 'processAdvice',
   },
   {
     emitter: 'tradingAdvisor',
     event: 'stratCandle',
-    handler: 'processStratCandle'
+    handler: 'processStratCandle',
   },
   {
     emitter: 'tradingAdvisor',
     event: 'stratUpdate',
-    handler: 'processStratUpdate'
+    handler: 'processStratUpdate',
   },
   {
     emitter: 'tradingAdvisor',
     event: 'stratNotification',
-    handler: 'processStratNotification'
+    handler: 'processStratNotification',
   },
   {
     emitter: ['trader', 'paperTrader'],
     event: 'tradeInitiated',
-    handler: 'processTradeInitiated'
+    handler: 'processTradeInitiated',
   },
   {
     emitter: ['trader', 'paperTrader'],
     event: 'tradeAborted',
-    handler: 'processTradeAborted'
+    handler: 'processTradeAborted',
   },
   {
     emitter: ['trader', 'paperTrader'],
     event: 'tradeCompleted',
-    handler: 'processTradeCompleted'
+    handler: 'processTradeCompleted',
   },
   {
     emitter: 'trader',
     event: 'tradeCancelled',
-    handler: 'processTradeCancelled'
+    handler: 'processTradeCancelled',
   },
   {
     emitter: 'trader',
     event: 'tradeErrored',
-    handler: 'processTradeErrored'
+    handler: 'processTradeErrored',
   },
   {
     emitter: ['trader', 'paperTrader'],
     event: 'portfolioChange',
-    handler: 'processPortfolioChange'
+    handler: 'processPortfolioChange',
   },
   {
     emitter: ['trader', 'paperTrader'],
     event: 'triggerCreated',
-    handler: 'processTriggerCreated'
+    handler: 'processTriggerCreated',
   },
   {
     emitter: ['trader', 'paperTrader'],
     event: 'triggerAborted',
-    handler: 'processTriggerAborted'
+    handler: 'processTriggerAborted',
   },
   {
     emitter: ['trader', 'paperTrader'],
     event: 'triggerFired',
-    handler: 'processTriggerFired'
+    handler: 'processTriggerFired',
   },
   {
     emitter: ['trader', 'paperTrader'],
     event: 'portfolioValueChange',
-    handler: 'processPortfolioValueChange'
+    handler: 'processPortfolioValueChange',
   },
   {
     emitter: 'performanceAnalyzer',
     event: 'performanceReport',
-    handler: 'processPerformanceReport'
+    handler: 'processPerformanceReport',
   },
   {
     emitter: 'performanceAnalyzer',
     event: 'roundtripUpdate',
-    handler: 'processRoundtripUpdate'
+    handler: 'processRoundtripUpdate',
   },
   {
     emitter: 'performanceAnalyzer',
     event: 'roundtrip',
-    handler: 'processRoundtrip'
+    handler: 'processRoundtrip',
   },
 ];
 

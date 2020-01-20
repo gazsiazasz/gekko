@@ -39,13 +39,13 @@ let Trader = function(config) {
   }
 
   this.gdax_public = new Gdax.PublicClient(
-    this.use_sandbox ? this.api_sandbox_url : undefined
+    this.use_sandbox ? this.api_sandbox_url : undefined,
   );
   this.gdax = new Gdax.AuthenticatedClient(
     this.key,
     this.secret,
     this.passphrase,
-    this.use_sandbox ? this.api_sandbox_url : undefined
+    this.use_sandbox ? this.api_sandbox_url : undefined,
   );
 };
 
@@ -64,11 +64,11 @@ let recoverableErrors = [
   'socket hang up',
   'EHOSTUNREACH',
   'EAI_AGAIN',
-  'ENETUNREACH'
+  'ENETUNREACH',
 ];
 
 let includes = (str, list) => {
-  if(!_.isString(str))
+  if (!_.isString(str))
     return false;
 
   return _.some(list, item => str.includes(item));
@@ -76,11 +76,11 @@ let includes = (str, list) => {
 
 Trader.prototype.processResponse = function(method, next) {
   return (error, response, body) => {
-    if(!error && body && !_.isEmpty(body.message)) {
+    if (!error && body && !_.isEmpty(body.message)) {
       error = new Error(body.message);
     }
 
-    if(
+    if (
       response &&
       response.statusCode < 200 &&
       response.statusCode >= 300
@@ -88,13 +88,13 @@ Trader.prototype.processResponse = function(method, next) {
       error = new Error(`Response code ${response.statusCode}`);
     }
 
-    if(error) {
-      if(includes(error.message, recoverableErrors)) {
+    if (error) {
+      if (includes(error.message, recoverableErrors)) {
         error.notFatal = true;
         error.backoffDelay = 1000;
       }
 
-      if(
+      if (
         ['buy', 'sell'].includes(method) &&
         error.message.includes('Insufficient funds')
       ) {
@@ -105,7 +105,7 @@ Trader.prototype.processResponse = function(method, next) {
     }
 
     return next(undefined, body);
-  }
+  };
 };
 
 Trader.prototype.getPortfolio = function(callback) {
@@ -165,7 +165,7 @@ Trader.prototype.buy = function(amount, price, callback) {
 
   let result = (err, data) => {
     if (err) {
-      console.log({buyParams}, err.message);
+      console.log({ buyParams }, err.message);
       return callback(err);
     }
     callback(undefined, data.id);
@@ -186,11 +186,11 @@ Trader.prototype.sell = function(amount, price, callback) {
 
   let result = (err, data) => {
     if (err) {
-      console.log({sellParams}, err.message);
+      console.log({ sellParams }, err.message);
       return callback(err);
     }
 
-    if(data.message && data.message.includes('Insufficient funds')) {
+    if (data.message && data.message.includes('Insufficient funds')) {
       err = new Error(data.message);
       err.retryOnce = true;
       return callback(err);
@@ -211,14 +211,15 @@ Trader.prototype.checkOrder = function(order, callback) {
     // @link:
     // https://stackoverflow.com/questions/48132078/available-gdax-order-statuses-and-meanings
     let status = data.status;
-    if(status === 'pending') {
+    if (status === 'pending') {
       // technically not open yet, but will be soon
       return callback(undefined, { executed: false, open: true, filledAmount: 0 });
-    } if (status === 'done' || status === 'settled') {
+    }
+    if (status === 'done' || status === 'settled') {
       return callback(undefined, { executed: true, open: false });
     } else if (status === 'rejected') {
       return callback(undefined, { executed: false, open: false });
-    } else if(status === 'open' || status === 'active') {
+    } else if (status === 'open' || status === 'active') {
       return callback(undefined, { executed: false, open: true, filledAmount: parseFloat(data.filled_size) });
     }
 
@@ -239,8 +240,8 @@ Trader.prototype.getOrder = function(order, callback) {
     let date = moment(data.done_at);
     let fees = {
       // you always pay fee in the base currency on gdax
-      [this.currency]: +data.fill_fees
-    }
+      [this.currency]: +data.fill_fees,
+    };
     let feePercent = +data.fill_fees / price / amount * 100;
 
     callback(undefined, { price, amount, date, fees, feePercent });
@@ -254,7 +255,7 @@ Trader.prototype.getOrder = function(order, callback) {
 Trader.prototype.cancelOrder = function(order, callback) {
   // callback for cancelOrder should be true if the order was already filled, otherwise false
   let result = (err, data) => {
-    if(err) {
+    if (err) {
       return callback(null, true);  // need to catch the specific error but usually an error on cancel means it was filled
     }
 
@@ -300,12 +301,12 @@ Trader.prototype.getTrades = function(since, callback, descending) {
                   after: last.trade_id - BATCH_SIZE * lastScan,
                   limit: BATCH_SIZE,
                 },
-                this.processResponse('getTrades', cb)
+                this.processResponse('getTrades', cb),
               );
             util.retry(
               retryForever,
               _.bind(handler, this),
-              _.bind(process, this)
+              _.bind(process, this),
             );
           }, QUERY_DELAY);
           lastScan++;
@@ -319,14 +320,14 @@ Trader.prototype.getTrades = function(since, callback, descending) {
         // if scanbackTid is set we need to move forward again
         console.log(
           'Backwards: ' +
-            last.time +
-            ' (' +
-            last.trade_id +
-            ') to ' +
-            first.time +
-            ' (' +
-            first.trade_id +
-            ')'
+          last.time +
+          ' (' +
+          last.trade_id +
+          ') to ' +
+          first.time +
+          ' (' +
+          first.trade_id +
+          ')',
         );
 
         this.scanbackResults = this.scanbackResults.concat(result.reverse());
@@ -338,12 +339,12 @@ Trader.prototype.getTrades = function(since, callback, descending) {
               this.gdax_public.getProductTrades(
                 this.pair,
                 { after: this.scanbackTid + BATCH_SIZE + 1, limit: BATCH_SIZE },
-                this.processResponse('getTrades', cb)
+                this.processResponse('getTrades', cb),
               );
             util.retry(
               retryForever,
               _.bind(handler, this),
-              _.bind(process, this)
+              _.bind(process, this),
             );
           }, QUERY_DELAY);
         } else {
@@ -368,12 +369,12 @@ Trader.prototype.getTrades = function(since, callback, descending) {
         this.gdax_public.getProductTrades(
           this.pair,
           { after: this.scanbackTid + BATCH_SIZE + 1, limit: BATCH_SIZE },
-          this.processResponse('getTrades', cb)
+          this.processResponse('getTrades', cb),
         );
       util.retry(
         retryForever,
         _.bind(handler, this),
-        _.bind(process, this)
+        _.bind(process, this),
       );
     } else if (since) {
       console.log('Scanning back in the history needed...', since);
@@ -384,7 +385,7 @@ Trader.prototype.getTrades = function(since, callback, descending) {
     this.gdax_public.getProductTrades(
       this.pair,
       { limit: BATCH_SIZE },
-      this.processResponse('getTrades', cb)
+      this.processResponse('getTrades', cb),
     );
   util.retry(null, fetch, handle);
 };
@@ -406,8 +407,8 @@ Trader.prototype.getMaxDecimalsNumber = function(number, decimalLimit = 8) {
   return decimalCount <= decimalLimit
     ? decimalNumber.toString()
     : (
-        Math.floor(decimalNumber * decimalMultiplier) / decimalMultiplier
-      ).toFixed(decimalLimit);
+      Math.floor(decimalNumber * decimalMultiplier) / decimalMultiplier
+    ).toFixed(decimalLimit);
 };
 
 Trader.getCapabilities = function() {
@@ -423,7 +424,7 @@ Trader.getCapabilities = function() {
     tid: 'tid',
     tradable: true,
     forceReorderDelay: false,
-    gekkoBroker: 0.6
+    gekkoBroker: 0.6,
   };
 };
 

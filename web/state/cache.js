@@ -8,7 +8,7 @@ module.exports = {
     return true;
   },
   get: name => {
-    if(_.has(cache, name))
+    if (_.has(cache, name))
       return cache[name];
-  }
+  },
 };

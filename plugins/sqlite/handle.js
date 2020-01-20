@@ -43,7 +43,7 @@ if (mode === 'realtime' || mode === 'importer') {
     util.die(
       `History database does not exist for exchange ${
         config.watch.exchange
-      } at version ${version}.`
+      } at version ${version}.`,
     );
 }
 
@@ -57,5 +57,5 @@ module.exports = {
     db.run('PRAGMA journal_mode = ' + journalMode);
     db.configure('busyTimeout', 10000);
     return db;
-  }
+  },
 };

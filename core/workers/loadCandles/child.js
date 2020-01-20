@@ -13,13 +13,13 @@ let start = (config, candleSize, daterange) => {
   let load = require(dirs.tools + 'candleLoader');
   load(config.candleSize, candles => {
     process.send(candles);
-  })
+  });
 };
 
 process.send('ready');
 
 process.on('message', (m) => {
-  if(m.what === 'start')
+  if (m.what === 'start')
     start(m.config, m.candleSize, m.daterange);
 });
 

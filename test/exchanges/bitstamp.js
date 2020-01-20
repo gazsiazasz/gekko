@@ -1,4 +1,3 @@
-
 // if you need to test Gekko against real mocked data
 // uncomment the following:
 
@@ -31,18 +30,19 @@ let TRADES = require('./data/bitstamp_trades.json');
 
 return; // TEMP
 
-let FakeExchange = function() {};
+let FakeExchange = function() {
+};
 FakeExchange.prototype = {
   transactions: function(since, handler, descending) {
     handler(
       null,
-      TRADES
+      TRADES,
     );
-  }
+  },
 };
 let transactionsSpy = sinon.spy(FakeExchange.prototype, 'transactions');
 spoofer = {
-  bitstamp: FakeExchange
+  bitstamp: FakeExchange,
 };
 
 describe('exchanges/bitstamp', function() {
@@ -65,15 +65,16 @@ describe('exchanges/bitstamp', function() {
   });
 
   it('should retry on exchange error', function() {
-    let ErrorFakeExchange = function() {};
+    let ErrorFakeExchange = function() {
+    };
     ErrorFakeExchange.prototype = {
       transactions: function(since, handler, descending) {
         handler('Auth error');
-      }
-    }
+      },
+    };
     spoofer = {
-      bitstamp: ErrorFakeExchange
-    }
+      bitstamp: ErrorFakeExchange,
+    };
 
     let ErroringBitstamp = proxyquire(dirs.exchanges + 'bitstamp', spoofer);
     let ebs = new ErroringBitstamp(config.watch);
@@ -81,7 +82,7 @@ describe('exchanges/bitstamp', function() {
     ebs.retry = _.noop;
     let retrySpy = sinon.spy(ebs, 'retry');
 
-    ebs.getTrades(null, _.noop)
+    ebs.getTrades(null, _.noop);
 
     expect(retrySpy.callCount).to.equal(1);
 

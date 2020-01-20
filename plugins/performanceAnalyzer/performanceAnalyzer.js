@@ -1,4 +1,3 @@
-
 let _ = require('lodash');
 let moment = require('moment');
 
@@ -18,7 +17,7 @@ let PerformanceAnalyzer = function() {
 
   this.dates = {
     start: false,
-    end: false
+    end: false,
   };
 
   this.startPrice = 0;
@@ -38,7 +37,7 @@ let PerformanceAnalyzer = function() {
   this.roundTrip = {
     id: 0,
     entry: false,
-    exit: false
+    exit: false,
   };
 
   this.portfolio = {};
@@ -51,7 +50,7 @@ let PerformanceAnalyzer = function() {
 };
 
 PerformanceAnalyzer.prototype.processPortfolioValueChange = function(event) {
-  if(!this.start.balance) {
+  if (!this.start.balance) {
     this.start.balance = event.balance;
   }
 
@@ -59,7 +58,7 @@ PerformanceAnalyzer.prototype.processPortfolioValueChange = function(event) {
 };
 
 PerformanceAnalyzer.prototype.processPortfolioChange = function(event) {
-  if(!this.start.portfolio) {
+  if (!this.start.portfolio) {
     this.start.portfolio = event;
   }
 };
@@ -70,7 +69,7 @@ PerformanceAnalyzer.prototype.processStratWarmupCompleted = function() {
 };
 
 PerformanceAnalyzer.prototype.processCandle = function(candle, done) {
-  if(!this.warmupCompleted) {
+  if (!this.warmupCompleted) {
     this.warmupCandle = candle;
     return done();
   }
@@ -78,14 +77,14 @@ PerformanceAnalyzer.prototype.processCandle = function(candle, done) {
   this.price = candle.close;
   this.dates.end = candle.start.clone().add(1, 'minute');
 
-  if(!this.dates.start) {
+  if (!this.dates.start) {
     this.dates.start = candle.start;
     this.startPrice = candle.close;
   }
 
   this.endPrice = candle.close;
 
-  if(this.openRoundTrip) {
+  if (this.openRoundTrip) {
     this.emitRoundtripUpdate();
   }
 
@@ -99,8 +98,8 @@ PerformanceAnalyzer.prototype.emitRoundtripUpdate = function() {
     at: this.dates.end,
     duration: this.dates.end.diff(this.roundTrip.entry.date),
     uPnl,
-    uProfit: uPnl / this.roundTrip.entry.total * 100
-  })
+    uProfit: uPnl / this.roundTrip.entry.total * 100,
+  });
 };
 
 PerformanceAnalyzer.prototype.processTradeCompleted = function(trade) {
@@ -111,22 +110,22 @@ PerformanceAnalyzer.prototype.processTradeCompleted = function(trade) {
   this.registerRoundtripPart(trade);
 
   let report = this.calculateReportStatistics();
-  if(report) {
+  if (report) {
     this.logger.handleTrade(trade, report);
     this.deferredEmit('performanceReport', report);
   }
 };
 
 PerformanceAnalyzer.prototype.registerRoundtripPart = function(trade) {
-  if(this.trades === 1 && trade.action === 'sell') {
+  if (this.trades === 1 && trade.action === 'sell') {
     // this is not part of a valid roundtrip
     return;
   }
 
-  if(trade.action === 'buy') {
+  if (trade.action === 'buy') {
     if (this.roundTrip.exit) {
       this.roundTrip.id++;
-      this.roundTrip.exit = false
+      this.roundTrip.exit = false;
     }
 
     this.roundTrip.entry = {
@@ -135,7 +134,7 @@ PerformanceAnalyzer.prototype.registerRoundtripPart = function(trade) {
       total: trade.portfolio.currency + (trade.portfolio.asset * trade.price),
     };
     this.openRoundTrip = true;
-  } else if(trade.action === 'sell') {
+  } else if (trade.action === 'sell') {
     this.roundTrip.exit = {
       date: trade.date,
       price: trade.price,
@@ -159,7 +158,7 @@ PerformanceAnalyzer.prototype.handleCompletedRoundtrip = function() {
     exitPrice: this.roundTrip.exit.price,
     exitBalance: this.roundTrip.exit.total,
 
-    duration: this.roundTrip.exit.date.diff(this.roundTrip.entry.date)
+    duration: this.roundTrip.exit.date.diff(this.roundTrip.entry.date),
   };
 
   roundtrip.pnl = roundtrip.exitBalance - roundtrip.entryBalance;
@@ -180,7 +179,7 @@ PerformanceAnalyzer.prototype.handleCompletedRoundtrip = function() {
 };
 
 PerformanceAnalyzer.prototype.calculateReportStatistics = function() {
-  if(!this.start.balance || !this.start.portfolio) {
+  if (!this.start.balance || !this.start.portfolio) {
     log.error('Cannot calculate a profit report without having received portfolio data.');
     log.error('Skipping performanceReport..');
     return false;
@@ -190,7 +189,7 @@ PerformanceAnalyzer.prototype.calculateReportStatistics = function() {
   let profit = this.balance - this.start.balance;
 
   let timespan = moment.duration(
-    this.dates.end.diff(this.dates.start)
+    this.dates.end.diff(this.dates.start),
   );
   let relativeProfit = this.balance / this.start.balance * 100 - 100;
   let relativeYearlyProfit = relativeProfit / timespan.asYears();
@@ -204,7 +203,7 @@ PerformanceAnalyzer.prototype.calculateReportStatistics = function() {
   let downside = statslite.percentile(this.losses.map(r => r.profit), 0.25)
     * Math.sqrt(this.trades / (this.trades - 2));
 
-  let ratioRoundTrips = this.roundTrips.length > 0 ? (this.roundTrips.filter(roundTrip => roundTrip.pnl > 0 ).length / this.roundTrips.length * 100).toFixed(4) : 100;
+  let ratioRoundTrips = this.roundTrips.length > 0 ? (this.roundTrips.filter(roundTrip => roundTrip.pnl > 0).length / this.roundTrips.length * 100).toFixed(4) : 100;
 
   let report = {
     startTime: this.dates.start.utc().format('YYYY-MM-DD HH:mm:ss'),
@@ -226,7 +225,7 @@ PerformanceAnalyzer.prototype.calculateReportStatistics = function() {
     exposure: percentExposure,
     sharpe,
     downside,
-    ratioRoundTrips
+    ratioRoundTrips,
   };
 
   report.alpha = report.relativeProfit - report.market;
@@ -235,12 +234,12 @@ PerformanceAnalyzer.prototype.calculateReportStatistics = function() {
 };
 
 PerformanceAnalyzer.prototype.finalize = function(done) {
-  if(!this.trades) {
+  if (!this.trades) {
     return done();
   }
 
   let report = this.calculateReportStatistics();
-  if(report) {
+  if (report) {
     this.logger.finalize(report);
     this.emit('performanceReport', report);
   }

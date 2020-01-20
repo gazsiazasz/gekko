@@ -7,7 +7,7 @@ let CoinFalcon = require('coinfalcon');
 let Trader = function(config) {
   _.bindAll(this, [
     'roundAmount',
-    'roundPrice'
+    'roundPrice',
   ]);
 
   this.makerFee = 0;
@@ -23,7 +23,7 @@ let Trader = function(config) {
   this.name = 'coinfalcon';
 
   this.market = _.find(Trader.getCapabilities().markets, (market) => {
-    return market.pair[0] === this.currency && market.pair[1] === this.asset
+    return market.pair[0] === this.currency && market.pair[1] === this.asset;
   });
 
   this.coinfalcon = new CoinFalcon.Client(this.key, this.secret);
@@ -32,7 +32,7 @@ let Trader = function(config) {
 };
 
 let includes = (str, list) => {
-  if(!_.isString(str))
+  if (!_.isString(str))
     return false;
 
   return _.some(list, item => str.includes(item));
@@ -61,7 +61,7 @@ let recoverableErrors = [
   'Client network socket disconnected before secure TLS connection was established',
   'socket hang up',
   // getaddrinfo EAI_AGAIN coinfalcon.com coinfalcon.com:443
-  'EAI_AGAIN'
+  'EAI_AGAIN',
 ];
 
 // errors that might mean
@@ -76,18 +76,18 @@ Trader.prototype.processResponse = function(method, args, next) {
 
   let checkTime = () => {
     let diff = moment().diff(requestAt, 's');
-    if(diff > 10) {
-      console.log(new Date,  '[CF] API CALL TOOK', diff, 'SECONDS!');
-      console.log(new Date,  '[CF]', {method, args, next});
+    if (diff > 10) {
+      console.log(new Date, '[CF] API CALL TOOK', diff, 'SECONDS!');
+      console.log(new Date, '[CF]', { method, args, next });
     }
   };
 
   let catcher = err => {
-    if(!err || !err.message) {
+    if (!err || !err.message) {
       err = new Error(err || 'Empty error');
     }
 
-    if(includes(err.message, recoverableErrors)) {
+    if (includes(err.message, recoverableErrors)) {
       return this.retry(method, args);
     }
 
@@ -99,21 +99,21 @@ Trader.prototype.processResponse = function(method, args, next) {
   return {
     failure: catcher,
     success: data => {
-      if(!data)
+      if (!data)
         return catcher();
 
-      if(data.error)
+      if (data.error)
         return catcher(data.error);
 
-      if(includes(data, ['Please complete the security check to proceed.']))
+      if (includes(data, ['Please complete the security check to proceed.']))
         return next(new Error(
           'Your IP has been flagged by CloudFlare. ' +
-          'As such Gekko Broker cannot access Coinfalcon.'
+          'As such Gekko Broker cannot access Coinfalcon.',
         ));
 
       next(undefined, data);
-    }
-  }
+    },
+  };
 };
 
 Trader.prototype.retry = function(method, args) {
@@ -127,13 +127,13 @@ Trader.prototype.retry = function(method, args) {
 
 Trader.prototype.getTicker = function(callback) {
   let handle = this.processResponse(this.getTicker, [callback], (err, res) => {
-    if(err)
+    if (err)
       return callback(err);
 
-    callback(null, {bid: +res.data.bids[0].price, ask: +res.data.asks[0].price})
+    callback(null, { bid: +res.data.bids[0].price, ask: +res.data.asks[0].price });
   });
 
-  let url = "markets/" + this.pair + "/orders?level=1";
+  let url = 'markets/' + this.pair + '/orders?level=1';
 
   this.coinfalcon.get(url).then(handle.success).catch(handle.failure);
 };
@@ -144,12 +144,12 @@ Trader.prototype.getFee = function(callback) {
 
 Trader.prototype.getPortfolio = function(callback) {
   let handle = this.processResponse(this.getPortfolio, [callback], (err, res) => {
-    if(err)
+    if (err)
       return callback(err);
 
     let portfolio = res.data.map(account => ({
       name: account.currency_code.toUpperCase(),
-      amount: parseFloat(account.available_balance)
+      amount: parseFloat(account.available_balance),
     }));
 
     callback(null, portfolio);
@@ -160,7 +160,7 @@ Trader.prototype.getPortfolio = function(callback) {
 
 Trader.prototype.getOpenOrders = function(callback) {
   let handle = this.processResponse(this.getOpenOrders, [callback], (err, res) => {
-    if(err)
+    if (err)
       return callback(err);
 
     console.log(new Date, 'CF getOpenOrders', res.data);
@@ -175,10 +175,10 @@ Trader.prototype.addOrder = function(type, amount, price, callback) {
   let args = _.toArray(arguments);
 
   let handle = this.processResponse(this.addOrder, args, (err, res) => {
-    if(err)
+    if (err)
       return callback(err);
 
-    if(!res.data.id) {
+    if (!res.data.id) {
       console.log(new Date, 'CF ERROR! CREATED ORDER BUT NO ID', res);
     }
 
@@ -190,7 +190,7 @@ Trader.prototype.addOrder = function(type, amount, price, callback) {
     operation_type: 'limit_order',
     market: this.pair,
     size: amount + '',
-    price: price + ''
+    price: price + '',
   };
 
   this.coinfalcon.post('user/orders', payload).then(handle.success).catch(handle.failure);
@@ -217,7 +217,8 @@ Trader.prototype.getPrecision = function(tickSize) {
   let e = 1;
   let p = 0;
   while (Math.round(tickSize * e) / e !== tickSize) {
-    e *= 10; p++;
+    e *= 10;
+    p++;
   }
   return p;
 };
@@ -233,7 +234,7 @@ Trader.prototype.roundPrice = function(price) {
 Trader.prototype.outbidPrice = function(price, isUp) {
   let newPrice;
 
-  if(isUp) {
+  if (isUp) {
     newPrice = price + this.market.minimalOrder.price;
   } else {
     newPrice = price - this.market.minimalOrder.price;
@@ -245,7 +246,7 @@ Trader.prototype.outbidPrice = function(price, isUp) {
 Trader.prototype.getOrder = function(order, callback) {
   let args = _.toArray(arguments);
   let handle = this.processResponse(this.getOrder, args, (err, res) => {
-    if(err)
+    if (err)
       return callback(err);
 
     let price = parseFloat(res.data.price);
@@ -263,17 +264,19 @@ Trader.prototype.checkOrder = function(order, callback) {
   let args = _.toArray(arguments);
 
   let handle = this.processResponse(this.checkOrder, args, (err, res) => {
-    if(err)
+    if (err)
       return callback(err);
 
     // https://docs.coinfalcon.com/#list-orders
     let status = res.data.status;
 
-    if(status === 'canceled') {
+    if (status === 'canceled') {
       return callback(undefined, { executed: false, open: false });
-    } if(status === 'fulfilled') {
+    }
+    if (status === 'fulfilled') {
       return callback(undefined, { executed: true, open: false });
-    } if(
+    }
+    if (
       status === 'pending' ||
       status === 'partially_filled' ||
       status === 'open'
@@ -293,24 +296,24 @@ Trader.prototype.cancelOrder = function(order, callback) {
 
   let handle = this.processResponse(this.cancelOrder, args, (err, res) => {
 
-    if(err) {
-      if(err.message.includes('has wrong status.')) {
+    if (err) {
+      if (err.message.includes('has wrong status.')) {
 
         // see https://github.com/askmike/gekko/issues/2440
         return setTimeout(() => {
           this.checkOrder(order, (err, res) => {
 
-            if(err) {
+            if (err) {
               return callback(err);
             }
 
-            if(!res.open) {
+            if (!res.open) {
               return callback(undefined, true);
             }
 
             return setTimeout(
               () => this.cancelOrder(order, callback),
-              this.interval
+              this.interval,
             );
           });
         }, this.interval);
@@ -319,7 +322,7 @@ Trader.prototype.cancelOrder = function(order, callback) {
     }
 
     callback(undefined, false, {
-      filled: +res.data.size_filled
+      filled: +res.data.size_filled,
     });
   });
 
@@ -341,7 +344,7 @@ Trader.prototype.getTrades = function(since, callback, descending) {
           amount: parseFloat(trade.size),
         });
       },
-      this
+      this,
     );
 
     if (descending) {
@@ -351,12 +354,12 @@ Trader.prototype.getTrades = function(since, callback, descending) {
     }
   }.bind(this);
 
-  let failure = function (err) {
+  let failure = function(err) {
     err = new Error(err);
     return this.retry(this.getTrades, args, err);
   }.bind(this);
 
-  let url = "markets/" + this.pair + "/trades";
+  let url = 'markets/' + this.pair + '/trades';
 
   if (since) {
     url += '?since_time=' + (_.isString(since) ? since : since.format());
@@ -365,7 +368,7 @@ Trader.prototype.getTrades = function(since, callback, descending) {
   this.coinfalcon.get(url).then(success).catch(failure);
 };
 
-Trader.getCapabilities = function () {
+Trader.getCapabilities = function() {
   return {
     name: 'CoinFalcon',
     slug: 'coinfalcon',
@@ -378,7 +381,7 @@ Trader.getCapabilities = function () {
     tid: 'tid',
     tradable: true,
     forceReorderDelay: false,
-    gekkoBroker: 0.6
+    gekkoBroker: 0.6,
   };
 };
 

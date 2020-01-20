@@ -28,7 +28,7 @@ request(options)
         minimalOrder: {
           amount: parseFloat(market.min_volume),
           price: parseFloat(market.min_price),
-          order: 0.0
+          order: 0.0,
         },
       };
     });

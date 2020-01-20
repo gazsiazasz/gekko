@@ -15,10 +15,10 @@ let method = {};
 // prepare everything our method needs
 method.init = function() {
   this.trend = {
-   direction: 'none',
-   duration: 0,
-   persisted: false,
-   adviced: false
+    direction: 'none',
+    duration: 0,
+    persisted: false,
+    adviced: false,
   };
 
   this.requiredHistory = this.tradingAdvisor.historySize;
@@ -58,52 +58,52 @@ method.check = function() {
 
   let thresholds = {
     low: momentumSettings.thresholds.low + hist * settings.thresholds.weightLow,
-    high: momentumSettings.thresholds.high + hist * settings.thresholds.weightHigh
+    high: momentumSettings.thresholds.high + hist * settings.thresholds.weightHigh,
   };
 
-  if(value < thresholds.low) {
+  if (value < thresholds.low) {
 
     // new trend detected
-    if(this.trend.direction !== 'up')
+    if (this.trend.direction !== 'up')
       this.trend = {
         duration: 0,
         persisted: false,
         direction: 'up',
-        adviced: false
+        adviced: false,
       };
 
     this.trend.duration++;
 
     log.debug('In uptrend since', this.trend.duration, 'candle(s)');
 
-    if(this.trend.duration >= settings.thresholds.persistence)
+    if (this.trend.duration >= settings.thresholds.persistence)
       this.trend.persisted = true;
 
-    if(this.trend.persisted && !this.trend.adviced) {
+    if (this.trend.persisted && !this.trend.adviced) {
       this.trend.adviced = true;
       this.advice('long');
     } else
       this.advice();
 
-  } else if(value > thresholds.high) {
+  } else if (value > thresholds.high) {
 
     // new trend detected
-    if(this.trend.direction !== 'down')
+    if (this.trend.direction !== 'down')
       this.trend = {
         duration: 0,
         persisted: false,
         direction: 'down',
-        adviced: false
+        adviced: false,
       };
 
     this.trend.duration++;
 
     log.debug('In downtrend since', this.trend.duration, 'candle(s)');
 
-    if(this.trend.duration >= settings.thresholds.persistence)
+    if (this.trend.duration >= settings.thresholds.persistence)
       this.trend.persisted = true;
 
-    if(this.trend.persisted && !this.trend.adviced) {
+    if (this.trend.persisted && !this.trend.adviced) {
       this.trend.adviced = true;
       this.advice('short');
     } else

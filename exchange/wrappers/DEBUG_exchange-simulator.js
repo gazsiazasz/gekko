@@ -23,14 +23,14 @@ Trader.prototype.getTrades = function(since, cb) {
 
     this.tid++;
 
-    if(this.tid % TREND_DURATION === 0) {
-      if(this.trend === 'up')
+    if (this.tid % TREND_DURATION === 0) {
+      if (this.trend === 'up')
         this.trend = 'down';
       else
         this.trend = 'up';
     }
 
-    if(this.trend === 'up')
+    if (this.trend === 'up')
       this.price += Math.random();
     else
       this.price -= Math.random();
@@ -39,18 +39,18 @@ Trader.prototype.getTrades = function(since, cb) {
       date: this.at.add(1, 'seconds').unix(),
       price: this.price,
       amount: Math.random() * 100,
-      tid: this.tid
-    }
+      tid: this.tid,
+    };
   });
 
   console.log(
-    `[EXCHANGE SIMULATOR] emitted ${amount} fake trades, up until ${this.at.format('YYYY-MM-DD HH:mm:ss')}.`
+    `[EXCHANGE SIMULATOR] emitted ${amount} fake trades, up until ${this.at.format('YYYY-MM-DD HH:mm:ss')}.`,
   );
 
   cb(null, trades);
 };
 
-Trader.getCapabilities = function () {
+Trader.getCapabilities = function() {
   return {
     name: 'Exchange Simulator',
     slug: 'DEBUG_exchange-simulator',
@@ -64,7 +64,7 @@ Trader.getCapabilities = function () {
     requires: ['key', 'secret', 'username'],
     fetchTimespan: 60,
     tid: 'tid',
-    tradable: false
+    tradable: false,
   };
 };
 

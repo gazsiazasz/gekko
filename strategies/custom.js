@@ -42,10 +42,10 @@ strat.log = function() {
 strat.check = function() {
 
   // Only continue if we have a new update.
-  if(!this.toUpdate)
+  if (!this.toUpdate)
     return;
 
-  if(this.currentTrend === 'long') {
+  if (this.currentTrend === 'long') {
 
     // If it was long, set it to short
     this.currentTrend = 'short';

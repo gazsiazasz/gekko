@@ -35,17 +35,17 @@ let start = (mode, config) => {
   let pipeline = require(dirs.core + 'pipeline');
   pipeline({
     config: config,
-    mode: mode
+    mode: mode,
   });
 };
 
 process.send('ready');
 
 process.on('message', function(m) {
-  if(m.what === 'start')
+  if (m.what === 'start')
     start(m.mode, m.config);
 
-  if(m.what === 'exit')
+  if (m.what === 'exit')
     process.exit(0);
 });
 
@@ -57,10 +57,10 @@ process.on('disconnect', function() {
 process
   .on('unhandledRejection', (message, p) => {
     console.error('unhandledRejection', message);
-    process.send({type: 'error', message: message});
+    process.send({ type: 'error', message: message });
   })
   .on('uncaughtException', err => {
     console.error('uncaughtException', err);
-    process.send({type: 'error', error: err});
+    process.send({ type: 'error', error: err });
     process.exit(1);
   });

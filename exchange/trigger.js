@@ -12,7 +12,7 @@ let triggers = require('./triggers');
 // @param type: type of trigger to wrap
 // @param props: properties to feed to trigger
 class Trigger {
-  constructor({api, type, props, onTrigger}) {
+  constructor({ api, type, props, onTrigger }) {
     this.onTrigger = onTrigger;
     this.api = api;
 
@@ -22,7 +22,7 @@ class Trigger {
     // as soon as the bid goes below trail.
     this.tickerProp = 'bid';
 
-    if(!_.has(triggers, type)) {
+    if (!_.has(triggers, type)) {
       throw new Error('Gekko Broker does not know trigger ' + type);
     }
 
@@ -31,7 +31,7 @@ class Trigger {
     bindAll(this);
     this.trigger = new triggers[type]({
       onTrigger: this.propogateTrigger,
-      ...props
+      ...props,
     });
 
     this.scheduleFetch();
@@ -42,18 +42,18 @@ class Trigger {
   }
 
   fetch() {
-    if(!this.isLive) {
+    if (!this.isLive) {
       return;
     }
-    this.api.getTicker(this.processTicker)
+    this.api.getTicker(this.processTicker);
   }
 
   processTicker(err, ticker) {
-    if(!this.isLive) {
+    if (!this.isLive) {
       return;
     }
 
-    if(err) {
+    if (err) {
       return console.log('[GB/trigger] failed to fetch ticker:', err);
     }
 
@@ -69,7 +69,7 @@ class Trigger {
   }
 
   propogateTrigger(payload) {
-    if(!this.isLive) {
+    if (!this.isLive) {
       return;
     }
     this.isLive = false;

@@ -2,7 +2,7 @@ let Therocktrading = require('therocktrading');
 let _ = require('lodash');
 let moment = require('moment');
 let retry = require('../exchangeUtils').retry;
-let marketData = require("./therocktrading-markets.json");
+let marketData = require('./therocktrading-markets.json');
 
 let QUERY_DELAY = 350;
 
@@ -50,11 +50,11 @@ let recoverableErrors = [
   'HTTP 503 Error',
   'EHOSTUNREACH',
   'EAI_AGAIN',
-  'ENETUNREACH'
+  'ENETUNREACH',
 ];
 
 let includes = (str, list) => {
-  if(!_.isString(str))
+  if (!_.isString(str))
     return false;
 
   return _.some(list, item => str.includes(item));
@@ -66,7 +66,7 @@ Trader.prototype.processResponse = function(method, next) {
       error = new Error(`Error ${body.code}: ${body.msg}`);
     }
 
-    if(!error && body && !_.isEmpty(body.message)) {
+    if (!error && body && !_.isEmpty(body.message)) {
       error = new Error(body.message);
     }
 
@@ -78,12 +78,12 @@ Trader.prototype.processResponse = function(method, next) {
       error = new Error(`Response code ${response.statusCode}`);
     }*/
 
-    if(error) {
-      if(_.isString(error)) {
+    if (error) {
+      if (_.isString(error)) {
         error = new Error(error);
       }
 
-      if(includes(error.message, recoverableErrors)) {
+      if (includes(error.message, recoverableErrors)) {
         error.notFatal = true;
       }
 
@@ -91,7 +91,7 @@ Trader.prototype.processResponse = function(method, next) {
     }
 
     return next(undefined, body);
-  }
+  };
 };
 
 Trader.prototype.getTrades = function(since, callback, descending) {
@@ -104,7 +104,7 @@ Trader.prototype.getTrades = function(since, callback, descending) {
           tid: trade.id,
           price: trade.price,
           amount: trade.amount,
-          date: moment.utc(trade.date).format('X')
+          date: moment.utc(trade.date).format('X'),
         };
       });
     }
@@ -116,10 +116,10 @@ Trader.prototype.getTrades = function(since, callback, descending) {
   //if (moment.isMoment(to)) to = to.format();
 
   let options = {
-    order: "DESC" // which is default at therock
+    order: 'DESC', // which is default at therock
   };
   if (since)
-  	options.after = since;
+    options.after = since;
   let fetch = cb => this.therocktrading.trades(this.pair, options, this.processResponse('getTrades', cb));
   retry(null, fetch, handle);
 };
@@ -161,26 +161,26 @@ Trader.prototype.getPortfolio = function(callback) {
 
 Trader.prototype.buy = function(amount, price, callback) {
   let handle = (err, result) => {
-    if(err) {
+    if (err) {
       return callback(err);
     }
     callback(undefined, result.id);
   };
   let fetch = next => {
-    this.therocktrading.buy(this.pair, amount.toString(), price.toString(), this.processResponse('order', next))
+    this.therocktrading.buy(this.pair, amount.toString(), price.toString(), this.processResponse('order', next));
   };
   retry(null, fetch, handle);
 };
 
 Trader.prototype.sell = function(amount, price, callback) {
   let handle = (err, result) => {
-    if(err) {
+    if (err) {
       return callback(err);
     }
     callback(undefined, result.id);
   };
   let fetch = next => {
-    this.therocktrading.sell(this.pair, amount.toString(), price.toString(), this.processResponse('order', next))
+    this.therocktrading.sell(this.pair, amount.toString(), price.toString(), this.processResponse('order', next));
   };
   retry(null, fetch, handle);
 };
@@ -188,15 +188,15 @@ Trader.prototype.sell = function(amount, price, callback) {
 
 Trader.prototype.getOrder = function(order, callback) {
   let handle = (err, result) => {
-    if(err)
+    if (err)
       return callback(err);
 
     let price = 0;
     let amount = 0;
     let date = moment(0);
 
-    if(result.amount === result.amount_unfilled) {
-      return callback(null, {price, amount, date});
+    if (result.amount === result.amount_unfilled) {
+      return callback(null, { price, amount, date });
     }
 
     _.each(result.trades, trade => {
@@ -210,7 +210,7 @@ Trader.prototype.getOrder = function(order, callback) {
 
     fees[this.currency] = price * amount * feePercent;
 
-    callback(err, {price, amount, date, fees, feePercent});
+    callback(err, { price, amount, date, fees, feePercent });
   };
 
   let fetch = cb => this.therocktrading.order_status(this.pair, order, this.processResponse('order_status', cb));
@@ -225,10 +225,18 @@ Trader.prototype.checkOrder = function(order, callback) {
     if (status === 'executed') {
       return callback(undefined, { executed: true, open: false, filledAmount: parseFloat(data.amount) });
     } else if (status === 'deleted') {
-      return callback(undefined, { executed: false, open: false, filledAmount: parseFloat(data.amount - data.amount_unfilled) });
+      return callback(undefined, {
+        executed: false,
+        open: false,
+        filledAmount: parseFloat(data.amount - data.amount_unfilled),
+      });
     } else if (status === 'active') {
       // should check if not expired (data.close_on)?
-      return callback(undefined, { executed: false, open: true, filledAmount:  parseFloat(data.amount - data.amount_unfilled) });
+      return callback(undefined, {
+        executed: false,
+        open: true,
+        filledAmount: parseFloat(data.amount - data.amount_unfilled),
+      });
     }
 
     callback(new Error('Unknown status ' + status));
@@ -240,11 +248,10 @@ Trader.prototype.checkOrder = function(order, callback) {
 };
 
 
-
 Trader.prototype.cancelOrder = function(order, callback) {
   // callback for cancelOrder should be true if the order was already filled, otherwise false
   let result = (err, data) => {
-    if(err) {
+    if (err) {
       return callback(null, true);  // need to catch the specific error but usually an error on cancel means it was filled
     }
 
@@ -277,7 +284,7 @@ Trader.getCapabilities = function() {
     // following tid, define type to use on trade to batch trades
     tid: 'tid',
     tradable: true,
-    gekkoBroker: 0.6
+    gekkoBroker: 0.6,
   };
 };
 

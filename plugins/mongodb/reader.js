@@ -5,7 +5,7 @@ let log = require(`${util.dirs().core}log`);
 let handle = require('./handle');
 let mongoUtil = require('./util');
 
-let Reader = function Reader () {
+let Reader = function Reader() {
   _.bindAll(this);
   this.db = handle;
   this.collection = this.db.collection(mongoUtil.settings.historyCollection);
@@ -13,7 +13,7 @@ let Reader = function Reader () {
 };
 
 // returns the furtherst point (up to `from`) in time we have valid data from
-Reader.prototype.mostRecentWindow = function mostRecentWindow (from, to, next) {
+Reader.prototype.mostRecentWindow = function mostRecentWindow(from, to, next) {
   let mFrom = from.unix();
   let mTo = to.unix();
 
@@ -35,7 +35,7 @@ Reader.prototype.mostRecentWindow = function mostRecentWindow (from, to, next) {
       log.debug('full history is available!');
       return next({
         mFrom,
-        mTo
+        mTo,
       });
     }
 
@@ -50,7 +50,7 @@ Reader.prototype.mostRecentWindow = function mostRecentWindow (from, to, next) {
       let leastRecent = _.last(docs).start;
       return next({
         from: leastRecent,
-        to: mostRecent
+        to: mostRecent,
       });
     }
 
@@ -58,13 +58,13 @@ Reader.prototype.mostRecentWindow = function mostRecentWindow (from, to, next) {
     // the minute before the gap
     return next({
       from: docs[gapIndex - 1].start,
-      to: mostRecent
+      to: mostRecent,
     });
-  })
+  });
 };
 
-Reader.prototype.get = function get (from, to, what, next) { // returns all fields in general
-  // Find some documents
+Reader.prototype.get = function get(from, to, what, next) { // returns all fields in general
+                                                            // Find some documents
   this.collection.find({ pair: this.pair, start: { $gte: from, $lte: to } }).sort({ start: 1 }, (err, docs) => {
     if (err) {
       return util.die('DB error at `get`');
@@ -73,25 +73,25 @@ Reader.prototype.get = function get (from, to, what, next) { // returns all fiel
   });
 };
 
-Reader.prototype.count = function fCount (from, to, next) {
+Reader.prototype.count = function fCount(from, to, next) {
   this.collection.count({ pair: this.pair, start: { $gte: from, $lte: to } }, (err, count) => {
     if (err) {
       return util.die('DB error at `count`');
     }
     return next(null, count);
-  })
+  });
 };
 
-Reader.prototype.countTotal = function countTotal (next) {
+Reader.prototype.countTotal = function countTotal(next) {
   this.collection.count({ pair: this.pair }, (err, count) => {
     if (err) {
       return util.die('DB error at `countTotal`');
     }
     return next(null, count);
-  })
+  });
 };
 
-Reader.prototype.getBoundry = function getBoundry (next) {
+Reader.prototype.getBoundry = function getBoundry(next) {
   this.collection.find({ pair: this.pair }, { start: 1 }).sort({ start: 1 }).limit(1, (err, docs) => {
     if (err) {
       return util.die('DB error at `getBoundry`');
@@ -113,7 +113,7 @@ Reader.prototype.tableExists = function(name, next) {
   return next(null, true); // Return true for backtest
 };
 
-Reader.prototype.close = function close () {
+Reader.prototype.close = function close() {
   this.db = null;
 };
 

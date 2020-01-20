@@ -52,8 +52,8 @@ let plugins = [
     modes: ['realtime'],
     dependencies: [{
       module: 'irc',
-      version: '0.5.2'
-    }]
+      version: '0.5.2',
+    }],
   },
   {
     name: 'Telegram bot',
@@ -63,8 +63,8 @@ let plugins = [
     modes: ['realtime'],
     dependencies: [{
       module: 'node-telegram-bot-api',
-      version: '0.24.0'
-    }]
+      version: '0.24.0',
+    }],
   },
   {
     name: 'XMPP bot',
@@ -75,8 +75,8 @@ let plugins = [
     modes: ['realtime'],
     dependencies: [{
       module: 'node-xmpp-client',
-      version: '3.0.2'
-    }]
+      version: '3.0.2',
+    }],
   },
   {
     name: 'Pushover',
@@ -86,8 +86,8 @@ let plugins = [
     modes: ['realtime'],
     dependencies: [{
       module: 'pushover-notifications',
-      version: '0.2.3'
-    }]
+      version: '0.2.3',
+    }],
   },
   {
     name: 'Campfire bot',
@@ -97,8 +97,8 @@ let plugins = [
     modes: ['realtime'],
     dependencies: [{
       module: 'ranger',
-      version: '0.2.4'
-    }]
+      version: '0.2.4',
+    }],
   },
   {
     name: 'Mailer',
@@ -108,11 +108,11 @@ let plugins = [
     modes: ['realtime'],
     dependencies: [{
       module: 'emailjs',
-      version: '1.0.5'
+      version: '1.0.5',
     }, {
       module: 'prompt-lite',
-      version: '0.1.1'
-    }]
+      version: '0.1.1',
+    }],
   },
   {
     name: 'Advice logger',
@@ -120,7 +120,7 @@ let plugins = [
     slug: 'adviceLogger',
     async: false,
     silent: true,
-    modes: ['realtime']
+    modes: ['realtime'],
   },
   {
     name: 'Trader',
@@ -157,8 +157,8 @@ let plugins = [
     modes: ['realtime'],
     dependencies: [{
       module: 'redis',
-      version: '0.10.0'
-    }]
+      version: '0.10.0',
+    }],
   },
   {
     name: 'Pushbullet',
@@ -168,22 +168,22 @@ let plugins = [
     modes: ['realtime'],
     dependencies: [{
       module: 'pushbullet',
-      version: '1.4.3'
-    }]
+      version: '1.4.3',
+    }],
   },
   {
     name: 'Kodi',
     description: 'Sends advice to Kodi.',
     slug: 'kodi',
     async: false,
-    modes: ['realtime']
+    modes: ['realtime'],
   },
   {
     name: 'Candle Uploader',
     description: 'Upload candles to an extneral server',
     slug: 'candleUploader',
     async: true,
-    modes: ['realtime']
+    modes: ['realtime'],
   },
   {
     name: 'Twitter',
@@ -193,8 +193,8 @@ let plugins = [
     modes: ['realtime'],
     dependencies: [{
       module: 'twitter',
-      version: '1.7.1'
-    }]
+      version: '1.7.1',
+    }],
   },
   {
     name: 'Slack',
@@ -204,15 +204,15 @@ let plugins = [
     modes: ['realtime'],
     dependencies: [{
       module: '@slack/client',
-      version: '3.13.0'
-    }]
+      version: '3.13.0',
+    }],
   },
   {
     name: 'IFTTT',
     description: 'Sends trades to IFTTT webhook.',
     slug: 'ifttt',
     async: false,
-    modes: ['realtime']
+    modes: ['realtime'],
   },
   {
     name: 'Event logger',
@@ -220,14 +220,14 @@ let plugins = [
     slug: 'eventLogger',
     async: false,
     modes: ['realtime', 'backtest'],
-    greedy: true
+    greedy: true,
   },
   {
     name: 'Backtest result export',
     description: 'Exports the results of a gekko backtest',
     slug: 'backtestResultExporter',
     async: false,
-    modes: ['backtest']
+    modes: ['backtest'],
   },
   {
     name: 'Child to parent',
@@ -235,7 +235,7 @@ let plugins = [
     slug: 'childToParent',
     async: false,
     modes: ['realtime'],
-    greedy: true
+    greedy: true,
   },
   {
     name: 'Candle Uploader',
@@ -245,8 +245,8 @@ let plugins = [
     modes: ['realtime'],
     dependencies: [{
       module: 'axios',
-      version: '0.18.0'
-    }]
+      version: '0.18.0',
+    }],
   },
   {
     name: 'Blotter',

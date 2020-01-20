@@ -19,7 +19,7 @@ let exchangeChecker = require(dirs.gekko + 'exchange/exchangeChecker');
 let TradeBatcher = require(util.dirs().budfox + 'tradeBatcher');
 
 let Fetcher = function(config) {
-  if(!_.isObject(config))
+  if (!_.isObject(config))
     throw new Error('TradeFetcher expects a config');
 
   let exchangeName = config.watch.exchange.toLowerCase();
@@ -36,10 +36,10 @@ let Fetcher = function(config) {
 
   // If the trading adviser is enabled we might need a very specific fetch since
   // to line up [local db, trading method, and fetching]
-  if(config.tradingAdvisor.enabled && config.tradingAdvisor.firstFetchSince) {
+  if (config.tradingAdvisor.enabled && config.tradingAdvisor.firstFetchSince) {
     this.firstSince = config.tradingAdvisor.firstFetchSince;
 
-    if(this.exchange.providesHistory === 'date') {
+    if (this.exchange.providesHistory === 'date') {
       this.firstSince = moment.unix(this.firstSince).utc();
     }
   }
@@ -48,12 +48,12 @@ let Fetcher = function(config) {
 
   this.pair = [
     config.watch.asset,
-    config.watch.currency
+    config.watch.currency,
   ].join('/');
 
   log.info('Starting to watch the market:',
     this.exchange.name,
-    this.pair
+    this.pair,
   );
 
   // if the exchange returns an error
@@ -70,7 +70,7 @@ let Fetcher = function(config) {
 util.makeEventEmitter(Fetcher);
 
 Fetcher.prototype._fetch = function(since) {
-  if(++this.tries >= this.limit)
+  if (++this.tries >= this.limit)
     return;
 
   this.exchangeTrader.getTrades(since, this.processTrades, false);
@@ -78,7 +78,7 @@ Fetcher.prototype._fetch = function(since) {
 
 Fetcher.prototype.fetch = function() {
   let since = false;
-  if(this.firstFetch) {
+  if (this.firstFetch) {
     since = this.firstSince;
     this.firstFetch = false;
   } else
@@ -90,8 +90,8 @@ Fetcher.prototype.fetch = function() {
 };
 
 Fetcher.prototype.processTrades = function(err, trades) {
-  if(err || _.isEmpty(trades)) {
-    if(err) {
+  if (err || _.isEmpty(trades)) {
+    if (err) {
       log.warn(this.exchange.name, 'returned an error while fetching trades:', err);
       log.debug('refetching...');
     } else

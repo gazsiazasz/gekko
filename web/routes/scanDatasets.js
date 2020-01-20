@@ -7,7 +7,7 @@ let scan = promisify(require('../../core/workers/datasetScan/parent'));
 // requires a post body with configuration of:
 //
 // - config.watch
-let route = function *() {
+let route = function* () {
 
   let config = require('./baseConfig');
 

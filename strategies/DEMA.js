@@ -46,19 +46,19 @@ method.check = function(candle) {
 
   let message = '@ ' + price.toFixed(8) + ' (' + resDEMA.toFixed(5) + '/' + diff.toFixed(5) + ')';
 
-  if(diff > this.settings.thresholds.up) {
+  if (diff > this.settings.thresholds.up) {
     log.debug('we are currently in uptrend', message);
 
-    if(this.currentTrend !== 'up') {
+    if (this.currentTrend !== 'up') {
       this.currentTrend = 'up';
       this.advice('long');
     } else
       this.advice();
 
-  } else if(diff < this.settings.thresholds.down) {
+  } else if (diff < this.settings.thresholds.down) {
     log.debug('we are currently in a downtrend', message);
 
-    if(this.currentTrend !== 'down') {
+    if (this.currentTrend !== 'down') {
       this.currentTrend = 'down';
       this.advice('short');
     } else

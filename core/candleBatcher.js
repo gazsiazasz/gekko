@@ -13,7 +13,7 @@ let _ = require('lodash');
 let util = require(__dirname + '/util');
 
 let CandleBatcher = function(candleSize) {
-  if(!_.isNumber(candleSize))
+  if (!_.isNumber(candleSize))
     throw new Error('candleSize is not a number');
 
   this.candleSize = candleSize;
@@ -26,7 +26,7 @@ let CandleBatcher = function(candleSize) {
 util.makeEventEmitter(CandleBatcher);
 
 CandleBatcher.prototype.write = function(candles) {
-  if(!_.isArray(candles)) {
+  if (!_.isArray(candles)) {
     throw new Error('candles is not an array');
   }
 
@@ -41,7 +41,7 @@ CandleBatcher.prototype.write = function(candles) {
 };
 
 CandleBatcher.prototype.check = function() {
-  if(_.size(this.smallCandles) % this.candleSize !== 0)
+  if (_.size(this.smallCandles) % this.candleSize !== 0)
     return;
 
   this.emitted++;
@@ -52,7 +52,7 @@ CandleBatcher.prototype.check = function() {
 CandleBatcher.prototype.flush = function() {
   _.each(
     this.calculatedCandles,
-    candle => this.emit('candle', candle)
+    candle => this.emit('candle', candle),
   );
 
   this.calculatedCandles = [];
@@ -75,10 +75,10 @@ CandleBatcher.prototype.calculate = function() {
       candle.trades += m.trades;
       return candle;
     },
-    first
+    first,
   );
 
-  if(candle.volume)
+  if (candle.volume)
     // we have added up all prices (relative to volume)
     // now divide by volume to get the Volume Weighted Price
     candle.vwp /= candle.volume;

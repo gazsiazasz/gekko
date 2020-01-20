@@ -45,8 +45,8 @@ config.MACD = {
     up: 0.025,
     // How many candle intervals should a trend persist
     // before we consider it real?
-    persistence: 1
-  }
+    persistence: 1,
+  },
 };
 
 // settings for other strategies can be found at the bottom, note that only
@@ -77,7 +77,7 @@ config.paperTrader = {
 
 config.performanceAnalyzer = {
   enabled: true,
-  riskFreeReturn: 5
+  riskFreeReturn: 5,
 };
 
 // Want Gekko to perform real trades on buy or sell advice?
@@ -104,7 +104,7 @@ config.pushover = {
   muteSoft: true, // disable advice printout if it's soft
   tag: '[GEKKO]',
   key: '',
-  user: ''
+  user: '',
 };
 
 config.blotter = {
@@ -166,7 +166,7 @@ config.pushbullet = {
   // your email
   email: 'jon_snow@westeros.com',
   // Messages will start with this tag
-  tag: '[GEKKO]'
+  tag: '[GEKKO]',
 };
 
 config.kodi = {
@@ -183,7 +183,7 @@ config.ircbot = {
   muteSoft: true,
   channel: '#your-channel',
   server: 'irc.freenode.net',
-  botName: 'gekkobot'
+  botName: 'gekkobot',
 };
 
 config.telegrambot = {
@@ -208,7 +208,7 @@ config.twitter = {
   // twitter access token key
   access_token_key: '',
   // twitter access token secret
-  access_token_secret: ''
+  access_token_secret: '',
 };
 
 config.xmppbot = {
@@ -219,7 +219,7 @@ config.xmppbot = {
   client_host: 'jabber_server',
   client_port: 5222,
   status_msg: 'I\'m online',
-  receiver: 'jabber_id_for_updates'
+  receiver: 'jabber_id_for_updates',
 };
 
 config.campfire = {
@@ -228,7 +228,7 @@ config.campfire = {
   nickname: 'Gordon',
   roomId: null,
   apiKey: '',
-  account: ''
+  account: '',
 };
 
 config.redisBeacon = {
@@ -242,8 +242,8 @@ config.redisBeacon = {
   // channel name.
   channelPrefix: '',
   broadcast: [
-    'candle'
-  ]
+    'candle',
+  ],
 };
 
 config.slack = {
@@ -251,7 +251,7 @@ config.slack = {
   token: '',
   sendMessageOnStart: true,
   muteSoft: true,
-  channel: '' // #tradebot
+  channel: '', // #tradebot
 };
 
 config.ifttt = {
@@ -259,11 +259,11 @@ config.ifttt = {
   eventName: 'gekko',
   makerKey: '',
   muteSoft: true,
-  sendMessageOnStart: true
+  sendMessageOnStart: true,
 };
 
 config.candleWriter = {
-  enabled: true
+  enabled: true,
 };
 
 config.adviceWriter = {
@@ -279,14 +279,14 @@ config.backtestResultExporter = {
     portfolioValues: true,
     stratCandles: true,
     roundtrips: true,
-    trades: true
-  }
+    trades: true,
+  },
 };
 
 config.candleUploader = {
   enabled: false,
   url: '',
-  apiKey: ''
+  apiKey: '',
 };
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -303,7 +303,7 @@ config.sqlite = {
 
   journalMode: require('./web/isWindows.js') ? 'DELETE' : 'WAL',
 
-  dependencies: []
+  dependencies: [],
 };
 
 // Postgres adapter example config (please note: requires postgres >= 9.5):
@@ -315,8 +315,8 @@ config.postgresql = {
   schema: 'public',
   dependencies: [{
     module: 'pg',
-    version: '7.4.3'
-  }]
+    version: '7.4.3',
+  }],
 };
 
 // Mongodb adapter, requires mongodb >= 3.3 (no version earlier tested)
@@ -326,14 +326,14 @@ config.mongodb = {
   connectionString: 'mongodb://localhost/gekko', // connection to mongodb server
   dependencies: [{
     module: 'mongojs',
-    version: '2.4.0'
-  }]
+    version: '2.4.0',
+  }],
 };
 
 config.candleUploader = {
   enabled: false,
   url: '',
-  apiKey: ''
+  apiKey: '',
 };
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -349,7 +349,7 @@ config.backtest = {
   //   from: "2018-03-01",
   //   to: "2018-04-28"
   //},
-  batchSize: 50
+  batchSize: 50,
 };
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -359,9 +359,9 @@ config.backtest = {
 config.importer = {
   daterange: {
     // NOTE: these dates are in UTC
-    from: "2017-11-01 00:00:00",
-    to: "2017-11-20 00:00:00"
-  }
+    from: '2017-11-01 00:00:00',
+    to: '2017-11-20 00:00:00',
+  },
 };
 
 
@@ -378,8 +378,8 @@ config.DEMA = {
   // the difference between the EMAs (to act as triggers)
   thresholds: {
     down: -0.025,
-    up: 0.025
-  }
+    up: 0.025,
+  },
 };
 
 // PPO settings:
@@ -395,8 +395,8 @@ config.PPO = {
     up: 0.025,
     // How many candle intervals should a trend persist
     // before we consider it real?
-    persistence: 2
-  }
+    persistence: 2,
+  },
 };
 
 // Uses one of the momentum indicators but adjusts the thresholds when PPO is bullish or bearish
@@ -409,8 +409,8 @@ config.varPPO = {
     weightHigh: -120,
     // How many candle intervals should a trend persist
     // before we consider it real?
-    persistence: 0
-  }
+    persistence: 0,
+  },
 };
 
 // RSI settings:
@@ -421,8 +421,8 @@ config.RSI = {
     high: 70,
     // How many candle intervals should a trend persist
     // before we consider it real?
-    persistence: 1
-  }
+    persistence: 1,
+  },
 };
 
 // TSI settings:
@@ -434,31 +434,31 @@ config.TSI = {
     high: 25,
     // How many candle intervals should a trend persist
     // before we consider it real?
-    persistence: 1
-  }
+    persistence: 1,
+  },
 };
 
 // Ultimate Oscillator Settings
 config.UO = {
   first: {
     weight: 4,
-    period: 7
+    period: 7,
   },
   second: {
     weight: 2,
-    period: 14
+    period: 14,
   },
   third: {
     weight: 1,
-    period: 28
+    period: 28,
   },
   thresholds: {
     low: 30,
     high: 70,
     // How many candle intervals should a trend persist
     // before we consider it real?
-    persistence: 1
-  }
+    persistence: 1,
+  },
 };
 
 // CCI Settings
@@ -468,8 +468,8 @@ config.CCI = {
   thresholds: {
     up: 100, // fixed values for overbuy upward trajectory
     down: -100, // fixed value for downward trajectory
-    persistence: 0 // filter spikes by adding extra filters candles
-  }
+    persistence: 0, // filter spikes by adding extra filters candles
+  },
 };
 
 // StochRSI settings
@@ -480,8 +480,8 @@ config.StochRSI = {
     high: 80,
     // How many candle intervals should a trend persist
     // before we consider it real?
-    persistence: 3
-  }
+    persistence: 3,
+  },
 };
 
 
@@ -494,24 +494,24 @@ config['talib-macd'] = {
   parameters: {
     optInFastPeriod: 10,
     optInSlowPeriod: 21,
-    optInSignalPeriod: 9
+    optInSignalPeriod: 9,
   },
   thresholds: {
     down: -0.025,
     up: 0.025,
-  }
+  },
 };
 
 config['talib-macd'] = {
   parameters: {
     optInFastPeriod: 10,
     optInSlowPeriod: 21,
-    optInSignalPeriod: 9
+    optInSignalPeriod: 9,
   },
   thresholds: {
     down: -0.025,
     up: 0.025,
-  }
+  },
 };
 
 config['tulip-adx'] = {
@@ -519,7 +519,7 @@ config['tulip-adx'] = {
   thresholds: {
     down: -0.025,
     up: 0.025,
-  }
+  },
 };
 
 

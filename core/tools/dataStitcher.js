@@ -24,15 +24,15 @@ Stitcher.prototype.verifyExchange = function() {
   let exchange;
   try {
     exchange = exchangeChecker.getExchangeCapabilities(slug);
-  } catch(e) {
+  } catch (e) {
     util.die(e.message);
   }
 
-  if(!exchange)
+  if (!exchange)
     util.die(`Unsupported exchange: ${slug}`);
 
   let error = exchangeChecker.cantMonitor(config.watch);
-  if(error)
+  if (error)
     util.die(error, true);
 };
 
@@ -44,7 +44,7 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
   // - step 3: see if overlap
   // - step 4: feed candle stream into CandleBatcher
 
-  if(config.tradingAdvisor.historySize === 0)
+  if (config.tradingAdvisor.historySize === 0)
     return done();
 
   let requiredHistory = config.tradingAdvisor.candleSize * config.tradingAdvisor.historySize;
@@ -55,7 +55,7 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
   log.info(
     '\tThe trading method requests',
     requiredHistory,
-    'minutes of historic data. Checking availablity..'
+    'minutes of historic data. Checking availablity..',
   );
 
   let endTime = moment().utc().startOf('minute');
@@ -65,22 +65,20 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
     // now we know what data is locally available, what
     // data would we need from the exchange?
 
-    if(!localData) {
+    if (!localData) {
       log.info('\tNo usable local data available, trying to get as much as possible from the exchange..');
       let idealExchangeStartTime = idealStartTime.clone();
       let idealExchangeStartTimeTS = idealExchangeStartTime.unix();
-    }
-    else if (idealStartTime.unix() < localData.from) {
+    } else if (idealStartTime.unix() < localData.from) {
       log.info('\tLocal data is still too recent, trying to get as much as possible from the exchange');
       let idealExchangeStartTime = idealStartTime.clone();
       let idealExchangeStartTimeTS = idealExchangeStartTime.unix();
-    }
-    else {
+    } else {
       log.debug('\tAvailable local data:');
       log.debug('\t\tfrom:', this.ago(localData.from));
       log.debug('\t\tto:', this.ago(localData.to));
 
-      log.info('\tUsable local data available, trying to match with exchange data..')
+      log.info('\tUsable local data available, trying to match with exchange data..');
       // local data is available, we need the next minute
 
 
@@ -93,14 +91,14 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
       util.setConfigProperty(
         'tradingAdvisor',
         'firstFetchSince',
-        idealExchangeStartTimeTS
+        idealExchangeStartTimeTS,
       );
     }
 
     // Limit the history Gekko can try to get from the exchange.
     let minutesAgo = endTime.diff(idealExchangeStartTime, 'minutes');
     let maxMinutesAgo = 4 * 60; // 4 hours
-    if(minutesAgo > maxMinutesAgo) {
+    if (minutesAgo > maxMinutesAgo) {
       log.info('\tPreventing Gekko from requesting', minutesAgo, 'minutes of history.');
       idealExchangeStartTime = endTime.clone().subtract(maxMinutesAgo, 'minutes');
       idealExchangeStartTimeTS = idealExchangeStartTime.unix();
@@ -115,7 +113,7 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
       // in case we have limited local data, and the
       // exchange would offer more than we have: ignore
       // the local data..
-      if(
+      if (
         localData &&
         exchangeData &&
         exchangeData.from < localData.from
@@ -125,14 +123,14 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
       }
 
       let stitchable = localData && exchangeData.from <= localData.to;
-      if(stitchable) {
+      if (stitchable) {
         log.debug('\tStitching datasets');
 
         // we can combine local data with exchange data
-        if(idealStartTime.unix() >= localData.from) {
+        if (idealStartTime.unix() >= localData.from) {
           log.info(
             '\tFull history locally available.',
-            'Seeding the trading method with all required historical candles.'
+            'Seeding the trading method with all required historical candles.',
           );
 
         } else {
@@ -145,7 +143,7 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
             'minutes are missing.');
           log.info('\tSeeding the trading method with',
             'partial historical data (Gekko needs more time before',
-            'it can give advice).'
+            'it can give advice).',
           );
         }
 
@@ -161,20 +159,20 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
         log.debug('\t\tto:', this.ago(to));
         return this.seedLocalData(from, to, done);
 
-      } else if(!stitchable) {
+      } else if (!stitchable) {
         log.debug('\tUnable to stitch datasets.');
         // we cannot use any local data..
         log.info(
-          '\tNot seeding locally available data to the trading method.'
+          '\tNot seeding locally available data to the trading method.',
         );
 
-        if(exchangeData.from < idealExchangeStartTimeTS) {
+        if (exchangeData.from < idealExchangeStartTimeTS) {
           log.info('\tHowever the exchange returned enough data anyway!');
-        } else if(localData) {
+        } else if (localData) {
           log.info(
             '\tThe exchange does not return enough data.',
             Math.round((localData.from - idealStartTime.unix()) / 60),
-            'minutes are still missing.'
+            'minutes are still missing.',
           );
         }
       }
@@ -198,20 +196,20 @@ Stitcher.prototype.checkExchangeTrades = function(since, next) {
 
   let watcher = new DataProvider(exchangeConfig);
   watcher.getTrades(since, function(e, d) {
-    if(e) {
+    if (e) {
       util.die(e.message);
     }
 
-    if(_.isEmpty(d))
+    if (_.isEmpty(d))
       return util.die(
         `Gekko tried to retrieve data since ${since.format('YYYY-MM-DD HH:mm:ss')}, however
-        ${provider} did not return any trades.`
+        ${provider} did not return any trades.`,
       );
 
     next(e, {
       from: _.first(d).date,
-      to: _.last(d).date
-    })
+      to: _.last(d).date,
+    });
   });
 };
 

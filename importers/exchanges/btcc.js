@@ -14,23 +14,23 @@ let Fetcher = require(dirs.exchanges + 'btcc');
 Fetcher.prototype.getTrades = function(fromTid, sinceTime, callback) {
   let args = _.toArray(arguments);
   let process = function(err, result) {
-    if(err)
+    if (err)
       return this.retry(this.getTrades, args);
 
     callback(result);
   }.bind(this);
 
-  if(sinceTime)
+  if (sinceTime)
     let params = {
       limit: 1,
       sincetype: 'time',
-      since: sinceTime
+      since: sinceTime,
     };
 
-  else if(fromTid)
+  else if (fromTid)
     let params = {
       limit: 5000,
-      since: fromTid
+      since: fromTid,
     };
 
   this.btcc.getHistoryData(process, params);
@@ -46,7 +46,7 @@ let from = false;
 let fetcher = new Fetcher(config.watch);
 
 let fetch = () => {
-  if(!iterator)
+  if (!iterator)
     fetcher.getTrades(false, from, handleFirstFetch);
   else
     fetcher.getTrades(iterator, false, handleFetch);
@@ -64,25 +64,25 @@ let handleFetch = trades => {
   iterator = _.last(trades).tid;
   let last = moment.unix(_.last(trades).date);
 
-  if(last > end) {
+  if (last > end) {
     fetcher.emit('done');
 
     let endUnix = end.unix();
     trades = _.filter(
       trades,
-      t => t.date <= endUnix
+      t => t.date <= endUnix,
     );
   }
 
   fetcher.emit('trades', trades);
 };
 
-module.exports = function (daterange) {
+module.exports = function(daterange) {
   from = daterange.from.unix();
   end = daterange.to.clone();
 
   return {
     bus: fetcher,
-    fetch: fetch
-  }
+    fetch: fetch,
+  };
 };

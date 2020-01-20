@@ -1,7 +1,7 @@
 // required indicators
 let SMMA = require('./SMMA.js');
 
-let Indicator = function (settings) {
+let Indicator = function(settings) {
   this.input = 'candle';
   this.lastClose = null;
   this.weight = settings.interval;
@@ -14,7 +14,7 @@ let Indicator = function (settings) {
   this.age = 0;
 };
 
-Indicator.prototype.update = function (candle) {
+Indicator.prototype.update = function(candle) {
   let currentClose = candle.close;
 
   if (this.lastClose === null) {

@@ -11,53 +11,53 @@ let reduce = (state, event) => {
 
   state = {
     ...state,
-    latestUpdate: new Date()
+    latestUpdate: new Date(),
   };
 
-  if(trackAllEvents.includes(type)) {
-    if(!state.events[type]) {
+  if (trackAllEvents.includes(type)) {
+    if (!state.events[type]) {
       state = {
         ...state,
         events: {
           ...state.events,
-          [type]: [ payload ]
-        }
-      }
+          [type]: [payload],
+        },
+      };
     } else {
       state = {
         ...state,
         events: {
           ...state.events,
-          [type]: [ ...state.events[type], payload ]
-        }
-      }
+          [type]: [...state.events[type], payload],
+        },
+      };
     }
   }
 
-  if(!state.events.initial[type] && !skipInitialEvents.includes(type)) {
+  if (!state.events.initial[type] && !skipInitialEvents.includes(type)) {
     state = {
       ...state,
       events: {
         ...state.events,
         initial: {
           ...state.events.initial,
-          [type]: payload
-        }
-      }
-    }
+          [type]: payload,
+        },
+      },
+    };
   }
 
-  if(!skipLatestEvents.includes(type)) {
+  if (!skipLatestEvents.includes(type)) {
     state = {
       ...state,
       events: {
         ...state.events,
         latest: {
           ...state.events.latest,
-          [type]: payload
-        }
-      }
-    }
+          [type]: payload,
+        },
+      },
+    };
   }
 
   return state;

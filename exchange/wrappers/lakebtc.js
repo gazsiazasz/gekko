@@ -1,11 +1,11 @@
-let Lakebtc = require("lakebtc_nodejs");
+let Lakebtc = require('lakebtc_nodejs');
 let _ = require('lodash');
 let moment = require('moment');
 let log = require('../../core/log');
 
 let Trader = function(config) {
   _.bindAll(this);
-  if(_.isObject(config)) {
+  if (_.isObject(config)) {
     this.key = config.key;
     this.secret = config.secret;
     this.clientID = config.username;
@@ -28,15 +28,17 @@ Trader.prototype.retry = function(method, args) {
   // make sure the callback (and any other fn)
   // is bound to Trader
   _.each(args, function(arg, i) {
-    if(_.isFunction(arg))
+    if (_.isFunction(arg))
       args[i] = _.bind(arg, self);
   });
 
   // run the failed method again with the same
   // arguments after wait
   setTimeout(
-    function() { method.apply(self, args) },
-    wait
+    function() {
+      method.apply(self, args);
+    },
+    wait,
   );
 };
 
@@ -44,7 +46,7 @@ Trader.prototype.getPortfolio = function(callback) {
   let set = function(err, data) {
     let portfolio = [];
     _.map(data.balance, function(amount, asset) {
-	  portfolio.push({name: asset, amount: parseFloat(amount)});
+      portfolio.push({ name: asset, amount: parseFloat(amount) });
     });
     callback(err, portfolio);
   };
@@ -61,7 +63,7 @@ Trader.prototype.getFee = function(callback) {
 
 Trader.prototype.buy = function(amount, price, callback) {
   let set = function(err, result) {
-    if(err || result.error)
+    if (err || result.error)
       return log.error('unable to buy:', err, result);
 
     callback(null, result.id);
@@ -78,7 +80,7 @@ Trader.prototype.buy = function(amount, price, callback) {
 
 Trader.prototype.sell = function(amount, price, callback) {
   let set = function(err, result) {
-    if(err || result.error)
+    if (err || result.error)
       return log.error('unable to sell:', err, result);
 
     callback(null, result.id);
@@ -89,7 +91,9 @@ Trader.prototype.sell = function(amount, price, callback) {
 
 Trader.prototype.checkOrder = function(order, callback) {
   let check = function(err, result) {
-    let stillThere = _.find(result, function(o) { return o.id === order });
+    let stillThere = _.find(result, function(o) {
+      return o.id === order;
+    });
     callback(err, !stillThere);
   };
 
@@ -98,7 +102,7 @@ Trader.prototype.checkOrder = function(order, callback) {
 
 Trader.prototype.cancelOrder = function(order, callback) {
   let cancel = function(err, result) {
-    if(err || !result.result)
+    if (err || !result.result)
       log.error('unable to cancel order', order, '(', err, result, ')');
   };
 
@@ -108,15 +112,15 @@ Trader.prototype.cancelOrder = function(order, callback) {
 Trader.prototype.getTrades = function(since, callback, descending) {
   let args = _.toArray(arguments);
   let process = function(err, result) {
-    if(err)
+    if (err)
       return this.retry(this.getTrades, args);
     callback(null, descending ? result.reverse() : result);
   };
   since = since ? since.unix() : moment().subtract(5, 'minutes').unix();
-  this.lakebtc.bctrades( _.bind(process, this), since);
+  this.lakebtc.bctrades(_.bind(process, this), since);
 };
 
-Trader.getCapabilities = function () {
+Trader.getCapabilities = function() {
   return {
     name: 'LakeBTC',
     slug: 'lakebtc',
@@ -124,13 +128,13 @@ Trader.getCapabilities = function () {
     assets: ['BTC'],
     markets: [
       {
-        pair: ['USD', 'BTC'], minimalOrder: { amount: 1, unit: 'currency' }
-      }
+        pair: ['USD', 'BTC'], minimalOrder: { amount: 1, unit: 'currency' },
+      },
     ],
     requires: ['key', 'secret'],
     providesHistory: false,
     fetchTimespan: 60,
-    tid: 'tid'
+    tid: 'tid',
   };
 };
 

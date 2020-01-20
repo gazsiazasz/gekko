@@ -10,7 +10,7 @@ let ListManager = function() {
 
 // add an item to the list
 ListManager.prototype.add = function(obj) {
-  if(!obj.id)
+  if (!obj.id)
     return false;
   this._list.push(_.clone(obj));
   return true;
@@ -19,7 +19,7 @@ ListManager.prototype.add = function(obj) {
 // update some properties on an item
 ListManager.prototype.update = function(id, updates) {
   let item = this._list.find(i => i.id === id);
-  if(!item)
+  if (!item)
     return false;
   _.merge(item, updates);
   return true;
@@ -33,7 +33,7 @@ ListManager.prototype.get = function(id) {
 // push a value to a array property of an item
 ListManager.prototype.push = function(id, prop, value) {
   let item = this._list.find(i => i.id === id);
-  if(!item)
+  if (!item)
     return false;
 
   item[prop].push(value);

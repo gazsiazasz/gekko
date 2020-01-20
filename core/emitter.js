@@ -17,12 +17,12 @@ util.inherits(GekkoEventEmitter, NativeEventEmitter);
 
 // push to stack
 GekkoEventEmitter.prototype.deferredEmit = function(name, payload) {
-  this.defferedEvents.push({name, payload});
+  this.defferedEvents.push({ name, payload });
 };
 
 // resolve FIFO
 GekkoEventEmitter.prototype.broadcastDeferredEmit = function() {
-  if(this.defferedEvents.length === 0)
+  if (this.defferedEvents.length === 0)
     return false;
 
   let event = this.defferedEvents.shift();

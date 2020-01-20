@@ -12,7 +12,7 @@ let sqlite3 = require('sqlite3');
 module.exports = done => {
   let dbDirectory = dirs.gekko + config.sqlite.dataDirectory;
 
-  if(!fs.existsSync(dbDirectory))
+  if (!fs.existsSync(dbDirectory))
     return done(null, []);
 
   let files = fs.readdirSync(dbDirectory);
@@ -20,45 +20,43 @@ module.exports = done => {
   let dbs = files
     .filter(f => {
       let parts = f.split('.');
-      if(_.last(parts) === 'db')
+      if (_.last(parts) === 'db')
         return true;
     });
 
-  if(!_.size(dbs))
+  if (!_.size(dbs))
     return done(null, []);
 
   let markets = [];
 
   async.each(dbs, (db, next) => {
 
-    let exchange = _.first(db.split('_'));
-    let handle = new sqlite3.Database(dbDirectory + '/' + db, sqlite3.OPEN_READONLY, err => {
-      if(err)
-        return next(err);
-
-      handle.all(`SELECT name FROM sqlite_master WHERE type='table'`, (err, tables) => {
-        if(err)
+      let exchange = _.first(db.split('_'));
+      let handle = new sqlite3.Database(dbDirectory + '/' + db, sqlite3.OPEN_READONLY, err => {
+        if (err)
           return next(err);
 
-        _.each(tables, table => {
-          let parts = table.name.split('_');
-          let first = parts.shift();
-          if(first === 'candles')
-            markets.push({
-              exchange: exchange,
-              currency: _.first(parts),
-              asset: _.last(parts)
-            });
+        handle.all(`SELECT name FROM sqlite_master WHERE type='table'`, (err, tables) => {
+          if (err)
+            return next(err);
+
+          _.each(tables, table => {
+            let parts = table.name.split('_');
+            let first = parts.shift();
+            if (first === 'candles')
+              markets.push({
+                exchange: exchange,
+                currency: _.first(parts),
+                asset: _.last(parts),
+              });
+          });
+
+          next();
         });
-
-        next();
       });
+    },
+    // got all tables!
+    err => {
+      done(err, markets);
     });
-
-
-  },
-  // got all tables!
-  err => {
-    done(err, markets);
-  });
 };

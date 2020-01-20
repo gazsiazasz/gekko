@@ -24,13 +24,13 @@ let Blotter = function(done) {
 
 Blotter.prototype.setup = function(done) {
 
-  this.headertxt = "Date,Price,Amount,Side,Fees,Value,P&L,Notes\n";
+  this.headertxt = 'Date,Price,Amount,Side,Fees,Value,P&L,Notes\n';
 
   fsw.readFile(this.filename, (err, _) => {
     if (err) {
       log.warn('No file with the name', this.filename, 'found. Creating new blotter file');
       fsw.appendFile(this.filename, this.headertxt, 'utf8', (err) => {
-        if(err) {
+        if (err) {
           log.error('Unable to write header text to blotter');
         }
       });
@@ -61,19 +61,18 @@ Blotter.prototype.processTradeCompleted = function(trade) {
 
   if (trade.action === 'buy') {
     //time, price, amount, side, fees, value at buy
-    this.outtxt = this.time + "," + trade.effectivePrice.toFixed(2) + "," + trade.amount.toFixed(8) + "," + trade.action + "," + trade.feePercent + "," + this.valueAtBuy;
-    if ((trade.price === 0 || isNaN(trade.price)) && (trade.amount === 0|| isNaN(trade.amount))) {
-      this.outtxt = this.outtxt + "," + ",Trade probably went through but didn't receive correct price/amount info\n";
+    this.outtxt = this.time + ',' + trade.effectivePrice.toFixed(2) + ',' + trade.amount.toFixed(8) + ',' + trade.action + ',' + trade.feePercent + ',' + this.valueAtBuy;
+    if ((trade.price === 0 || isNaN(trade.price)) && (trade.amount === 0 || isNaN(trade.amount))) {
+      this.outtxt = this.outtxt + ',' + ',Trade probably went through but didn\'t receive correct price/amount info\n';
     } else {
-      this.outtxt = this.outtxt  + "\n";
+      this.outtxt = this.outtxt + '\n';
     }
     this.writeBlotter();
-  }
-  else if (trade.action === 'sell'){
+  } else if (trade.action === 'sell') {
     let sellValue = (this.roundUp(trade.effectivePrice * trade.amount));
     //time, price, amount, side, fees, value at sell
-    this.outtxt = this.time + "," + trade.effectivePrice.toFixed(2) + "," + trade.amount.toFixed(8) + "," + trade.action + "," + trade.feePercent + "," + sellValue + ",";
-    if ((trade.price === 0 || isNaN(trade.price)) && (trade.amount === 0|| isNaN(trade.amount))) {
+    this.outtxt = this.time + ',' + trade.effectivePrice.toFixed(2) + ',' + trade.amount.toFixed(8) + ',' + trade.action + ',' + trade.feePercent + ',' + sellValue + ',';
+    if ((trade.price === 0 || isNaN(trade.price)) && (trade.amount === 0 || isNaN(trade.amount))) {
       this.inaccurateData = true;
     }
     this.valueAtBuy = 0.0;
@@ -84,7 +83,7 @@ Blotter.prototype.processTradeCompleted = function(trade) {
 
 Blotter.prototype.writeBlotter = function() {
   fsw.appendFile(this.filename, this.outtxt, 'utf8', (err) => {
-    if(err) {
+    if (err) {
       log.error('Unable to write trade to blotter');
     }
   });
@@ -93,12 +92,12 @@ Blotter.prototype.writeBlotter = function() {
 Blotter.prototype.processRoundtrip = function(trip) {
   log.info('Roundtrip', trip);
   if (!this.tradeError) {
-    this.outtxt = this.outtxt + this.roundUp(trip.pnl) +'\n';
+    this.outtxt = this.outtxt + this.roundUp(trip.pnl) + '\n';
     this.writeBlotter();
     return;
   }
   if (this.inaccurateData) {
-    this.outtxt = this.outtxt + this.roundUp(trip.pnl) + ",Trade probably went through but didn't receive correct price/amount info\n";
+    this.outtxt = this.outtxt + this.roundUp(trip.pnl) + ',Trade probably went through but didn\'t receive correct price/amount info\n';
     this.inaccurateData = false;
     this.writeBlotter;
     return;

@@ -21,18 +21,18 @@ let to = moment.utc(daterange.to).startOf('minute');
 let from = moment.utc(daterange.from).startOf('minute');
 let toUnix = to.unix();
 
-if(to <= from)
+if (to <= from)
   util.die('This daterange does not make sense.');
 
-if(!from.isValid())
+if (!from.isValid())
   util.die('invalid `from`');
 
-if(!to.isValid())
+if (!to.isValid())
   util.die('invalid `to`');
 
 let iterator = {
   from: from.clone(),
-  to: from.clone().add(batchSize, 'm').subtract(1, 's')
+  to: from.clone().add(batchSize, 'm').subtract(1, 's'),
 };
 
 let DONE = false;
@@ -44,7 +44,7 @@ let next;
 let doneFn = () => {
   process.nextTick(() => {
     next(result);
-  })
+  });
 };
 
 module.exports = function(candleSize, _next) {
@@ -61,30 +61,30 @@ let getBatch = () => {
     iterator.from.unix(),
     iterator.to.unix(),
     'full',
-    handleCandles
-  )
+    handleCandles,
+  );
 };
 
 let shiftIterator = () => {
   iterator = {
     from: iterator.from.clone().add(batchSize, 'm'),
-    to: iterator.from.clone().add(batchSize * 2, 'm').subtract(1, 's')
-  }
+    to: iterator.from.clone().add(batchSize * 2, 'm').subtract(1, 's'),
+  };
 };
 
 let handleCandles = (err, data) => {
-  if(err) {
+  if (err) {
     console.error(err);
-    util.die('Encountered an error..')
+    util.die('Encountered an error..');
   }
 
-  if(_.size(data) && _.last(data).start >= toUnix || iterator.from.unix() >= toUnix)
+  if (_.size(data) && _.last(data).start >= toUnix || iterator.from.unix() >= toUnix)
     DONE = true;
 
   batcher.write(data);
   batcher.flush();
 
-  if(DONE) {
+  if (DONE) {
     reader.close();
 
     setTimeout(doneFn, 100);

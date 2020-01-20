@@ -15,15 +15,15 @@ module.exports = (mode, config, callback) => {
   let message = {
     what: 'start',
     mode: mode,
-    config: config
+    config: config,
   };
 
   child.on('message', function(m) {
-    if(m === 'ready')
+    if (m === 'ready')
       return child.send(message);
 
-    if(m === 'done')
-      return child.send({what: 'exit'});
+    if (m === 'done')
+      return child.send({ what: 'exit' });
 
     handle.message(m);
   });

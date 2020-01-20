@@ -5,12 +5,12 @@ let errors = require('./exchangeErrors');
 let _ = require('lodash');
 
 let retryInstance = (options, checkFn, callback, e) => {
-  if(!options) {
+  if (!options) {
     options = {
       retries: 100,
       factor: 1.2,
       minTimeout: 1 * 1000,
-      maxTimeout: 4 * 1000
+      maxTimeout: 4 * 1000,
     };
   }
 
@@ -20,22 +20,22 @@ let retryInstance = (options, checkFn, callback, e) => {
   operation.attempt(function(currentAttempt) {
     checkFn((err, result) => {
 
-      if(!err) {
+      if (!err) {
         return callback(undefined, result);
       }
 
       console.log(new Date, err.message);
 
       let maxAttempts = err.retry;
-      if(maxAttempts === true)
+      if (maxAttempts === true)
         maxAttempts = 10;
 
-      if(err.retry && attempt++ < maxAttempts) {
+      if (err.retry && attempt++ < maxAttempts) {
         return operation.retry(err);
       }
 
-      if(err.notFatal) {
-        if(err.backoffDelay) {
+      if (err.notFatal) {
+        if (err.backoffDelay) {
           return setTimeout(() => operation.retry(err), err.backoffDelay);
         }
 
@@ -51,32 +51,32 @@ let retryInstance = (options, checkFn, callback, e) => {
 let allMethods = targetClass => {
   let propertys = Object.getOwnPropertyNames(Object.getPrototypeOf(targetClass));
   propertys.splice(propertys.indexOf('constructor'), 1);
-  return propertys
+  return propertys;
 };
 
 let bindAll = (targetClass, methodNames = []) => {
   for (let name of !methodNames.length ? allMethods(targetClass) : methodNames) {
-    targetClass[name] = targetClass[name].bind(targetClass)
+    targetClass[name] = targetClass[name].bind(targetClass);
   }
 };
 
-let isValidOrder = ({api, market, amount, price}) => {
+let isValidOrder = ({ api, market, amount, price }) => {
   let reason = false;
 
   // Check amount
-  if(amount < market.minimalOrder.amount) {
+  if (amount < market.minimalOrder.amount) {
     reason = 'Amount is too small';
   }
 
   // Some exchanges have restrictions on prices
-  if(
+  if (
     _.isFunction(api.isValidPrice) &&
     !api.isValidPrice(price)
   ) {
     reason = 'Price is not valid';
   }
 
-  if(
+  if (
     _.isFunction(api.isValidLot) &&
     !api.isValidLot(price, amount)
   ) {
@@ -85,28 +85,28 @@ let isValidOrder = ({api, market, amount, price}) => {
 
   return {
     reason,
-    valid: !reason
-  }
+    valid: !reason,
+  };
 };
 
 
 // https://gist.github.com/jiggzson/b5f489af9ad931e3d186
 let scientificToDecimal = num => {
-  if(/\d+\.?\d*e[+\-]*\d+/i.test(num)) {
+  if (/\d+\.?\d*e[+\-]*\d+/i.test(num)) {
     let zero = '0';
     let parts = String(num).toLowerCase().split('e'); // split into coeff and exponent
     let e = parts.pop(); // store the exponential part
     let l = Math.abs(e); // get the number of zeros
-    let sign = e/l;
+    let sign = e / l;
     let coeff_array = parts[0].split('.');
-    if(sign === -1) {
+    if (sign === -1) {
       num = zero + '.' + new Array(l).join(zero) + coeff_array.join('');
     } else {
       let dec = coeff_array[1];
-      if(dec) {
+      if (dec) {
         l = l - dec.length;
       }
-      num = coeff_array.join('') + new Array(l+1).join(zero);
+      num = coeff_array.join('') + new Array(l + 1).join(zero);
     }
   } else {
     // make sure we always cast to string
@@ -124,25 +124,25 @@ let cacheFn = (fn, timeout) => {
   let callbackQueue = [];
 
   return next => {
-    if(inflight) {
+    if (inflight) {
       return callbackQueue.push(next);
     }
 
     let now = +new Date;
-    if(cache && now >= nextCall) {
+    if (cache && now >= nextCall) {
       return next(res.error, res.result);
     }
 
     inflight = true;
     fn((error, result) => {
-      cache = {error, result};
+      cache = { error, result };
       nextCall = now + timeout;
       next(error, result);
       callbackQueue.forEach(cb => cb(error, result));
       callbackQueue = [];
       inflight = false;
-    })
-  }
+    });
+  };
 };
 
 module.exports = {
@@ -150,5 +150,5 @@ module.exports = {
   bindAll,
   isValidOrder,
   scientificToDecimal,
-  cacheFn
+  cacheFn,
 };

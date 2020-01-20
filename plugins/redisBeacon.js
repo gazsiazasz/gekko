@@ -7,7 +7,7 @@ let watch = config.watch;
 let subscriptions = require('../subscriptions');
 let _ = require('lodash');
 
-let redis = require("redis");
+let redis = require('redis');
 
 let Actor = function(done) {
   _.bindAll(this);
@@ -15,7 +15,7 @@ let Actor = function(done) {
   this.market = [
     watch.exchange,
     watch.currency,
-    watch.asset
+    watch.asset,
   ].join('-');
 
   this.init(done);
@@ -31,20 +31,22 @@ let Actor = function(done) {
 let proto = {};
 _.each(redisBeacon.broadcast, function(e) {
   // grab the corresponding subscription
-  let subscription = _.find(subscriptions, function(s) { return s.event === e });
+  let subscription = _.find(subscriptions, function(s) {
+    return s.event === e;
+  });
 
-  if(!subscription)
+  if (!subscription)
     util.die('Gekko does not know this event:' + e);
 
   let channel = redisBeacon.channelPrefix + subscription.event;
 
   proto[subscription.handler] = function(message, cb) {
-    if(!_.isFunction(cb))
+    if (!_.isFunction(cb))
       cb = _.noop;
 
     this.emit(channel, {
       market: this.market,
-      data: message
+      data: message,
     }, cb);
   };
 

@@ -5,17 +5,17 @@ let config = require('../core/util').getConfig();
 let ircbot = config.ircbot;
 let utc = moment.utc;
 
-let irc = require("irc");
+let irc = require('irc');
 
 let Actor = function() {
   _.bindAll(this);
 
   this.bot = new irc.Client(ircbot.server, ircbot.botName, {
-    channels: [ ircbot.channel ]
+    channels: [ircbot.channel],
   });
 
-  this.bot.addListener("message", this.verifyQuestion);
-  this.bot.addListener("error", this.logError);
+  this.bot.addListener('message', this.verifyQuestion);
+  this.bot.addListener('error', this.logError);
 
   this.advice = 'Dont got one yet :(';
   this.adviceTime = utc();
@@ -28,7 +28,7 @@ let Actor = function() {
     ';;price': 'emitPrice',
     ';;donate': 'emitDonation',
     ';;real advice': 'emitRealAdvice',
-    ';;help': 'emitHelp'
+    ';;help': 'emitHelp',
   };
 
   this.rawCommands = _.keys(this.commands);
@@ -42,16 +42,16 @@ Actor.prototype.processCandle = function(candle, done) {
 };
 
 Actor.prototype.processAdvice = function(advice) {
-  if (advice.recommendation === "soft" && ircbot.muteSoft) return;
+  if (advice.recommendation === 'soft' && ircbot.muteSoft) return;
   this.advice = advice.recommendation;
   this.adviceTime = utc();
 
-  if(ircbot.emitUpdates)
+  if (ircbot.emitUpdates)
     this.newAdvice();
 };
 
 Actor.prototype.verifyQuestion = function(from, to, text, message) {
-  if(text in this.commands)
+  if (text in this.commands)
     this[this.commands[text]]();
 };
 
@@ -78,8 +78,8 @@ Actor.prototype.emitAdvice = function() {
     ' ',
     config.watch.asset,
     ' (from ',
-      this.adviceTime.fromNow(),
-    ')'
+    this.adviceTime.fromNow(),
+    ')',
   ].join('');
 
   this.bot.say(ircbot.channel, message);
@@ -100,8 +100,8 @@ Actor.prototype.emitPrice = function() {
     ' ',
     config.watch.currency,
     ' (from ',
-      this.priceTime.fromNow(),
-    ')'
+    this.priceTime.fromNow(),
+    ')',
   ].join('');
 
   this.bot.say(ircbot.channel, message);
@@ -121,7 +121,7 @@ Actor.prototype.emitHelp = function() {
     function(message, command) {
       return message + ' ' + command + ',';
     },
-    'possible commands are:'
+    'possible commands are:',
   );
 
   message = message.substr(0, _.size(message) - 1) + '.';
@@ -140,7 +140,7 @@ Actor.prototype.emitRealAdvice = function() {
     'The most valuable commodity I know of is information.',
     'It\'s not a question of enough, pal. It\'s a zero sum game, somebody wins, somebody loses. Money itself isn\'t lost or made, it\'s simply transferred from one perception to another.',
     'What\'s worth doing is worth doing for money. (Wait, wasn\'t I a free and open source bot?)',
-    'When I get a hold of the son of a bitch who leaked this, I\'m gonna tear his eyeballs out and I\'m gonna suck his fucking skull.'
+    'When I get a hold of the son of a bitch who leaked this, I\'m gonna tear his eyeballs out and I\'m gonna suck his fucking skull.',
   ];
 
   this.bot.say(ircbot.channel, _.first(_.shuffle(realAdvice)));
@@ -149,6 +149,5 @@ Actor.prototype.emitRealAdvice = function() {
 Actor.prototype.logError = function(message) {
   log.error('IRC ERROR:', message);
 };
-
 
 module.exports = Actor;

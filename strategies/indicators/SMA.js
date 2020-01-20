@@ -15,7 +15,7 @@ Indicator.prototype.update = function(price) {
   this.prices[this.age] = price;
   this.sum += price - tail;
   this.result = this.sum / this.prices.length;
-  this.age = (this.age + 1) % this.windowLength
+  this.age = (this.age + 1) % this.windowLength;
 };
 
 module.exports = Indicator;

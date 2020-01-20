@@ -16,7 +16,7 @@ let Gekko = function(plugins) {
   this.plugins = plugins;
   this.candleConsumers = plugins
     .filter(plugin => plugin.processCandle);
-  Writable.call(this, {objectMode: true});
+  Writable.call(this, { objectMode: true });
 
   this.producers = this.plugins
     .filter(p => p.meta.emits);
@@ -25,14 +25,14 @@ let Gekko = function(plugins) {
 };
 
 Gekko.prototype = Object.create(Writable.prototype, {
-  constructor: { value: Gekko }
+  constructor: { value: Gekko },
 });
 
-if(config.debug && mode !== 'importer') {
+if (config.debug && mode !== 'importer') {
   // decorate with more debug information
   Gekko.prototype._write = function(chunk, encoding, _done) {
 
-    if(chunk.isFinished) {
+    if (chunk.isFinished) {
       return this.finalize();
     }
 
@@ -41,10 +41,10 @@ if(config.debug && mode !== 'importer') {
     let at = null;
 
     let timer = setTimeout(() => {
-      if(!relayed)
+      if (!relayed)
         log.error([
           `The plugin "${at}" has not processed a candle for 1 second.`,
-          `This will cause Gekko to slow down or stop working completely.`
+          `This will cause Gekko to slow down or stop working completely.`,
         ].join(' '));
     }, 1000);
 
@@ -58,11 +58,11 @@ if(config.debug && mode !== 'importer') {
       at = c.meta.name;
       c.processCandle(chunk, flushEvents);
     }, this);
-  }
+  };
 } else {
   // skip decoration
   Gekko.prototype._write = function(chunk, encoding, _done) {
-    if(chunk.isFinished) {
+    if (chunk.isFinished) {
       return this.finalize();
     }
 
@@ -73,29 +73,29 @@ if(config.debug && mode !== 'importer') {
     _.each(this.candleConsumers, function(c) {
       c.processCandle(chunk, flushEvents);
     }, this);
-  }
+  };
 }
 
 Gekko.prototype.flushDefferedEvents = function() {
   let broadcasted = _.find(
     this.producers,
-    producer => producer.broadcastDeferredEmit()
+    producer => producer.broadcastDeferredEmit(),
   );
 
   // If we braodcasted anything we might have
   // triggered more events, recurse until we
   // have fully broadcasted everything.
-  if(broadcasted)
+  if (broadcasted)
     this.flushDefferedEvents();
 };
 
 Gekko.prototype.finalize = function() {
   let tradingMethod = _.find(
     this.candleConsumers,
-    c => c.meta.name === 'Trading Advisor'
+    c => c.meta.name === 'Trading Advisor',
   );
 
-  if(!tradingMethod)
+  if (!tradingMethod)
     return this.shutdown();
 
   tradingMethod.finish(this.shutdown.bind(this));
@@ -114,7 +114,7 @@ Gekko.prototype.shutdown = function() {
       // so that is has time to process all remaining events (and send report data)
       if (env === 'child-process') process.send('done');
       else process.exit(0);
-    }
+    },
   );
 };
 

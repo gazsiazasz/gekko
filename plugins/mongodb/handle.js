@@ -9,7 +9,7 @@ let dirs = util.dirs();
 let pluginHelper = require(`${dirs.core}pluginUtil`);
 let pluginMock = {
   slug: 'mongodb adapter',
-  dependencies: config.mongodb.dependencies
+  dependencies: config.mongodb.dependencies,
 };
 
 // exit if plugin couldn't be loaded
@@ -22,7 +22,7 @@ let mode = util.gekkoMode();
 
 let collections = [
   mongoUtil.settings.historyCollection,
-  mongoUtil.settings.adviceCollection
+  mongoUtil.settings.adviceCollection,
 ];
 
 let connection = mongojs(config.mongodb.connectionString, collections);
@@ -38,10 +38,10 @@ if (mode === 'backtest') {
     if (docs.length === 0) {
       util.die(`History table for ${config.watch.exchange} with pair ${pair} is empty.`);
     }
-  })
+  });
 }
 
-if(mongoUtil.settings.exchange) {
-    collection.createIndex({start: 1, pair: 1}, {unique: true}); // create unique index on "time" and "pair"
+if (mongoUtil.settings.exchange) {
+  collection.createIndex({ start: 1, pair: 1 }, { unique: true }); // create unique index on "time" and "pair"
 }
 module.exports = connection;

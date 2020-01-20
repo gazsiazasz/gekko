@@ -18,9 +18,10 @@ describe('exchange/triggers/trailingStop', () => {
       let ts = new TrailingStop({
         trail: 10,
         initialPrice: 100,
-        onTrigger: () => {}
-      })
-    }).to.not.throw()
+        onTrigger: () => {
+        },
+      });
+    }).to.not.throw();
   });
 
   it('should call onTrigger when the stop hits', () => {
@@ -29,7 +30,7 @@ describe('exchange/triggers/trailingStop', () => {
     let ts = new TrailingStop({
       trail: 10,
       initialPrice: 100,
-      onTrigger: spy
+      onTrigger: spy,
     });
 
     ts.updatePrice(50);
@@ -42,7 +43,7 @@ describe('exchange/triggers/trailingStop', () => {
 
     let ts = new TrailingStop({
       trail: 10,
-      initialPrice: 100
+      initialPrice: 100,
     });
 
     ts.on('trigger', spy);
@@ -58,7 +59,7 @@ describe('exchange/triggers/trailingStop', () => {
     let ts = new TrailingStop({
       trail: 10,
       initialPrice: 100,
-      onTrigger: spy
+      onTrigger: spy,
     });
 
     ts.updatePrice(100);
@@ -76,7 +77,7 @@ describe('exchange/triggers/trailingStop', () => {
     let ts = new TrailingStop({
       trail: 10,
       initialPrice: 100,
-      onTrigger: spy
+      onTrigger: spy,
     });
 
     ts.updatePrice(99);
@@ -98,7 +99,7 @@ describe('exchange/triggers/trailingStop', () => {
     let ts = new TrailingStop({
       trail: 10,
       initialPrice: 100,
-      onTrigger: spy
+      onTrigger: spy,
     });
 
     ts.updatePrice(99);
@@ -118,7 +119,7 @@ describe('exchange/triggers/trailingStop', () => {
     let ts = new TrailingStop({
       trail: 10,
       initialPrice: 100,
-      onTrigger: spy
+      onTrigger: spy,
     });
 
     ts.updatePrice(101);
@@ -140,7 +141,7 @@ describe('exchange/triggers/trailingStop', () => {
     let ts = new TrailingStop({
       trail: 10,
       initialPrice: 100,
-      onTrigger: spy
+      onTrigger: spy,
     });
 
     ts.updatePrice(90);
@@ -152,13 +153,13 @@ describe('exchange/triggers/trailingStop', () => {
     expect(spy2.called).to.be.false;
   });
 
-    it('should not trigger when the the price swings above the trail', () => {
+  it('should not trigger when the the price swings above the trail', () => {
     let spy = sinon.spy();
 
     let ts = new TrailingStop({
       trail: 10,
       initialPrice: 100,
-      onTrigger: spy
+      onTrigger: spy,
     });
 
     ts.updatePrice(110);

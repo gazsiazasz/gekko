@@ -15,13 +15,13 @@ let Store = function(done, pluginMeta) {
 };
 
 Store.prototype.writeCandles = function() {
-  if(_.isEmpty(this.cache)){
+  if (_.isEmpty(this.cache)) {
     return;
   }
 
   //log.debug('Writing candles to DB!');
   _.each(this.cache, candle => {
-    let stmt =  `
+    let stmt = `
     BEGIN;
     LOCK TABLE ${postgresUtil.table('candles')} IN SHARE ROW EXCLUSIVE MODE;
     INSERT INTO ${postgresUtil.table('candles')}
@@ -33,14 +33,14 @@ Store.prototype.writeCandles = function() {
     COMMIT;
     `;
 
-    this.db.connect((err,client,done) => {
-      if(err) {
+    this.db.connect((err, client, done) => {
+      if (err) {
         util.die(err);
       }
       client.query(stmt, (err, res) => {
         done();
         if (err) {
-          log.debug(err.stack)
+          log.debug(err.stack);
         } else {
           //log.debug(res)
         }
@@ -65,7 +65,7 @@ let finalize = function(done) {
   done();
 };
 
-if(config.candleWriter.enabled) {
+if (config.candleWriter.enabled) {
   Store.prototype.processCandle = processCandle;
   Store.prototype.finalize = finalize;
 }

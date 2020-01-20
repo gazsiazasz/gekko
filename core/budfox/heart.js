@@ -9,7 +9,7 @@ let moment = require('moment');
 let TICKRATE;
 if (util.getConfig().watch.tickrate)
   TICKRATE = util.getConfig().watch.tickrate;
-else if(util.getConfig().watch.exchange === 'okcoin')
+else if (util.getConfig().watch.exchange === 'okcoin')
   TICKRATE = 2;
 else
   TICKRATE = 20;
@@ -28,10 +28,10 @@ Heart.prototype.pump = function() {
 };
 
 Heart.prototype.tick = function() {
-  if(this.lastTick) {
+  if (this.lastTick) {
     // make sure the last tick happened not to lang ago
     // @link https://github.com/askmike/gekko/issues/514
-    if(this.lastTick < moment().unix() - TICKRATE * 3)
+    if (this.lastTick < moment().unix() - TICKRATE * 3)
       util.die('Failed to tick in time, see https://github.com/askmike/gekko/issues/514 for details', true);
   }
 
@@ -42,7 +42,7 @@ Heart.prototype.tick = function() {
 Heart.prototype.scheduleTicks = function() {
   setInterval(
     this.tick,
-    +moment.duration(TICKRATE, 's')
+    +moment.duration(TICKRATE, 's'),
   );
 
   // start!

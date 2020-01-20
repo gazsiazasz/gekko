@@ -17,19 +17,19 @@ module.exports = function(config, done) {
 
   scan((err, markets) => {
 
-    if(err)
+    if (err)
       return done(err);
 
-      let numCPUCores = os.cpus().length;
-      if(numCPUCores === undefined)
-         numCPUCores = 1;
-      async.eachLimit(markets, numCPUCores, (market, next) => {
+    let numCPUCores = os.cpus().length;
+    if (numCPUCores === undefined)
+      numCPUCores = 1;
+    async.eachLimit(markets, numCPUCores, (market, next) => {
 
       let marketConfig = _.clone(config);
       marketConfig.watch = market;
 
       dateRangeScan(marketConfig, (err, ranges) => {
-        if(err)
+        if (err)
           return next();
 
         market.ranges = ranges;
@@ -40,15 +40,15 @@ module.exports = function(config, done) {
     }, err => {
       let resp = {
         datasets: [],
-        errors: []
+        errors: [],
       };
       markets.forEach(market => {
-        if(market.ranges)
+        if (market.ranges)
           resp.datasets.push(market);
         else
           resp.errors.push(market);
       });
       done(err, resp);
-    })
+    });
   });
 };

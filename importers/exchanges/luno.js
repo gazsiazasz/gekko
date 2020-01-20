@@ -19,7 +19,7 @@ Fetcher.prototype.getTrades = function(since, callback, descending) {
     'TIMEDOUT',
     'CONNRESET',
     'CONNREFUSED',
-    'NOTFOUND'
+    'NOTFOUND',
   ];
 
   let processResponse = function(funcName, callback) {
@@ -43,7 +43,7 @@ Fetcher.prototype.getTrades = function(since, callback, descending) {
       }
 
       return callback(undefined, body);
-    }
+    };
   };
 
   let process = (err, result) => {
@@ -63,7 +63,7 @@ Fetcher.prototype.getTrades = function(since, callback, descending) {
   };
 
   if (moment.isMoment(since)) since = since.valueOf();
-  (_.isNumber(since) && since > 0) ? since: since = 0;
+  (_.isNumber(since) && since > 0) ? since : since = 0;
 
   console.log('importer getting trades from Luno since', moment.utc(since).format('YYYY-MM-DD HH:mm:ss'), 'UTC');
 

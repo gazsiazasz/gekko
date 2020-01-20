@@ -14,7 +14,7 @@ let Store = function(done, pluginMeta) {
   this.db.serialize(this.upsertTables);
 
   this.cache = [];
-  this.buffered = util.gekkoMode() === "importer";
+  this.buffered = util.gekkoMode() === 'importer';
 };
 
 Store.prototype.upsertTables = function() {
@@ -49,21 +49,21 @@ Store.prototype.upsertTables = function() {
 };
 
 Store.prototype.writeCandles = function() {
-  if(_.isEmpty(this.cache))
+  if (_.isEmpty(this.cache))
     return;
 
   let transaction = () => {
-    this.db.run("BEGIN TRANSACTION");
+    this.db.run('BEGIN TRANSACTION');
 
     let stmt = this.db.prepare(`
       INSERT OR IGNORE INTO ${sqliteUtil.table('candles')}
       VALUES (?,?,?,?,?,?,?,?,?)
     `, function(err, rows) {
-        if(err) {
-          log.error(err);
-          return util.die('DB error at INSERT: '+ err);
-        }
-      });
+      if (err) {
+        log.error(err);
+        return util.die('DB error at INSERT: ' + err);
+      }
+    });
 
     _.each(this.cache, candle => {
       stmt.run(
@@ -75,14 +75,14 @@ Store.prototype.writeCandles = function() {
         candle.close,
         candle.vwp,
         candle.volume,
-        candle.trades
+        candle.trades,
       );
     });
 
     stmt.finalize();
-    this.db.run("COMMIT");
+    this.db.run('COMMIT');
     // TEMP: should fix https://forum.gekko.wizb.it/thread-57279-post-59194.html#pid59194
-    this.db.run("pragma wal_checkpoint;");
+    this.db.run('pragma wal_checkpoint;');
 
     this.cache = [];
   };
@@ -100,11 +100,13 @@ let processCandle = function(candle, done) {
 
 let finalize = function(done) {
   this.writeCandles();
-  this.db.close(() => { done(); });
+  this.db.close(() => {
+    done();
+  });
   this.db = null;
 };
 
-if(config.candleWriter.enabled) {
+if (config.candleWriter.enabled) {
   Store.prototype.processCandle = processCandle;
   Store.prototype.finalize = finalize;
 }

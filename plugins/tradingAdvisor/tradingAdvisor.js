@@ -28,7 +28,7 @@ let Actor = function(done) {
   // so that the strat can use this data as a "warmup period"
   //
   // the realtime "leech" market won't use the stitcher
-  if(mode === 'realtime' && !isLeecher) {
+  if (mode === 'realtime' && !isLeecher) {
     let Stitcher = require(dirs.tools + 'dataStitcher');
     let stitcher = new Stitcher(this.batcher);
     stitcher.prepareHistoricalData(done);
@@ -38,7 +38,7 @@ let Actor = function(done) {
 
 Actor.prototype.setupStrategy = function() {
 
-  if(!fs.existsSync(dirs.methods + this.strategyName + '.js'))
+  if (!fs.existsSync(dirs.methods + this.strategyName + '.js'))
     util.die('Gekko can\'t find the strategy "' + this.strategyName + '"');
 
   log.info('\t', 'Using the strategy: ' + this.strategyName);
@@ -54,7 +54,7 @@ Actor.prototype.setupStrategy = function() {
   });
 
   let stratSettings;
-  if(config[this.strategyName]) {
+  if (config[this.strategyName]) {
     stratSettings = config[this.strategyName];
   }
 
@@ -62,15 +62,15 @@ Actor.prototype.setupStrategy = function() {
   this.strategy
     .on(
       'stratWarmupCompleted',
-      e => this.deferredEmit('stratWarmupCompleted', e)
+      e => this.deferredEmit('stratWarmupCompleted', e),
     )
     .on('advice', this.relayAdvice)
     .on(
       'stratUpdate',
-      e => this.deferredEmit('stratUpdate', e)
+      e => this.deferredEmit('stratUpdate', e),
     ).on('stratNotification',
-      e => this.deferredEmit('stratNotification', e)
-    );
+    e => this.deferredEmit('stratNotification', e),
+  );
 
   this.strategy
     .on('tradeCompleted', this.processTradeCompleted);
@@ -88,7 +88,7 @@ Actor.prototype.setupStrategy = function() {
 Actor.prototype.processCandle = function(candle, done) {
   this.candle = candle;
   let completedBatch = this.batcher.write([candle]);
-  if(completedBatch) {
+  if (completedBatch) {
     this.next = done;
   } else {
     done();

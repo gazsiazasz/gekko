@@ -20,7 +20,7 @@ let AsyncIndicatorRunner = function() {
     high: [],
     low: [],
     close: [],
-    volume: []
+    volume: [],
   };
 
   this.candlePropsCacheSize = 1000;
@@ -31,8 +31,8 @@ let AsyncIndicatorRunner = function() {
 };
 
 AsyncIndicatorRunner.prototype.processCandle = function(candle, next) {
-  if(this.inflight) {
-    return this.backlog.push({candle, next});
+  if (this.inflight) {
+    return this.backlog.push({ candle, next });
   }
 
   this.age++;
@@ -44,7 +44,7 @@ AsyncIndicatorRunner.prototype.processCandle = function(candle, next) {
   this.candleProps.close.push(candle.close);
   this.candleProps.volume.push(candle.volume);
 
-  if(this.age > this.candlePropsCacheSize) {
+  if (this.age > this.candlePropsCacheSize) {
     this.candleProps.open.shift();
     this.candleProps.high.shift();
     this.candleProps.low.shift();
@@ -58,12 +58,12 @@ AsyncIndicatorRunner.prototype.processCandle = function(candle, next) {
 AsyncIndicatorRunner.prototype.calculateIndicators = function(next) {
   let done = _.after(
     _.size(this.talibIndicators) + _.size(this.tulipIndicators),
-    this.handlePostFlight(next)
+    this.handlePostFlight(next),
   );
 
   // handle result from talib
   let talibResultHander = name => (err, result) => {
-    if(err)
+    if (err)
       util.die('TALIB ERROR:', err);
 
     this.talibIndicators[name].result = _.mapValues(result, v => _.last(v));
@@ -75,13 +75,13 @@ AsyncIndicatorRunner.prototype.calculateIndicators = function(next) {
     this.talibIndicators,
     (indicator, name) => indicator.run(
       this.candleProps,
-      talibResultHander(name)
-    )
+      talibResultHander(name),
+    ),
   );
 
   // handle result from tulip
   let tulindResultHander = name => (err, result) => {
-    if(err)
+    if (err)
       util.die('TULIP ERROR:', err);
 
     this.tulipIndicators[name].result = _.mapValues(result, v => _.last(v));
@@ -93,8 +93,8 @@ AsyncIndicatorRunner.prototype.calculateIndicators = function(next) {
     this.tulipIndicators,
     (indicator, name) => indicator.run(
       this.candleProps,
-      tulindResultHander(name)
-    )
+      tulindResultHander(name),
+    ),
   );
 };
 
@@ -103,48 +103,48 @@ AsyncIndicatorRunner.prototype.handlePostFlight = function(next) {
     next();
     this.inflight = false;
 
-    if(this.backlog.length) {
+    if (this.backlog.length) {
       let { candle, next } = this.backlog.shift();
       this.processCandle(candle, next);
     }
-  }
+  };
 };
 
 AsyncIndicatorRunner.prototype.addTalibIndicator = function(name, type, parameters) {
-  if(!talib)
+  if (!talib)
     util.die('Talib is not enabled');
 
-  if(!_.contains(allowedTalibIndicators, type))
+  if (!_.contains(allowedTalibIndicators, type))
     util.die('I do not know the talib indicator ' + type);
 
-  if(this.setup)
+  if (this.setup)
     util.die('Can only add talib indicators in the init method!');
 
   let basectx = this;
 
   this.talibIndicators[name] = {
     run: talib[type].create(parameters),
-    result: NaN
-  }
+    result: NaN,
+  };
 };
 
 AsyncIndicatorRunner.prototype.addTulipIndicator = function(name, type, parameters) {
-  if(!tulind) {
+  if (!tulind) {
     util.die('Tulip indicators is not enabled');
   }
 
-  if(!_.contains(allowedTulipIndicators, type))
+  if (!_.contains(allowedTulipIndicators, type))
     util.die('I do not know the tulip indicator ' + type);
 
-  if(this.setup)
+  if (this.setup)
     util.die('Can only add tulip indicators in the init method!');
 
   let basectx = this;
 
   this.tulipIndicators[name] = {
     run: tulind[type].create(parameters),
-    result: NaN
-  }
+    result: NaN,
+  };
 };
 
 module.exports = AsyncIndicatorRunner;

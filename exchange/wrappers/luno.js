@@ -1,4 +1,4 @@
-let Luno = require("bitx");
+let Luno = require('bitx');
 let _ = require('lodash');
 let moment = require('moment');
 let node_util = require('util');
@@ -17,7 +17,7 @@ let Trader = function(config) {
     this.pair = config.asset + config.currency;
   }
   this.luno = new Luno(this.key, this.secret, {
-    pair: this.pair
+    pair: this.pair,
   });
   this.market = _.find(Trader.getCapabilities().markets, (market) => {
     return market.pair[0] === this.currency && market.pair[1] === this.asset;
@@ -35,7 +35,7 @@ Trader.prototype.inspect = function(obj) {
     showhidden: false,
     depth: null,
     breakLength: Infinity,
-    colors: true
+    colors: true,
   });
 };
 
@@ -63,7 +63,7 @@ let recoverableErrors = [
   'TIMEDOUT',
   'CONNRESET',
   'CONNREFUSED',
-  'NOTFOUND'
+  'NOTFOUND',
 ];
 
 
@@ -111,7 +111,7 @@ let processResponse = function(funcName, callback) {
     }
 
     return callback(undefined, body);
-  }
+  };
 };
 
 //------- Gekko Functions ---------//
@@ -127,7 +127,7 @@ Trader.prototype.getTicker = function(callback) {
     let ticker = {
       ask: data.ask,
       bid: data.bid,
-      spread: round(data.ask - data.bid)
+      spread: round(data.ask - data.bid),
     };
     log(name, 'getTicker() -->', this.inspect(ticker));
     callback(undefined, ticker);
@@ -183,13 +183,13 @@ Trader.prototype.getPortfolio = function(callback) {
     }
 
     let portfolio = [{
-        name: this.asset.toUpperCase(),
-        amount: assetAmount
-      },
+      name: this.asset.toUpperCase(),
+      amount: assetAmount,
+    },
       {
         name: this.currency.toUpperCase(),
-        amount: currencyAmount
-      }
+        amount: currencyAmount,
+      },
     ];
     log(name, 'getPortfolio() --> ' + this.inspect(portfolio));
     callback(undefined, portfolio);
@@ -262,7 +262,7 @@ Trader.prototype.getOrder = function(order, callback) {
     let date = moment();
     let fees = {
       [this.asset]: +data.fee_base,
-      [this.currency]: +data.fee_counter
+      [this.currency]: +data.fee_counter,
     };
     let feePercent = round(data.fee_base / data.base * 100, 2);
     if (data.state === 'PENDING') {
@@ -275,7 +275,7 @@ Trader.prototype.getOrder = function(order, callback) {
       amount,
       date,
       fees,
-      feePercent
+      feePercent,
     };
     log(name, 'getOrder() -->', this.inspect(result));
     callback(undefined, result);
@@ -300,7 +300,7 @@ Trader.prototype.checkOrder = function(order, callback) {
       open: data.state === 'PENDING',
       executed: data.limit_volume === data.base,
       filledAmount: +data.base,
-      remaining: round(+data.limit_volume - +data.base)
+      remaining: round(+data.limit_volume - +data.base),
     };
     log(name, 'checkOrder()', order, 'result:', this.inspect(result));
     callback(undefined, result);
@@ -343,7 +343,7 @@ Trader.prototype.cancelOrder = function(order, callback) {
       }
       let remaining = {
         remaining: orderStatus.remaining,
-        filled: orderStatus.filledAmount
+        filled: orderStatus.filledAmount,
       };
       log(name, 'cancelOrder() --> status: false remaining:', this.inspect(remaining));
       return callback(undefined, false, remaining);
@@ -367,21 +367,21 @@ Trader.prototype.getTrades = function(since, callback, descending) {
         price: t.price,
         date: Math.round(t.timestamp / 1000),
         amount: t.volume,
-        tid: t.timestamp
-      }
+        tid: t.timestamp,
+      };
     });
     if (!descending) {
-      trades = trades.reverse()
+      trades = trades.reverse();
     }
     callback(undefined, trades);
   };
 
   if (moment.isMoment(since)) since = since.valueOf();
-  (_.isNumber(since) && since > 0) ? since: since = 0;
+  (_.isNumber(since) && since > 0) ? since : since = 0;
 
   let options = {
     pair: this.pair,
-    since: since
+    since: since,
   };
 
   let handler = cb => this.luno.getTrades(options, processResponse('getTrades', cb));
@@ -395,7 +395,7 @@ Trader.getCapabilities = function() {
     currencies: ['MYR', 'KES', 'NGN', 'ZAR', 'XBT'],
     assets: ['ETH', 'XBT'],
     markets: [
-      { pair: ['XBT', 'ETH'], minimalOrder: { amount: 0.01,   unit: 'asset' }, precision: 2 },
+      { pair: ['XBT', 'ETH'], minimalOrder: { amount: 0.01, unit: 'asset' }, precision: 2 },
       { pair: ['MYR', 'XBT'], minimalOrder: { amount: 0.0005, unit: 'asset' }, precision: 6 },
       { pair: ['KES', 'XBT'], minimalOrder: { amount: 0.0005, unit: 'asset' }, precision: 6 },
       { pair: ['NGN', 'XBT'], minimalOrder: { amount: 0.0005, unit: 'asset' }, precision: 6 },
@@ -408,7 +408,7 @@ Trader.getCapabilities = function() {
     tid: 'tid',
     tradable: true,
     forceReorderDelay: true,
-    gekkoBroker: 0.6
+    gekkoBroker: 0.6,
   };
 };
 

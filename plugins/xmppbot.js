@@ -7,15 +7,15 @@ let xmppbot = config.xmppbot;
 let utc = moment.utc;
 
 
-
 let Actor = function() {
   _.bindAll(this);
 
-  this.bot = new xmpp.Client({ jid: xmppbot.client_id,
-               password: xmppbot.client_pwd,
-               host: xmppbot.client_host,
-               port: xmppbot.client_port
-               });
+  this.bot = new xmpp.Client({
+    jid: xmppbot.client_id,
+    password: xmppbot.client_pwd,
+    host: xmppbot.client_host,
+    port: xmppbot.client_port,
+  });
 
   this.advice = 'Dont got one yet :(';
   this.adviceTime = utc();
@@ -28,48 +28,47 @@ let Actor = function() {
     ';;price': 'emitPrice',
     ';;donate': 'emitDonation',
     ';;real advice': 'emitRealAdvice',
-    ';;help': 'emitHelp'
+    ';;help': 'emitHelp',
   };
 
   this.rawCommands = _.keys(this.commands);
 
   this.bot.addListener('online', this.setState);
   this.bot.addListener('stanza', this.rawStanza);
-  this.bot.addListener("error", this.logError);
+  this.bot.addListener('error', this.logError);
   this.bot.connection.socket.setTimeout(0);
   this.bot.connection.socket.setKeepAlive(true, 10000);
 
 };
 
 Actor.prototype.setState = function() {
-    let elem = new xmpp.Element('presence', { }).c('show').t('chat').up().c('status').t(this.state);
-    this.bot.send(elem);
+  let elem = new xmpp.Element('presence', {}).c('show').t('chat').up().c('status').t(this.state);
+  this.bot.send(elem);
 };
 
 Actor.prototype.rawStanza = function(stanza) {
- if (stanza.is('presence') && (stanza.attrs.type === 'subscribe')) {
-            this.bot.send(new xmpp.Element('presence', { to: stanza.attrs.from, type: 'subscribed' }));
- }
- if (stanza.is('message') &&
-     // Important: never reply to errors!
-     stanza.attrs.type !== 'error') {
+  if (stanza.is('presence') && (stanza.attrs.type === 'subscribe')) {
+    this.bot.send(new xmpp.Element('presence', { to: stanza.attrs.from, type: 'subscribed' }));
+  }
+  if (stanza.is('message') &&
+    // Important: never reply to errors!
+    stanza.attrs.type !== 'error') {
 
-     // Swap addresses...
-     let from = stanza.attrs.from;
-     let body = stanza.getChild('body');
-     if (!body) {
-       return;
-     }
+    // Swap addresses...
+    let from = stanza.attrs.from;
+    let body = stanza.getChild('body');
+    if (!body) {
+      return;
+    }
 
-     let message_recv = body.getText();   //Get Incoming Message
-     this.verifyQuestion(from, message_recv);
+    let message_recv = body.getText();   //Get Incoming Message
+    this.verifyQuestion(from, message_recv);
   }
 };
 
-Actor.prototype.sendMessageTo = function(receiver, message){
-  this.bot.send(new xmpp.Element('message', { to: receiver, type: 'chat' }).
-        c('body').t(message)
-    );
+Actor.prototype.sendMessageTo = function(receiver, message) {
+  this.bot.send(new xmpp.Element('message', { to: receiver, type: 'chat' }).c('body').t(message),
+  );
 };
 Actor.prototype.sendMessage = function(message) {
   this.sendMessageTo(this.from, message);
@@ -85,12 +84,12 @@ Actor.prototype.processAdvice = function(advice) {
   this.advice = advice.recommendation;
   this.adviceTime = utc();
 
-  if(xmppbot.emitUpdates)
+  if (xmppbot.emitUpdates)
     this.newAdvice(xmppbot.receiver);
 };
 
 Actor.prototype.verifyQuestion = function(receiver, text) {
-  if(text in this.commands)
+  if (text in this.commands)
     this[this.commands[text]](receiver);
 };
 
@@ -117,8 +116,8 @@ Actor.prototype.emitAdvice = function(receiver) {
     ' ',
     config.watch.asset,
     ' (from ',
-      this.adviceTime.fromNow(),
-    ')'
+    this.adviceTime.fromNow(),
+    ')',
   ].join('');
 
   this.sendMessageTo(receiver, message);
@@ -139,8 +138,8 @@ Actor.prototype.emitPrice = function(receiver) {
     ' ',
     config.watch.currency,
     ' (from ',
-      this.priceTime.fromNow(),
-    ')'
+    this.priceTime.fromNow(),
+    ')',
   ].join('');
 
   this.sendMessageTo(receiver, message);
@@ -160,7 +159,7 @@ Actor.prototype.emitHelp = function(receiver) {
     function(message, command) {
       return message + ' ' + command + ',';
     },
-    'possible commands are:'
+    'possible commands are:',
   );
 
   message = message.substr(0, _.size(message) - 1) + '.';
@@ -179,7 +178,7 @@ Actor.prototype.emitRealAdvice = function(receiver) {
     'The most valuable commodity I know of is information.',
     'It\'s not a question of enough, pal. It\'s a zero sum game, somebody wins, somebody loses. Money itself isn\'t lost or made, it\'s simply transferred from one perception to another.',
     'What\'s worth doing is worth doing for money. (Wait, wasn\'t I a free and open source bot?)',
-    'When I get a hold of the son of a bitch who leaked this, I\'m gonna tear his eyeballs out and I\'m gonna suck his fucking skull.'
+    'When I get a hold of the son of a bitch who leaked this, I\'m gonna tear his eyeballs out and I\'m gonna suck his fucking skull.',
   ];
 
   this.sendMessageTo(receiver, _.first(_.shuffle(realAdvice)));

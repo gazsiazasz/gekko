@@ -1,7 +1,7 @@
 // required indicators
 let SMA = require('./SMA');
 
-let Indicator = function (weight) {
+let Indicator = function(weight) {
   this.input = 'price';
   this.sma = new SMA(weight);
   this.weight = weight;
@@ -10,12 +10,12 @@ let Indicator = function (weight) {
   this.age = 0;
 };
 
-Indicator.prototype.update = function (price) {
+Indicator.prototype.update = function(price) {
   this.prices[this.age] = price;
 
-  if(this.prices.length < this.weight) {
+  if (this.prices.length < this.weight) {
     this.sma.update(price);
-  } else if(this.prices.length === this.weight) {
+  } else if (this.prices.length === this.weight) {
     this.sma.update(price);
     this.result = this.sma.result;
   } else {

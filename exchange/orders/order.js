@@ -23,16 +23,16 @@ class BaseOrder extends EventEmitter {
     bindAll(this);
   }
 
-  submit({side, amount, price, alreadyFilled}) {
+  submit({ side, amount, price, alreadyFilled }) {
     let check = isValidOrder({
       market: this.market,
       api: this.api,
       amount,
-      price
+      price,
     });
 
-    if(!check.valid) {
-      if(alreadyFilled) {
+    if (!check.valid) {
+      if (alreadyFilled) {
         // partially filled, but the remainder is too
         // small.
         return this.filled();
@@ -64,7 +64,7 @@ class BaseOrder extends EventEmitter {
     this.rejectedReason = reason;
     this.status = states.REJECTED;
     this.emitStatus();
-    console.log(new Date, 'sticky rejected', reason)
+    console.log(new Date, 'sticky rejected', reason);
     this.finish();
   }
 
@@ -72,7 +72,7 @@ class BaseOrder extends EventEmitter {
     this.status = states.FILLED;
     this.emitStatus();
     this.completed = true;
-    console.log(new Date, 'sticky filled')
+    console.log(new Date, 'sticky filled');
     this.finish(true);
   }
 
@@ -80,8 +80,8 @@ class BaseOrder extends EventEmitter {
     this.completed = true;
     this.emit('completed', {
       status: this.status,
-      filled
-    })
+      filled,
+    });
   }
 }
 

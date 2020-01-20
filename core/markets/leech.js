@@ -19,14 +19,14 @@ let TICKINTERVAL = 20 * 1000; // 20 seconds
 let slug = config.watch.exchange.toLowerCase();
 let exchange = exchangeChecker.getExchangeCapabilities(slug);
 
-if(!exchange)
+if (!exchange)
   util.die(`Unsupported exchange: ${slug}`);
 
 let error = exchangeChecker.cantMonitor(config.watch);
-if(error)
+if (error)
   util.die(error, true);
 
-if(config.market.from)
+if (config.market.from)
   var fromTs = moment.utc(config.market.from).unix();
 else
   var fromTs = moment().startOf('minute').unix();
@@ -36,20 +36,20 @@ let Market = function() {
 
   _.bindAll(this);
 
-  Readable.call(this, {objectMode: true});
+  Readable.call(this, { objectMode: true });
 
   this.reader = new Reader();
   this.latestTs = fromTs;
 
   setInterval(
     this.get,
-    TICKINTERVAL
+    TICKINTERVAL,
   );
 };
 
 let Readable = require('stream').Readable;
 Market.prototype = Object.create(Readable.prototype, {
-  constructor: { value: Market }
+  constructor: { value: Market },
 });
 
 Market.prototype._read = _.once(function() {
@@ -63,13 +63,13 @@ Market.prototype.get = function() {
     this.latestTs,
     future,
     'full',
-    this.processCandles
-  )
+    this.processCandles,
+  );
 };
 
 Market.prototype.processCandles = function(err, candles) {
   let amount = _.size(candles);
-  if(amount === 0) {
+  if (amount === 0) {
     // no new candles!
     return;
   }

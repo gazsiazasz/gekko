@@ -20,6 +20,6 @@ ipc.on('start', config => {
       reader.close();
       ipc.send('ranges', ranges);
       process.exit(0);
-    }
+    },
   );
 });

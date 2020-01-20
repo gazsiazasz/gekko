@@ -23,19 +23,20 @@ let spoofer = {};
 
 let TRADES = [
   { tid: 1, amount: 1, price: 100, date: 1475837937 },
-  { tid: 2, amount: 1, price: 100, date: 1475837938 }
+  { tid: 2, amount: 1, price: 100, date: 1475837938 },
 ];
 
 // stub the exchange
-let FakeProvider = function() {};
+let FakeProvider = function() {
+};
 let getTrades = function(since, handler, descending) {
   handler(
     null,
-    TRADES
+    TRADES,
   );
 };
 FakeProvider.prototype = {
-  getTrades: getTrades
+  getTrades: getTrades,
 };
 
 spoofer[providerPath] = FakeProvider;

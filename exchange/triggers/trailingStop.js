@@ -8,7 +8,7 @@ let EventEmitter = require('events');
 // @param trail: fixed offset from the price
 // @param onTrigger: fn to call when the stop triggers
 class TrailingStop extends EventEmitter {
-  constructor({trail, initialPrice, onTrigger}) {
+  constructor({ trail, initialPrice, onTrigger }) {
     super();
 
     this.trail = trail;
@@ -20,23 +20,23 @@ class TrailingStop extends EventEmitter {
   }
 
   updatePrice(price) {
-    if(!this.isLive) {
+    if (!this.isLive) {
       return;
     }
 
-    if(price > this.trailingPoint + this.trail) {
+    if (price > this.trailingPoint + this.trail) {
       this.trailingPoint = price - this.trail;
     }
 
     this.previousPrice = price;
 
-    if(price <= this.trailingPoint) {
+    if (price <= this.trailingPoint) {
       this.trigger();
     }
   }
 
   updateTrail(trail) {
-    if(!this.isLive) {
+    if (!this.isLive) {
       return;
     }
 
@@ -47,12 +47,12 @@ class TrailingStop extends EventEmitter {
   }
 
   trigger() {
-    if(!this.isLive) {
+    if (!this.isLive) {
       return;
     }
 
     this.isLive = false;
-    if(this.onTrigger) {
+    if (this.onTrigger) {
       this.onTrigger(this.previousPrice);
     }
     this.emit('trigger', this.previousPrice);

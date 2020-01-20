@@ -22,7 +22,7 @@ Reader.prototype.mostRecentWindow = function(from, to, next) {
 
   this.db.connect((err, client, done) => {
 
-    if(err) {
+    if (err) {
       log.error(err);
       return util.die(err.message);
     }
@@ -31,7 +31,7 @@ Reader.prototype.mostRecentWindow = function(from, to, next) {
       SELECT start from ${postgresUtil.table('candles')}
       WHERE start <= ${to} AND start >= ${from}
       ORDER BY start DESC
-    `), function (err, result) {
+    `), function(err, result) {
       if (err) {
         // bail out if the table does not exist
         if (err.message.indexOf(' does not exist') !== -1)
@@ -51,17 +51,17 @@ Reader.prototype.mostRecentWindow = function(from, to, next) {
     query.on('end', function() {
       done();
       // no candles are available
-      if(rows.length === 0) {
+      if (rows.length === 0) {
         return next(false);
       }
 
-      if(rows.length === maxAmount) {
+      if (rows.length === maxAmount) {
 
         // full history is available!
 
         return next({
           from: from,
-          to: to
+          to: to,
         });
       }
 
@@ -74,26 +74,26 @@ Reader.prototype.mostRecentWindow = function(from, to, next) {
 
       // if there was no gap in the records, but
       // there were not enough records.
-      if(gapIndex === -1) {
+      if (gapIndex === -1) {
         let leastRecent = _.last(rows).start;
         return next({
           from: leastRecent,
-          to: mostRecent
+          to: mostRecent,
         });
       }
 
       // else return mostRecent and the
       // the minute before the gap
       return next({
-        from: rows[ gapIndex - 1 ].start,
-        to: mostRecent
+        from: rows[gapIndex - 1].start,
+        to: mostRecent,
       });
     });
   });
 };
 
-Reader.prototype.tableExists = function (name, next) {
-  this.db.connect((err,client,done) => {
+Reader.prototype.tableExists = function(name, next) {
+  this.db.connect((err, client, done) => {
     client.query(`
       SELECT table_name
       FROM information_schema.tables
@@ -111,11 +111,11 @@ Reader.prototype.tableExists = function (name, next) {
 };
 
 Reader.prototype.get = function(from, to, what, next) {
-  if(what === 'full'){
+  if (what === 'full') {
     what = '*';
   }
 
-  this.db.connect((err,client,done) => {
+  this.db.connect((err, client, done) => {
     let query = client.query(new Query(`
     SELECT ${what} from ${postgresUtil.table('candles')}
     WHERE start <= ${to} AND start >= ${from}
@@ -127,7 +127,7 @@ Reader.prototype.get = function(from, to, what, next) {
       rows.push(row);
     });
 
-    query.on('end',function(){
+    query.on('end', function() {
       done();
       next(null, rows);
     });
@@ -135,8 +135,8 @@ Reader.prototype.get = function(from, to, what, next) {
 };
 
 Reader.prototype.count = function(from, to, next) {
-  this.db.connect((err,client,done) => {
-    if(err) {
+  this.db.connect((err, client, done) => {
+    if (err) {
       log.error(err);
       return util.die(err.message);
     }
@@ -150,7 +150,7 @@ Reader.prototype.count = function(from, to, next) {
       rows.push(row);
     });
 
-    query.on('end',function(){
+    query.on('end', function() {
       done();
       next(null, _.first(rows).count);
     });
@@ -158,7 +158,7 @@ Reader.prototype.count = function(from, to, next) {
 };
 
 Reader.prototype.countTotal = function(next) {
-  this.db.connect((err,client,done) => {
+  this.db.connect((err, client, done) => {
     let query = client.query(new Query(`
     SELECT COUNT(*) as count from ${postgresUtil.table('candles')}
     `));
@@ -167,7 +167,7 @@ Reader.prototype.countTotal = function(next) {
       rows.push(row);
     });
 
-    query.on('end',function(){
+    query.on('end', function() {
       done();
       next(null, _.first(rows).count);
     });
@@ -175,7 +175,7 @@ Reader.prototype.countTotal = function(next) {
 };
 
 Reader.prototype.getBoundry = function(next) {
-  this.db.connect((err,client,done) => {
+  this.db.connect((err, client, done) => {
     let query = client.query(new Query(`
     SELECT (
       SELECT start
@@ -194,7 +194,7 @@ Reader.prototype.getBoundry = function(next) {
       rows.push(row);
     });
 
-    query.on('end',function(){
+    query.on('end', function() {
       done();
       next(null, _.first(rows));
     });

@@ -12,11 +12,11 @@ let ChildToParent = function() {
     // .filter(sub => config.childToParent.events.includes(sub.event))
     .forEach(sub => {
       this[sub.handler] = (event, next) => {
-        process.send({type: sub.event, payload: event});
-        if(_.isFunction(next)) {
+        process.send({ type: sub.event, payload: event });
+        if (_.isFunction(next)) {
           next();
         }
-      }
+      };
     }, this);
 
 };

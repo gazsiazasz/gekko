@@ -8,7 +8,7 @@ let log = require(`${util.dirs().core}log`);
 let handle = require('./handle');
 let mongoUtil = require('./util');
 
-let Store = function Store (done) {
+let Store = function Store(done) {
   _.bindAll(this);
   this.done = done;
   this.db = handle;
@@ -25,7 +25,7 @@ let Store = function Store (done) {
   done();
 };
 
-Store.prototype.writeCandles = function writeCandles () {
+Store.prototype.writeCandles = function writeCandles() {
   if (_.isEmpty(this.candleCache)) { // nothing to do
     return;
   }
@@ -42,7 +42,7 @@ Store.prototype.writeCandles = function writeCandles () {
       vwp: candle.vwp,
       volume: candle.volume,
       trades: candle.trades,
-      pair: this.pair
+      pair: this.pair,
     };
     candles.push(mCandle);
   });
@@ -61,7 +61,7 @@ Store.prototype.writeCandles = function writeCandles () {
   this.candleCache = [];
 };
 
-let processCandle = function processCandle (candle, done) {
+let processCandle = function processCandle(candle, done) {
   // because we might get a lot of candles
   // in the same tick, we rather batch them
   // up and insert them at once at next tick.
@@ -77,13 +77,13 @@ let processCandle = function processCandle (candle, done) {
 let finalize = function(done) {
   this.writeCandles();
   // Fix connection closed before all candles was written to db
-  setTimeout( () => {
+  setTimeout(() => {
     this.db = null;
     done();
   }, 1000);
 };
 
-let processAdvice = function processAdvice (advice) {
+let processAdvice = function processAdvice(advice) {
   if (config.candleWriter.muteSoft && advice.recommendation === 'soft') {
     return;
   }
@@ -95,7 +95,7 @@ let processAdvice = function processAdvice (advice) {
     pair: this.pair,
     recommendation: advice.recommendation,
     price: this.price,
-    portfolio: advice.portfolio
+    portfolio: advice.portfolio,
   };
 
   this.adviceCollection.insert(mAdvice);

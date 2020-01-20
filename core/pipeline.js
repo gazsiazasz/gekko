@@ -53,12 +53,12 @@ let pipeline = (settings) => {
       pluginParameters,
       pluginHelper.load,
       function(error, _plugins) {
-        if(error)
+        if (error)
           return util.die(error, true);
 
         plugins = _.compact(_plugins);
         next();
-      }
+      },
     );
   };
 
@@ -67,7 +67,7 @@ let pipeline = (settings) => {
   let referenceEmitters = function(next) {
 
     _.each(plugins, function(plugin) {
-      if(plugin.meta.emits)
+      if (plugin.meta.emits)
         emitters[plugin.meta.slug] = plugin;
     });
 
@@ -79,7 +79,7 @@ let pipeline = (settings) => {
     // events broadcasted by plugins
     let pluginSubscriptions = _.filter(
       subscriptions,
-      sub => sub.emitter !== 'market'
+      sub => sub.emitter !== 'market',
     );
 
     // some events can be broadcasted by different
@@ -92,10 +92,10 @@ let pipeline = (settings) => {
         subscription.emitters = subscription.emitter;
         let singleEventEmitters = subscription.emitter
           .filter(
-            s => _.size(plugins.filter(p => p.meta.slug === s))
+            s => _.size(plugins.filter(p => p.meta.slug === s)),
           );
 
-        if(_.size(singleEventEmitters) > 1) {
+        if (_.size(singleEventEmitters) > 1) {
           let error = `Multiple plugins are broadcasting`;
           error += ` the event "${subscription.event}" (${singleEventEmitters.join(',')}).`;
           error += 'This is unsupported.';
@@ -103,7 +103,7 @@ let pipeline = (settings) => {
         } else {
           subscription.emitter = _.first(singleEventEmitters);
         }
-      }
+      },
     );
 
     // subscribe interested plugins to
@@ -111,20 +111,20 @@ let pipeline = (settings) => {
     _.each(plugins, function(plugin) {
       _.each(pluginSubscriptions, function(sub) {
 
-        if(plugin[sub.handler]) {
+        if (plugin[sub.handler]) {
           // if a plugin wants to listen
           // to something disabled
-          if(!emitters[sub.emitter]) {
-            if(!plugin.meta.greedy) {
+          if (!emitters[sub.emitter]) {
+            if (!plugin.meta.greedy) {
 
               let emitterMessage;
-              if(sub.emitters) {
+              if (sub.emitters) {
                 emitterMessage = 'all of the emitting plugins [ ';
                 emitterMessage += sub.emitters.join(', ');
                 emitterMessage += ' ] are disabled.';
               } else {
                 emitterMessage = 'the emitting plugin (' + sub.emitter;
-                emitterMessage += ')is disabled.'
+                emitterMessage += ')is disabled.';
               }
 
               log.error([
@@ -133,7 +133,7 @@ let pipeline = (settings) => {
                 sub.event + ',',
                 'however',
                 emitterMessage,
-                plugin.meta.name + ' might malfunction because of it.'
+                plugin.meta.name + ' might malfunction because of it.',
               ].join(' '));
             }
             return;
@@ -144,7 +144,7 @@ let pipeline = (settings) => {
             .on(sub.event,
               plugin[
                 sub.handler
-              ])
+                ]);
         }
 
       });
@@ -153,15 +153,15 @@ let pipeline = (settings) => {
     // events broadcasted by the market
     let marketSubscriptions = _.filter(
       subscriptions,
-      {emitter: 'market'}
+      { emitter: 'market' },
     );
 
     // subscribe plugins to the market
     _.each(plugins, function(plugin) {
       _.each(marketSubscriptions, function(sub) {
 
-        if(plugin[sub.handler]) {
-          if(sub.event === 'candle')
+        if (plugin[sub.handler]) {
+          if (sub.event === 'candle')
             candleConsumers.push(plugin);
         }
 
@@ -172,7 +172,7 @@ let pipeline = (settings) => {
   };
 
   let prepareMarket = function(next) {
-    if(mode === 'backtest' && config.backtest.daterange === 'scan')
+    if (mode === 'backtest' && config.backtest.daterange === 'scan')
       require(dirs.core + 'prepareDateRange')(next);
     else
       next();
@@ -181,7 +181,7 @@ let pipeline = (settings) => {
   let setupMarket = function(next) {
     // load a market based on the config (or fallback to mode)
     let marketType;
-    if(config.market)
+    if (config.market)
       marketType = config.market.type;
     else
       marketType = mode;
@@ -198,17 +198,17 @@ let pipeline = (settings) => {
     // events broadcasted by the market
     let marketSubscriptions = _.filter(
       subscriptions,
-      {emitter: 'market'}
+      { emitter: 'market' },
     );
 
     _.each(plugins, function(plugin) {
       _.each(marketSubscriptions, function(sub) {
 
-        if(sub.event === 'candle')
+        if (sub.event === 'candle')
           // these are handled via the market stream
           return;
 
-        if(plugin[sub.handler]) {
+        if (plugin[sub.handler]) {
           market.on(sub.event, plugin[sub.handler]);
         }
 
@@ -229,7 +229,7 @@ let pipeline = (settings) => {
       subscribePlugins,
       prepareMarket,
       setupMarket,
-      subscribePluginsToMarket
+      subscribePluginsToMarket,
     ],
     function() {
 
@@ -237,13 +237,13 @@ let pipeline = (settings) => {
 
       market.pipe(gekkoStream);
 
-        // convert JS objects to JSON string
-        // .pipe(new require('stringify-stream')())
-        // output to standard out
-        // .pipe(process.stdout);
+      // convert JS objects to JSON string
+      // .pipe(new require('stringify-stream')())
+      // output to standard out
+      // .pipe(process.stdout);
 
       market.on('end', gekkoStream.finalize);
-    }
+    },
   );
 
 };

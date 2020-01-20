@@ -26,7 +26,7 @@ let handleFetch = (err, trades) => {
     log.error(`There was an error importing from Binance ${err}`);
     fetcher.emit('done');
     return fetcher.emit('trades', []);
-}
+  }
 
   if (trades.length > 0) {
     let last = moment.unix(_.last(trades).date).utc();

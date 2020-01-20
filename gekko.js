@@ -39,7 +39,7 @@ console.log('\tI\'m gonna make you rich, Bud Fox.', '\n\n');
 
 let dirs = util.dirs();
 
-if(util.launchUI()) {
+if (util.launchUI()) {
   return require(util.dirs().web + 'server');
 }
 
@@ -47,7 +47,7 @@ let pipeline = require(dirs.core + 'pipeline');
 let config = util.getConfig();
 let mode = util.gekkoMode();
 
-if(
+if (
   config.trader &&
   config.trader.enabled &&
   !config['I understand that Gekko only automates MY OWN trading strategies']
@@ -58,6 +58,6 @@ if(
 // > 'Cause they're sheep, and sheep get slaughtered.
 pipeline({
   config: config,
-  mode: mode
+  mode: mode,
 });
 

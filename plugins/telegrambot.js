@@ -5,7 +5,7 @@ let config = require('../core/util').getConfig();
 let telegrambot = config.telegrambot;
 let emitTrades = telegrambot.emitTrades;
 let utc = moment.utc;
-let telegram = require("node-telegram-bot-api");
+let telegram = require('node-telegram-bot-api');
 
 let Actor = function() {
   _.bindAll(this);
@@ -22,7 +22,7 @@ let Actor = function() {
     '/subscribe': 'emitSubscribe',
     '/unsubscribe': 'emitUnSubscribe',
     '/price': 'emitPrice',
-    '/help': 'emitHelp'
+    '/help': 'emitHelp',
   };
   if (telegrambot.donate) {
     this.commands['/donate'] = 'emitDonate';
@@ -49,43 +49,43 @@ Actor.prototype.processAdvice = function(advice) {
   this.subscribers.forEach(this.emitAdvice, this);
 };
 
-if(emitTrades) {
-  Actor.prototype.processTradeInitiated = function (tradeInitiated) {
+if (emitTrades) {
+  Actor.prototype.processTradeInitiated = function(tradeInitiated) {
     let message = 'Trade initiated. ID: ' + tradeInitiated.id +
-    '\nAction: ' + tradeInitiated.action + '\nPortfolio: ' +
-    tradeInitiated.portfolio + '\nBalance: ' + tradeInitiated.balance;
+      '\nAction: ' + tradeInitiated.action + '\nPortfolio: ' +
+      tradeInitiated.portfolio + '\nBalance: ' + tradeInitiated.balance;
     this.bot.sendMessage(this.chatId, message);
   };
 
-  Actor.prototype.processTradeCancelled = function (tradeCancelled) {
+  Actor.prototype.processTradeCancelled = function(tradeCancelled) {
     let message = 'Trade cancelled. ID: ' + tradeCancelled.id;
     this.bot.sendMessage(this.chatId, message);
   };
 
-  Actor.prototype.processTradeAborted = function (tradeAborted) {
+  Actor.prototype.processTradeAborted = function(tradeAborted) {
     let message = 'Trade aborted. ID: ' + tradeAborted.id +
-    '\nNot creating order! Reason: ' + tradeAborted.reason;
+      '\nNot creating order! Reason: ' + tradeAborted.reason;
     this.bot.sendMessage(this.chatId, message);
   };
 
-  Actor.prototype.processTradeErrored = function (tradeErrored) {
+  Actor.prototype.processTradeErrored = function(tradeErrored) {
     let message = 'Trade errored. ID: ' + tradeErrored.id +
-    '\nReason: ' + tradeErrored.reason;
+      '\nReason: ' + tradeErrored.reason;
     this.bot.sendMessage(this.chatId, message);
   };
 
-  Actor.prototype.processTradeCompleted = function (tradeCompleted) {
+  Actor.prototype.processTradeCompleted = function(tradeCompleted) {
     let message = 'Trade completed. ID: ' + tradeCompleted.id +
-    '\nAction: ' + tradeCompleted.action +
-    '\nPrice: ' + tradeCompleted.price +
-    '\nAmount: ' + tradeCompleted.amount +
-    '\nCost: ' + tradeCompleted.cost +
-    '\nPortfolio: ' + tradeCompleted.portfolio +
-    '\nBalance: ' + tradeCompleted.balance +
-    '\nFee percent: ' + tradeCompleted.feePercent +
-    '\nEffective price: ' + tradeCompleted.effectivePrice;
+      '\nAction: ' + tradeCompleted.action +
+      '\nPrice: ' + tradeCompleted.price +
+      '\nAmount: ' + tradeCompleted.amount +
+      '\nCost: ' + tradeCompleted.cost +
+      '\nPortfolio: ' + tradeCompleted.portfolio +
+      '\nBalance: ' + tradeCompleted.balance +
+      '\nFee percent: ' + tradeCompleted.feePercent +
+      '\nEffective price: ' + tradeCompleted.effectivePrice;
     this.bot.sendMessage(this.chatId, message);
-  }
+  };
 }
 
 Actor.prototype.verifyQuestion = function(msg, text) {
@@ -106,16 +106,16 @@ Actor.prototype.emitSubscribe = function() {
     this.subscribers.push(this.chatId);
     this.bot.sendMessage(this.chatId, `Success! Got ${this.subscribers.length} subscribers.`);
   } else {
-    this.bot.sendMessage(this.chatId, "You are already subscribed.");
+    this.bot.sendMessage(this.chatId, 'You are already subscribed.');
   }
 };
 
 Actor.prototype.emitUnSubscribe = function() {
   if (this.subscribers.indexOf(this.chatId) > -1) {
     this.subscribers.splice(this.subscribers.indexOf(this.chatId), 1);
-    this.bot.sendMessage(this.chatId, "Success!");
+    this.bot.sendMessage(this.chatId, 'Success!');
   } else {
-    this.bot.sendMessage(this.chatId, "You are not subscribed.");
+    this.bot.sendMessage(this.chatId, 'You are not subscribed.');
   }
 };
 
@@ -143,7 +143,7 @@ Actor.prototype.emitAdvice = function(chatId) {
       this.adviceTime.fromNow() +
       ')';
   } else {
-    message += 'None'
+    message += 'None';
   }
 
   if (chatId) {
@@ -168,7 +168,7 @@ Actor.prototype.emitPrice = function() {
     config.watch.currency,
     ' (from ',
     this.priceTime.fromNow(),
-    ')'
+    ')',
   ].join('');
 
   this.bot.sendMessage(this.chatId, message);
@@ -184,7 +184,7 @@ Actor.prototype.emitHelp = function() {
     function(message, command) {
       return message + ' ' + command + ',';
     },
-    'Possible commands are:'
+    'Possible commands are:',
   );
   message = message.substr(0, _.size(message) - 1) + '.';
   this.bot.sendMessage(this.chatId, message);

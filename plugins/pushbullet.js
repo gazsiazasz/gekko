@@ -5,9 +5,9 @@
 
 
 /**
-Required Config:
+ Required Config:
 
-config.pushbullet = {
+ config.pushbullet = {
   // sends pushbullets if true
   enabled: true,
   // Send 'Gekko starting' message if true
@@ -29,7 +29,7 @@ config.pushbullet = {
 
  **/
 
-let pushbullet = require("pushbullet");
+let pushbullet = require('pushbullet');
 let _ = require('lodash');
 let moment = require('moment');
 let request = require('request');
@@ -64,25 +64,25 @@ Pushbullet.prototype.setup = function(done) {
       let asset = config.watch.asset;
       let tradeType = 'watching';
       if (config.trader.enabled) {
-        tradeType = "Live Trading";
+        tradeType = 'Live Trading';
       }
       if (config.paperTrader.enabled) {
-        tradeType = "Paper Trading";
+        tradeType = 'Paper Trading';
       }
 
       let body = `Gekko has started ${tradeType} ${asset}/${currency} on ${exchange}.`;
 
       //If trading Advisor is enabled, add strategy and candle size information
       if (config.tradingAdvisor.enabled) {
-        body += `\n\nUsing ${config.tradingAdvisor.method} strategy on M${config.tradingAdvisor.candleSize} candles.`
+        body += `\n\nUsing ${config.tradingAdvisor.method} strategy on M${config.tradingAdvisor.candleSize} candles.`;
       }
 
       this.mail(title, body);
     } else {
-      log.debug('Skipping Send message on startup')
+      log.debug('Skipping Send message on startup');
     }
   };
-  setupPushBullet.call(this)
+  setupPushBullet.call(this);
 };
 
 Pushbullet.prototype.processCandle = function(candle, done) {
@@ -107,7 +107,7 @@ Pushbullet.prototype.processAdvice = function(advice) {
       '.\n\nThe current ',
       config.watch.asset,
       ' price is ',
-      this.advicePrice
+      this.advicePrice,
     ].join('');
 
     let subject = pbConf.tag + ' New advice: go ' + advice.recommendation;
@@ -147,11 +147,11 @@ Pushbullet.prototype.processTradeCompleted = function(trade) {
 
 
       if (nBal >= oBal) { // profit!
-        balanceChangeStr = `\n\nRound trip profit of: \n${getNumStr(diffBal)}${config.watch.currency} \n${getNumStr(percDiffBal,2)}%\n`;
-        subject = `${subject}: +${getNumStr(percDiffBal,2)}%`
+        balanceChangeStr = `\n\nRound trip profit of: \n${getNumStr(diffBal)}${config.watch.currency} \n${getNumStr(percDiffBal, 2)}%\n`;
+        subject = `${subject}: +${getNumStr(percDiffBal, 2)}%`;
       } else if (nBal < oBal) { //  Loss :(
-        balanceChangeStr = `\n\nRound trip loss of: \n-${getNumStr(diffBal)}${config.watch.currency} \n-${getNumStr(percDiffBal,2)}%\n`;
-        subject = `${subject}: -${getNumStr(percDiffBal,2)}%`
+        balanceChangeStr = `\n\nRound trip loss of: \n-${getNumStr(diffBal)}${config.watch.currency} \n-${getNumStr(percDiffBal, 2)}%\n`;
+        subject = `${subject}: -${getNumStr(percDiffBal, 2)}%`;
       }
 
       //Calculate overall P/l
@@ -159,16 +159,16 @@ Pushbullet.prototype.processTradeCompleted = function(trade) {
       let tDiffBal = Math.abs(nBal - sBal);
       let percDiffTotBal = (tDiffBal / sBal) * 100;
       if (nBal >= sBal) { // profit!
-        totBalanceChangeStr = `\nOverall gain of: \n${getNumStr(tDiffBal)}${config.watch.currency} \n${getNumStr(percDiffTotBal,2)}%\n`
+        totBalanceChangeStr = `\nOverall gain of: \n${getNumStr(tDiffBal)}${config.watch.currency} \n${getNumStr(percDiffTotBal, 2)}%\n`;
       } else if (nBal < sBal) { //  Loss :(
-        totBalanceChangeStr = `\nOverall loss of \n-${getNumStr(tDiffBal)}${config.watch.currency} \n-${getNumStr(percDiffTotBal,2)}%\n`
+        totBalanceChangeStr = `\nOverall loss of \n-${getNumStr(tDiffBal)}${config.watch.currency} \n-${getNumStr(percDiffTotBal, 2)}%\n`;
 
       } else if (trade.action === 'sell' && !this.hasBought) {
-        balanceChangeStr = `\n\nNot enough data for exposure time, round trip or overall performance yet. This will appear after bot has completed first round trip.`
+        balanceChangeStr = `\n\nNot enough data for exposure time, round trip or overall performance yet. This will appear after bot has completed first round trip.`;
       }
     }
 
-    let costOfTradeStr = `\nCost of Trade: ${getNumStr(trade.cost)}${config.watch.currency}, ${getNumStr(((trade.cost / (trade.amount*trade.price)) * 100), 2)}%`;
+    let costOfTradeStr = `\nCost of Trade: ${getNumStr(trade.cost)}${config.watch.currency}, ${getNumStr(((trade.cost / (trade.amount * trade.price)) * 100), 2)}%`;
 
     //build strings that are only sent for Live trading, not paperTrader
     let orderFillTimeStr = '';
@@ -187,7 +187,7 @@ Pushbullet.prototype.processTradeCompleted = function(trade) {
       } else if (trade.action === 'sell') {
         slip = 100 * ((this.advicePrice - trade.price) / this.advicePrice);
       }
-      slippageStr = `\nSlipped ${getNumStr(slip,2)}% from advice @ ${getNumStr(this.advicePrice)}`;
+      slippageStr = `\nSlipped ${getNumStr(slip, 2)}% from advice @ ${getNumStr(this.advicePrice)}`;
 
 
     }
@@ -215,11 +215,11 @@ Pushbullet.prototype.processTradeCompleted = function(trade) {
 function getNumStr(num, fixed = 4) {
   let numStr = '';
 
-  if (typeof num != "number") {
+  if (typeof num != 'number') {
     num = Number(num);
     if (isNaN(num)) {
       // console.log("Pushbullet Plugin: Number Conversion Failed");
-      return "Conversion Failure";
+      return 'Conversion Failure';
     }
   }
 
@@ -282,9 +282,9 @@ function capF(inWord) { //Capitalise first letter of string
 function getPastTense(action) {
   let ret = '';
   if (action === 'buy') {
-    ret = 'Bought'
+    ret = 'Bought';
   } else if (action === 'sell') {
-    ret = 'Sold'
+    ret = 'Sold';
   }
   return ret;
 }
@@ -293,9 +293,9 @@ Pushbullet.prototype.mail = function(subject, content, done) {
   let pusher = new pushbullet(pbConf.key);
   pusher.note(pbConf.email, subject, content, function(error, response) {
     if (error || !response) {
-      log.error('Pushbullet ERROR:', error)
+      log.error('Pushbullet ERROR:', error);
     } else if (response && response.active) {
-      log.info('Pushbullet Message Sent')
+      log.info('Pushbullet Message Sent');
     }
   });
 };
