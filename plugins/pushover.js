@@ -1,21 +1,21 @@
-var push = require( 'pushover-notifications' );
-var _ = require('lodash');
-var log = require('../core/log.js');
-var util = require('../core/util.js');
-var config = util.getConfig();
-var pushoverConfig = config.pushover;
+let push = require('pushover-notifications');
+let _ = require('lodash');
+let log = require('../core/log.js');
+let util = require('../core/util.js');
+let config = util.getConfig();
+let pushoverConfig = config.pushover;
 
-var Pushover = function() {
+let Pushover = function() {
   _.bindAll(this);
 
   this.p;
   this.price = 'N/A';
 
   this.setup();
-}
+};
 
 Pushover.prototype.setup = function() {
-  var setupPushover = function() {
+  let setupPushover = function() {
     this.p = new push( {
         user: pushoverConfig.user,
         token: pushoverConfig.key,
@@ -36,12 +36,12 @@ Pushover.prototype.setup = function() {
       );
     } else
     log.debug('Setup pushover adviser.');
-  }
+  };
     setupPushover.call(this);
-}
+};
 
 Pushover.prototype.send = function(subject, content) {
-  var msg = {
+  let msg = {
       // These values correspond to the parameters detailed on https://pushover.net/api
       // 'message' is required. All other values are optional.
       message: content,
@@ -58,28 +58,28 @@ Pushover.prototype.send = function(subject, content) {
       console.log( result );
   });
 
-}
+};
 
 Pushover.prototype.processCandle = function(candle, callback) {
   this.price = candle.close;
   callback();
-}
+};
 
 Pushover.prototype.processAdvice = function(advice) {
-  if (advice.recommendation == 'soft' && pushoverConfig.muteSoft) return;
-  var text = [
+  if (advice.recommendation === 'soft' && pushoverConfig.muteSoft) return;
+  let text = [
     advice.recommendation,
     this.price
   ].join(' ');
-  var subject = text;
+  let subject = text;
   this.send(subject, text);
-}
+};
 
 Pushover.prototype.checkResults = function(err) {
   if(err)
     log.warn('error sending pushover', err);
   else
     log.info('Send advice via pushover.');
-}
+};
 
 module.exports = Pushover;

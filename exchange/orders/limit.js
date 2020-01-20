@@ -11,13 +11,13 @@ throw ':(';
 
 */
 
-const _ = require('lodash');
-const async = require('async');
-const events = require('events');
-const moment = require('moment');
-const errors = require('../exchangeErrors');
-const BaseOrder = require('./order');
-const states = require('./states');
+let _ = require('lodash');
+let async = require('async');
+let events = require('events');
+let moment = require('moment');
+let errors = require('../exchangeErrors');
+let BaseOrder = require('./order');
+let states = require('./states');
 
 class LimitOrder extends BaseOrder {
   constructor(api) {

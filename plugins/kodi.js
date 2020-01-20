@@ -2,14 +2,14 @@
  * Created by billymcintosh on 24/12/17.
  */
 
-var _ = require('lodash');
-var request = require('request');
-var log = require('../core/log.js');
-var util = require('../core/util.js');
-var config = util.getConfig();
-var kodiConfig = config.kodi;
+let _ = require('lodash');
+let request = require('request');
+let log = require('../core/log.js');
+let util = require('../core/util.js');
+let config = util.getConfig();
+let kodiConfig = config.kodi;
 
-var Kodi = function(done) {
+let Kodi = function(done) {
     _.bindAll(this);
 
     this.exchange = config.watch.exchange.charAt().toUpperCase() + config.watch.exchange.slice(1)
@@ -20,17 +20,17 @@ var Kodi = function(done) {
 };
 
 Kodi.prototype.setup = function(done) {
-    var setupKodi = function (err, result) {
+    let setupKodi = function (err, result) {
         if(kodiConfig.sendMessageOnStart) {
-            var currency = config.watch.currency;
-            var asset = config.watch.asset;
-            var title = "Gekko Started";
-            var message = `Watching ${this.exchange} - ${currency}/${asset}`;
+            let currency = config.watch.currency;
+            let asset = config.watch.asset;
+            let title = "Gekko Started";
+            let message = `Watching ${this.exchange} - ${currency}/${asset}`;
             this.mail(title, message);
         } else {
             log.debug('Skipping Send message on startup')
         }
-    }
+    };
     setupKodi.call(this)
 };
 
@@ -41,20 +41,20 @@ Kodi.prototype.processCandle = function(candle, done) {
 };
 
 Kodi.prototype.processAdvice = function(advice) {
-    var title = `Gekko: Going ${advice.recommendation} @ ${this.price}`
-    var message = `${this.exchange} ${config.watch.currency}/${config.watch.asset}`;
+    let title = `Gekko: Going ${advice.recommendation} @ ${this.price}`;
+    let message = `${this.exchange} ${config.watch.currency}/${config.watch.asset}`;
     this.mail(title, message);
 };
 
 Kodi.prototype.mail = function(title, message, done) {
-    var options = {
+    let options = {
       body: `{"jsonrpc":"2.0","method":"GUI.ShowNotification","params":{"title":"${title}","message":"${message}"},"id":1}`,
       headers: {
         'Content-Type': 'application/json'
       },
       method: 'POST',
       url: kodiConfig.host
-    }
+    };
 
     request(options, (error, response, body) => {
         if (!error) {
@@ -63,6 +63,6 @@ Kodi.prototype.mail = function(title, message, done) {
             log.debug(`Kodi ${error}`)
         }
     })
-}
+};
 
 module.exports = Kodi;

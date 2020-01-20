@@ -25,7 +25,7 @@
 //    when given the configuration object (relative from `gekko/plugins/`).
 // greedy: if this plugin wants to subscribe to a lot of events, but can function
 //    properly when some events wont be emitted.
-var plugins = [
+let plugins = [
   {
     name: 'Candle writer',
     description: 'Store candles in a database',

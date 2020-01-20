@@ -1,17 +1,17 @@
-const util = require('../../core/util.js');
-const _ = require('lodash');
-const moment = require('moment');
-const log = require('../../core/log');
-const retry = require('../../exchange/exchangeUtils').retry;
+let util = require('../../core/util.js');
+let _ = require('lodash');
+let moment = require('moment');
+let log = require('../../core/log');
+let retry = require('../../exchange/exchangeUtils').retry;
 
-const config = util.getConfig();
+let config = util.getConfig();
 
-const dirs = util.dirs();
+let dirs = util.dirs();
 
-const Fetcher = require(dirs.exchanges + 'poloniex');
+let Fetcher = require(dirs.exchanges + 'poloniex');
 
-const batchSize = 60 * 2; // 2 hour
-const overlapSize = 10; // 10 minutes
+let batchSize = 60 * 2; // 2 hour
+let overlapSize = 10; // 10 minutes
 
 // Helper methods
 function joinCurrencies(currencyA, currencyB){
@@ -20,7 +20,7 @@ function joinCurrencies(currencyA, currencyB){
 
 // patch getTrades..
 Fetcher.prototype.getTrades = function(range, callback) {
-  const handle = (err, result) => {
+  let handle = (err, result) => {
     if(err) {
       return callback(err);
     }
@@ -42,26 +42,26 @@ Fetcher.prototype.getTrades = function(range, callback) {
     callback(result.reverse());
   };
 
-  const params = {
+  let params = {
     currencyPair: joinCurrencies(this.currency, this.asset)
-  }
+  };
 
   params.start = range.from.unix();
   params.end = range.to.unix();
 
-  const fetch = next => this.poloniex._public('returnTradeHistory', params, this.processResponse(next));
+  let fetch = next => this.poloniex._public('returnTradeHistory', params, this.processResponse(next));
   retry(null, fetch, handle);
-}
+};
 
 util.makeEventEmitter(Fetcher);
 
-var iterator = false;
-var end = false;
-var done = false;
+let iterator = false;
+let end = false;
+let done = false;
 
-var fetcher = new Fetcher(config.watch);
+let fetcher = new Fetcher(config.watch);
 
-var fetch = () => {
+let fetch = () => {
   log.info(
     config.watch.currency,
     config.watch.asset,
@@ -79,9 +79,9 @@ var fetch = () => {
     process.send({type: 'log', log: msg});
   }
   fetcher.getTrades(iterator, handleFetch);
-}
+};
 
-var handleFetch = trades => {
+let handleFetch = trades => {
   iterator.from.add(batchSize, 'minutes').subtract(overlapSize, 'minutes');
   iterator.to.add(batchSize, 'minutes').subtract(overlapSize, 'minutes');
 
@@ -94,12 +94,12 @@ var handleFetch = trades => {
     return fetcher.emit('trades', []);
   }
 
-  var last = moment.unix(_.last(trades).date);
+  let last = moment.unix(_.last(trades).date);
 
   if(last > end) {
     fetcher.emit('done');
 
-    var endUnix = end.unix();
+    let endUnix = end.unix();
     trades = _.filter(
       trades,
       t => t.date <= endUnix
@@ -107,20 +107,17 @@ var handleFetch = trades => {
   }
 
   fetcher.emit('trades', trades);
-}
+};
 
 module.exports = function (daterange) {
   iterator = {
     from: daterange.from.clone(),
     to: daterange.from.clone().add(batchSize, 'minutes')
-  }
+  };
   end = daterange.to.clone();
 
   return {
     bus: fetcher,
     fetch: fetch
   }
-}
-
-
-
+};

@@ -7,7 +7,7 @@ module.exports = cb => {
         cb(null, {
           done: false,
           latest: message.payload
-        })
+        });
 
       else if(message.type === 'error') {
         cb(message.error);
@@ -23,4 +23,4 @@ module.exports = cb => {
         cb(null, { done: true });
     }
   }
-}
+};

@@ -2,27 +2,27 @@
 // database (which is expected to be updated regularly, like with a
 // realtime market running in parallel).
 
-const _ = require('lodash');
-const moment = require('moment');
+let _ = require('lodash');
+let moment = require('moment');
 
-const util = require('../util');
-const dirs = util.dirs();
-const config = util.getConfig();
+let util = require('../util');
+let dirs = util.dirs();
+let config = util.getConfig();
 
-const exchangeChecker = require(dirs.gekko + 'exchange/exchangeChecker');
+let exchangeChecker = require(dirs.gekko + 'exchange/exchangeChecker');
 
-const adapter = config[config.adapter];
-const Reader = require(dirs.gekko + adapter.path + '/reader');
+let adapter = config[config.adapter];
+let Reader = require(dirs.gekko + adapter.path + '/reader');
 
-const TICKINTERVAL = 20 * 1000; // 20 seconds
+let TICKINTERVAL = 20 * 1000; // 20 seconds
 
-const slug = config.watch.exchange.toLowerCase();
-const exchange = exchangeChecker.getExchangeCapabilities(slug);
+let slug = config.watch.exchange.toLowerCase();
+let exchange = exchangeChecker.getExchangeCapabilities(slug);
 
 if(!exchange)
-  util.die(`Unsupported exchange: ${slug}`)
+  util.die(`Unsupported exchange: ${slug}`);
 
-const error = exchangeChecker.cantMonitor(config.watch);
+let error = exchangeChecker.cantMonitor(config.watch);
 if(error)
   util.die(error, true);
 
@@ -32,7 +32,7 @@ else
   var fromTs = moment().startOf('minute').unix();
 
 
-var Market = function() {
+let Market = function() {
 
   _.bindAll(this);
 
@@ -45,9 +45,9 @@ var Market = function() {
     this.get,
     TICKINTERVAL
   );
-}
+};
 
-var Readable = require('stream').Readable;
+let Readable = require('stream').Readable;
 Market.prototype = Object.create(Readable.prototype, {
   constructor: { value: Market }
 });
@@ -57,7 +57,7 @@ Market.prototype._read = _.once(function() {
 });
 
 Market.prototype.get = function() {
-  var future = moment().add(1, 'minute').unix();
+  let future = moment().add(1, 'minute').unix();
 
   this.reader.get(
     this.latestTs,
@@ -65,10 +65,10 @@ Market.prototype.get = function() {
     'full',
     this.processCandles
   )
-}
+};
 
 Market.prototype.processCandles = function(err, candles) {
-  var amount = _.size(candles);
+  let amount = _.size(candles);
   if(amount === 0) {
     // no new candles!
     return;
@@ -86,6 +86,6 @@ Market.prototype.processCandles = function(err, candles) {
   }, this);
 
   this.latestTs = _.last(candles).start.unix() + 1;
-}
+};
 
 module.exports = Market;

@@ -1,11 +1,11 @@
-const superagent = require('superagent');
-const _ = require('lodash');
-const log = require('../core/log.js');
-const util = require('../core/util.js');
-const config = util.getConfig();
-const iftttConfig = config.ifttt;
+let superagent = require('superagent');
+let _ = require('lodash');
+let log = require('../core/log.js');
+let util = require('../core/util.js');
+let config = util.getConfig();
+let iftttConfig = config.ifttt;
 
-const IFTTT = function(done) {
+let IFTTT = function(done) {
   _.bindAll(this);
   this.ifttt;
   this.price = 'N/A';
@@ -14,12 +14,12 @@ const IFTTT = function(done) {
 };
 
 IFTTT.prototype.setup = function(done) {
-  var setupIFTTT = function () {
+  let setupIFTTT = function () {
     if(iftttConfig.sendMessageOnStart){
-      var exchange = config.watch.exchange;
-      var currency = config.watch.currency;
-      var asset = config.watch.asset;
-      var body = "Gekko has started, Ive started watching "
+      let exchange = config.watch.exchange;
+      let currency = config.watch.currency;
+      let asset = config.watch.asset;
+      let body = "Gekko has started, Ive started watching "
         +exchange
         +" "
         +currency
@@ -41,16 +41,16 @@ IFTTT.prototype.processCandle = function(candle, done) {
 };
 
 IFTTT.prototype.portfolioUpdate = function(portfolio) {
-  var message = "Gekko has detected a portfolio update. " +
+  let message = "Gekko has detected a portfolio update. " +
     "Your current " + config.watch.currency + " balance is " + portfolio.currency + '.' +
     "Your current " + config.watch.exchange + " balance is " + portfolio.assert + '.';
   this.send(message);
-}
+};
 
 IFTTT.prototype.processAdvice = function(advice) {
-  if (advice.recommendation == 'soft' && iftttConfig.muteSoft) return;
+  if (advice.recommendation === 'soft' && iftttConfig.muteSoft) return;
 
-  const text = [
+  let text = [
     'Gekko is watching ',
     config.watch.exchange,
     ' and has detected a new trend, advice is to go ',

@@ -1,41 +1,41 @@
-const _ = require('lodash');
-const fs = require('fs');
+let _ = require('lodash');
+let fs = require('fs');
 
-const util = require('../../core/util.js');
-const config = util.getConfig();
-const dirs = util.dirs();
+let util = require('../../core/util.js');
+let config = util.getConfig();
+let dirs = util.dirs();
 
-const log = require(util.dirs().core + 'log');
-const postgresUtil = require('./util');
+let log = require(util.dirs().core + 'log');
+let postgresUtil = require('./util');
 
-const adapter = config.postgresql;
+let adapter = config.postgresql;
 
 // verify the correct dependencies are installed
-const pluginHelper = require(dirs.core + 'pluginUtil');
-const pluginMock = {
+let pluginHelper = require(dirs.core + 'pluginUtil');
+let pluginMock = {
   slug: 'postgresql adapter',
   dependencies: config.postgresql.dependencies
-}
+};
 
-const cannotLoad = pluginHelper.cannotLoad(pluginMock);
+let cannotLoad = pluginHelper.cannotLoad(pluginMock);
 if(cannotLoad) {
   util.die(cannotLoad);
 }
 
-const pg = require('pg');
+let pg = require('pg');
 
-const version = adapter.version;
+let version = adapter.version;
 
-const dbName = postgresUtil.database();
+let dbName = postgresUtil.database();
 
-const mode = util.gekkoMode();
+let mode = util.gekkoMode();
 
-const connectionString = config.postgresql.connectionString;
+let connectionString = config.postgresql.connectionString;
 
-const checkClient = new pg.Pool({
+let checkClient = new pg.Pool({
   connectionString: connectionString + '/postgres',
 });
-const pool = new pg.Pool({
+let pool = new pg.Pool({
   connectionString: connectionString + '/' + dbName,
 });
 
@@ -76,7 +76,7 @@ checkClient.connect((err, client, done) => {
     });
 });
 
-const createDatabase = (client, done) => {
+let createDatabase = (client, done) => {
   client.query("CREATE DATABASE " + dbName, err => {
     if(err) {
       util.die(err);
@@ -86,10 +86,10 @@ const createDatabase = (client, done) => {
     done();
     upsertTables();
   });
-}
+};
 
-const upsertTables = () => {
-  const upsertQuery =
+let upsertTables = () => {
+  let upsertQuery =
     `CREATE TABLE IF NOT EXISTS
     ${postgresUtil.table('candles')} (
       id BIGSERIAL PRIMARY KEY,
@@ -108,7 +108,7 @@ const upsertTables = () => {
       util.die(err);
     }
   });
-}
+};
 
 
 module.exports = pool;

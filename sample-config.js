@@ -1,7 +1,7 @@
 // Everything is explained here:
 // @link https://gekko.wizb.it/docs/commandline/plugins.html
 
-var config = {};
+let config = {};
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //                          GENERAL SETTINGS
@@ -19,7 +19,7 @@ config.watch = {
   exchange: 'binance',
   currency: 'USDT',
   asset: 'BTC',
-}
+};
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //                       CONFIGURING TRADING ADVICE
@@ -30,7 +30,7 @@ config.tradingAdvisor = {
   method: 'MACD',
   candleSize: 60,
   historySize: 10,
-}
+};
 
 // MACD settings:
 config.MACD = {
@@ -73,12 +73,12 @@ config.paperTrader = {
   feeUsing: 'maker',
   // how much slippage/spread should Gekko assume per trade?
   slippage: 0.05,
-}
+};
 
 config.performanceAnalyzer = {
   enabled: true,
   riskFreeReturn: 5
-}
+};
 
 // Want Gekko to perform real trades on buy or sell advice?
 // Enabling this will activate trades for the market being
@@ -89,14 +89,14 @@ config.trader = {
   secret: '',
   username: '', // your username, only required for specific exchanges.
   passphrase: '', // GDAX, requires a passphrase.
-}
+};
 
 config.eventLogger = {
   enabled: false,
   // optionally pass a whitelist of events to log, if not past
   // the eventLogger will log _all_ events.
   // whitelist: ['portfolioChange', 'portfolioValueChange']
-}
+};
 
 config.pushover = {
   enabled: false,
@@ -105,14 +105,14 @@ config.pushover = {
   tag: '[GEKKO]',
   key: '',
   user: ''
-}
+};
 
 config.blotter = {
   enabled: false,
   filename: 'blotter.csv',
   dateFormat: 'l LT',
   timezone: -300, // -300 minutes for EST(-5:00), only used if exchange doesn't provide correct timezone
-}
+};
 
 // want Gekko to send a mail on buy or sell advice?
 config.mailer = {
@@ -148,7 +148,7 @@ config.mailer = {
   to: '', // 'me@somedomain.com, me@someotherdomain.com'
   ssl: true, // Use SSL (true for Gmail)
   port: '', // Set if you don't want to use the default port
-}
+};
 
 config.pushbullet = {
   // sends pushbullets if true
@@ -175,7 +175,7 @@ config.kodi = {
   host: 'http://ip-or-hostname:8080/jsonrpc',
   enabled: false,
   sendMessageOnStart: true,
-}
+};
 
 config.ircbot = {
   enabled: false,
@@ -184,7 +184,7 @@ config.ircbot = {
   channel: '#your-channel',
   server: 'irc.freenode.net',
   botName: 'gekkobot'
-}
+};
 
 config.telegrambot = {
   enabled: false,
@@ -220,7 +220,7 @@ config.xmppbot = {
   client_port: 5222,
   status_msg: 'I\'m online',
   receiver: 'jabber_id_for_updates'
-}
+};
 
 config.campfire = {
   enabled: false,
@@ -229,7 +229,7 @@ config.campfire = {
   roomId: null,
   apiKey: '',
   account: ''
-}
+};
 
 config.redisBeacon = {
   enabled: false,
@@ -244,7 +244,7 @@ config.redisBeacon = {
   broadcast: [
     'candle'
   ]
-}
+};
 
 config.slack = {
   enabled: false,
@@ -252,7 +252,7 @@ config.slack = {
   sendMessageOnStart: true,
   muteSoft: true,
   channel: '' // #tradebot
-}
+};
 
 config.ifttt = {
   enabled: false,
@@ -260,16 +260,16 @@ config.ifttt = {
   makerKey: '',
   muteSoft: true,
   sendMessageOnStart: true
-}
+};
 
 config.candleWriter = {
   enabled: true
-}
+};
 
 config.adviceWriter = {
   enabled: false,
   muteSoft: true,
-}
+};
 
 config.backtestResultExporter = {
   enabled: false,
@@ -281,13 +281,13 @@ config.backtestResultExporter = {
     roundtrips: true,
     trades: true
   }
-}
+};
 
 config.candleUploader = {
   enabled: false,
   url: '',
   apiKey: ''
-}
+};
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //                       CONFIGURING ADAPTER
@@ -304,7 +304,7 @@ config.sqlite = {
   journalMode: require('./web/isWindows.js') ? 'DELETE' : 'WAL',
 
   dependencies: []
-}
+};
 
 // Postgres adapter example config (please note: requires postgres >= 9.5):
 config.postgresql = {
@@ -317,7 +317,7 @@ config.postgresql = {
     module: 'pg',
     version: '7.4.3'
   }]
-}
+};
 
 // Mongodb adapter, requires mongodb >= 3.3 (no version earlier tested)
 config.mongodb = {
@@ -328,13 +328,13 @@ config.mongodb = {
     module: 'mongojs',
     version: '2.4.0'
   }]
-}
+};
 
 config.candleUploader = {
   enabled: false,
   url: '',
   apiKey: ''
-}
+};
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //                       CONFIGURING BACKTESTING
@@ -350,7 +350,7 @@ config.backtest = {
   //   to: "2018-04-28"
   //},
   batchSize: 50
-}
+};
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //                       CONFIGURING IMPORTING
@@ -362,7 +362,7 @@ config.importer = {
     from: "2017-11-01 00:00:00",
     to: "2017-11-20 00:00:00"
   }
-}
+};
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -488,7 +488,7 @@ config.StochRSI = {
 // custom settings:
 config.custom = {
   my_custom_setting: 10,
-}
+};
 
 config['talib-macd'] = {
   parameters: {
@@ -500,7 +500,7 @@ config['talib-macd'] = {
     down: -0.025,
     up: 0.025,
   }
-}
+};
 
 config['talib-macd'] = {
   parameters: {
@@ -512,7 +512,7 @@ config['talib-macd'] = {
     down: -0.025,
     up: 0.025,
   }
-}
+};
 
 config['tulip-adx'] = {
   optInTimePeriod: 10,
@@ -520,7 +520,7 @@ config['tulip-adx'] = {
     down: -0.025,
     up: 0.025,
   }
-}
+};
 
 
 // set this to true if you understand that Gekko will

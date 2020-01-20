@@ -1,22 +1,22 @@
-var BATCH_SIZE = 60; // minutes
-var MISSING_CANDLES_ALLOWED = 3; // minutes, per batch
+let BATCH_SIZE = 60; // minutes
+let MISSING_CANDLES_ALLOWED = 3; // minutes, per batch
 
-var _ = require('lodash');
-var moment = require('moment');
-var async = require('async');
+let _ = require('lodash');
+let moment = require('moment');
+let async = require('async');
 
-var util = require('../util');
-var config = util.getConfig();
-var dirs = util.dirs();
-var log = require(dirs.core + 'log');
+let util = require('../util');
+let config = util.getConfig();
+let dirs = util.dirs();
+let log = require(dirs.core + 'log');
 
-var adapter = config[config.adapter];
-var Reader = require(dirs.gekko + adapter.path + '/reader');
+let adapter = config[config.adapter];
+let Reader = require(dirs.gekko + adapter.path + '/reader');
 
-var reader = new Reader();
+let reader = new Reader();
 
 // todo: rewrite with generators or async/await..
-var scan = function(done) {
+let scan = function(done) {
   log.info('Scanning local history for backtestable dateranges.');
 
   reader.tableExists('candles', (err, exists) => {
@@ -32,10 +32,10 @@ var scan = function(done) {
       available: reader.countTotal
     }, (err, res) => {
 
-      var first = res.boundry.first;
-      var last = res.boundry.last;
+      let first = res.boundry.first;
+      let last = res.boundry.last;
 
-      var optimal = (last - first) / 60;
+      let optimal = (last - first) / 60;
 
       log.debug('Available', res.available);
       log.debug('Optimal', optimal);
@@ -51,16 +51,16 @@ var scan = function(done) {
 
       // figure out where the gaps are..
 
-      var missing = optimal - res.available + 1;
+      let missing = optimal - res.available + 1;
 
       log.info(`The database has ${missing} candles missing, Figuring out which ones...`);
-      
-      var iterator = {
+
+      let iterator = {
         from: last - (BATCH_SIZE * 60),
         to: last
-      }
+      };
 
-      var batches = [];
+      let batches = [];
 
       // loop through all candles we have
       // in batches and track whether they
@@ -70,13 +70,13 @@ var scan = function(done) {
             return iterator.from > first
           },
           next => {
-            var from = iterator.from;
-            var to = iterator.to;
+            let from = iterator.from;
+            let to = iterator.to;
             reader.count(
               from,
               iterator.to,
               (err, count) => {
-                var complete = count + MISSING_CANDLES_ALLOWED > BATCH_SIZE;
+                let complete = count + MISSING_CANDLES_ALLOWED > BATCH_SIZE;
 
                 if(complete)
                   batches.push({
@@ -99,15 +99,15 @@ var scan = function(done) {
             // batches is now a list like
             // [ {from: unix, to: unix } ]
 
-            var ranges = [ batches.shift() ];
+            let ranges = [ batches.shift() ];
 
             _.each(batches, batch => {
-              var curRange = _.last(ranges);
+              let curRange = _.last(ranges);
               if(batch.to === curRange.from)
                 curRange.from = batch.from;
               else
                 ranges.push( batch );
-            })
+            });
 
             // we have been counting chronologically reversed
             // (backwards, from now into the past), flip definitions
@@ -133,6 +133,6 @@ var scan = function(done) {
     });
 
   });
-}
+};
 
 module.exports = scan;

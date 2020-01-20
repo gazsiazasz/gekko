@@ -1,11 +1,11 @@
 // Fake exchanges: used to test purposes to develop Gekko (works without internet).
 
-const _ = require('lodash');
-const moment = require('moment');
+let _ = require('lodash');
+let moment = require('moment');
 
-const TREND_DURATION = 1000;
+let TREND_DURATION = 1000;
 
-const Trader = function() {
+let Trader = function() {
   this.name = 'Exchange Simulator';
   this.at = moment().subtract(30, 'minutes');
 
@@ -14,12 +14,12 @@ const Trader = function() {
   this.price = 100;
   this.trend = 'up';
   this.tid = 0;
-}
+};
 
 Trader.prototype.getTrades = function(since, cb) {
-  const amount = moment().diff(this.at, 'seconds');
+  let amount = moment().diff(this.at, 'seconds');
 
-  const trades = _.range(amount).map(() => {
+  let trades = _.range(amount).map(() => {
 
     this.tid++;
 
@@ -48,7 +48,7 @@ Trader.prototype.getTrades = function(since, cb) {
   );
 
   cb(null, trades);
-}
+};
 
 Trader.getCapabilities = function () {
   return {
@@ -66,7 +66,7 @@ Trader.getCapabilities = function () {
     tid: 'tid',
     tradable: false
   };
-}
+};
 
 module.exports = Trader;
 

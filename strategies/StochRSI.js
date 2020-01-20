@@ -6,13 +6,13 @@
 
  */
 // helpers
-var _ = require('lodash');
-var log = require('../core/log.js');
+let _ = require('lodash');
+let log = require('../core/log.js');
 
-var RSI = require('./indicators/RSI.js');
+let RSI = require('./indicators/RSI.js');
 
 // let's create our own method
-var method = {};
+let method = {};
 
 // prepare everything our method needs
 method.init = function() {
@@ -31,7 +31,7 @@ method.init = function() {
   this.addIndicator('rsi', 'RSI', { interval: this.interval });
 
 	this.RSIhistory = [];
-}
+};
 
 // what happens on every new candle?
 method.update = function(candle) {
@@ -46,19 +46,19 @@ method.update = function(candle) {
 	this.lowestRSI = _.min(this.RSIhistory);
 	this.highestRSI = _.max(this.RSIhistory);
 	this.stochRSI = ((this.rsi - this.lowestRSI) / (this.highestRSI - this.lowestRSI)) * 100;
-}
+};
 
 // for debugging purposes log the last
 // calculated parameters.
 method.log = function() {
-  var digits = 8;
+  let digits = 8;
 
   log.debug('calculated StochRSI properties for candle:');
   log.debug('\t', 'rsi:', this.rsi.toFixed(digits));
 	log.debug("StochRSI min:\t\t" + this.lowestRSI.toFixed(digits));
 	log.debug("StochRSI max:\t\t" + this.highestRSI.toFixed(digits));
 	log.debug("StochRSI Value:\t\t" + this.stochRSI.toFixed(2));
-}
+};
 
 method.check = function() {
 	if(this.stochRSI > this.settings.thresholds.high) {
@@ -116,6 +116,6 @@ method.check = function() {
 		this.advice();
 	}
 
-}
+};
 
 module.exports = method;

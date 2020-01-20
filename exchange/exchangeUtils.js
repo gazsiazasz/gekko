@@ -1,10 +1,10 @@
 // generic low level reusuable utils for interacting with exchanges.
 
-const retry = require('retry');
-const errors = require('./exchangeErrors');
-const _ = require('lodash');
+let retry = require('retry');
+let errors = require('./exchangeErrors');
+let _ = require('lodash');
 
-const retryInstance = (options, checkFn, callback, e) => {
+let retryInstance = (options, checkFn, callback, e) => {
   if(!options) {
     options = {
       retries: 100,
@@ -16,7 +16,7 @@ const retryInstance = (options, checkFn, callback, e) => {
 
   let attempt = 0;
 
-  const operation = retry.operation(options);
+  let operation = retry.operation(options);
   operation.attempt(function(currentAttempt) {
     checkFn((err, result) => {
 
@@ -45,22 +45,22 @@ const retryInstance = (options, checkFn, callback, e) => {
       callback(err, result);
     });
   });
-}
+};
 
 // es6 bind all: https://github.com/posrix/es6-class-bind-all/blob/master/lib/es6ClassBindAll.js
-const allMethods = targetClass => {
-  const propertys = Object.getOwnPropertyNames(Object.getPrototypeOf(targetClass))
-  propertys.splice(propertys.indexOf('constructor'), 1)
+let allMethods = targetClass => {
+  let propertys = Object.getOwnPropertyNames(Object.getPrototypeOf(targetClass));
+  propertys.splice(propertys.indexOf('constructor'), 1);
   return propertys
-}
+};
 
-const bindAll = (targetClass, methodNames = []) => {
-  for (const name of !methodNames.length ? allMethods(targetClass) : methodNames) {
+let bindAll = (targetClass, methodNames = []) => {
+  for (let name of !methodNames.length ? allMethods(targetClass) : methodNames) {
     targetClass[name] = targetClass[name].bind(targetClass)
   }
-}
+};
 
-const isValidOrder = ({api, market, amount, price}) => {
+let isValidOrder = ({api, market, amount, price}) => {
   let reason = false;
 
   // Check amount
@@ -87,22 +87,22 @@ const isValidOrder = ({api, market, amount, price}) => {
     reason,
     valid: !reason
   }
-}
+};
 
 
 // https://gist.github.com/jiggzson/b5f489af9ad931e3d186
-const scientificToDecimal = num => {
-  if(/\d+\.?\d*e[\+\-]*\d+/i.test(num)) {
-    const zero = '0';
-    const parts = String(num).toLowerCase().split('e'); // split into coeff and exponent
-    const e = parts.pop(); // store the exponential part
-    const l = Math.abs(e); // get the number of zeros
-    const sign = e/l;
-    const coeff_array = parts[0].split('.');
+let scientificToDecimal = num => {
+  if(/\d+\.?\d*e[+\-]*\d+/i.test(num)) {
+    let zero = '0';
+    let parts = String(num).toLowerCase().split('e'); // split into coeff and exponent
+    let e = parts.pop(); // store the exponential part
+    let l = Math.abs(e); // get the number of zeros
+    let sign = e/l;
+    let coeff_array = parts[0].split('.');
     if(sign === -1) {
       num = zero + '.' + new Array(l).join(zero) + coeff_array.join('');
     } else {
-      const dec = coeff_array[1];
+      let dec = coeff_array[1];
       if(dec) {
         l = l - dec.length;
       }
@@ -114,10 +114,10 @@ const scientificToDecimal = num => {
   }
 
   return num;
-}
+};
 
 // TEMP until we have proper scheduling
-const cacheFn = (fn, timeout) => {
+let cacheFn = (fn, timeout) => {
   let nextCall = false;
   let cache = false;
   let inflight = false;
@@ -128,7 +128,7 @@ const cacheFn = (fn, timeout) => {
       return callbackQueue.push(next);
     }
 
-    const now = +new Date;
+    let now = +new Date;
     if(cache && now >= nextCall) {
       return next(res.error, res.result);
     }
@@ -143,7 +143,7 @@ const cacheFn = (fn, timeout) => {
       inflight = false;
     })
   }
-}
+};
 
 module.exports = {
   retry: retryInstance,
@@ -151,4 +151,4 @@ module.exports = {
   isValidOrder,
   scientificToDecimal,
   cacheFn
-}
+};

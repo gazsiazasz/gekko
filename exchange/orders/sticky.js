@@ -12,13 +12,13 @@
     - native move
 */
 
-const _ = require('lodash');
-const async = require('async');
-const events = require('events');
-const moment = require('moment');
-const errors = require('../exchangeErrors');
-const BaseOrder = require('./order');
-const states = require('./states');
+let _ = require('lodash');
+let async = require('async');
+let events = require('events');
+let moment = require('moment');
+let errors = require('../exchangeErrors');
+let BaseOrder = require('./order');
+let states = require('./states');
 
 class StickyOrder extends BaseOrder {
   constructor({api, marketConfig, capabilities}) {
@@ -97,7 +97,7 @@ class StickyOrder extends BaseOrder {
 
   calculatePrice(ticker) {
 
-    const r = this.roundPrice;
+    let r = this.roundPrice;
 
     if(this.initialLimit && !this.id) {
       console.log('passing initial limit of:', this.limit);
@@ -114,7 +114,7 @@ class StickyOrder extends BaseOrder {
         return r(ticker.bid);
       }
 
-      const outbidPrice = this.outbidPrice(ticker.bid, true);
+      let outbidPrice = this.outbidPrice(ticker.bid, true);
 
       if(outbidPrice <= this.limit && outbidPrice < ticker.ask) {
         return r(outbidPrice);
@@ -132,7 +132,7 @@ class StickyOrder extends BaseOrder {
         return r(ticker.ask);
       }
 
-      const outbidPrice = this.outbidPrice(ticker.ask, false);
+      let outbidPrice = this.outbidPrice(ticker.ask, false);
 
       if(outbidPrice >= this.limit && outbidPrice > ticker.bid) {
         return r(outbidPrice);
@@ -147,7 +147,7 @@ class StickyOrder extends BaseOrder {
       return false;
     }
 
-    const alreadyFilled = this.calculateFilled();
+    let alreadyFilled = this.calculateFilled();
 
     this.submit({
       side: this.side,
@@ -170,7 +170,7 @@ class StickyOrder extends BaseOrder {
       return false;
     }
 
-    const id = this.id;
+    let id = this.id;
 
     setTimeout(
       () => {
@@ -179,7 +179,7 @@ class StickyOrder extends BaseOrder {
             return;
           }
 
-          const amount = res.amount;
+          let amount = res.amount;
 
           if(this.orders[id].filled === amount) {
             // handle original error
@@ -291,7 +291,7 @@ class StickyOrder extends BaseOrder {
     }
 
     this.sticking = true;
-    const checkId = this.id;
+    let checkId = this.id;
 
     this.api.checkOrder(this.id, (err, result) => {
 
@@ -331,7 +331,7 @@ class StickyOrder extends BaseOrder {
 
         // if we are already at limit we dont care where the top is
         // note: might be string VS float
-        if(this.price == this.limit) {
+        if(this.price === this.limit) {
           this.scheduleNextCheck();
           return;
         }
@@ -361,9 +361,9 @@ class StickyOrder extends BaseOrder {
           this.ticker = ticker;
           this.emit('ticker', ticker);
 
-          const bookSide = this.side === 'buy' ? 'bid' : 'ask';
+          let bookSide = this.side === 'buy' ? 'bid' : 'ask';
           // note: might be string VS float
-          if(ticker[bookSide] != this.price) {
+          if(ticker[bookSide] !== this.price) {
             return this.move(this.calculatePrice(ticker));
           } else {
             this.scheduleNextCheck();
@@ -430,8 +430,8 @@ class StickyOrder extends BaseOrder {
       let amountFilled = data.filled;
 
       if(!amountFilled && data.remaining) {
-        const alreadyFilled = this.calculateFilled();
-        const orderAmount = this.roundAmount(this.amount - alreadyFilled);
+        let alreadyFilled = this.calculateFilled();
+        let orderAmount = this.roundAmount(this.amount - alreadyFilled);
         amountFilled = this.roundAmount(orderAmount - data.remaining);
       }
 
@@ -440,8 +440,6 @@ class StickyOrder extends BaseOrder {
         this.emit('fill', this.calculateFilled());
       }
     }
-
-    return;
   }
 
   move(price) {
@@ -454,7 +452,7 @@ class StickyOrder extends BaseOrder {
 
     this.log(`${this.side} ${this.id} this.move 1`);
 
-    const cancelId = this.id;
+    let cancelId = this.id;
 
     this.api.cancelOrder(cancelId, (err, filled, data) => {
       this.log(`${this.side} ${this.id} this.move 2`);
@@ -532,8 +530,8 @@ class StickyOrder extends BaseOrder {
     this.limit = this.roundPrice(limit);
     this.movingLimit = false;
 
-    const moveBuy = this.side === 'buy' && this.limit < this.price;
-    const moveSell = this.side === 'sell' && this.limit > this.price;
+    let moveBuy = this.side === 'buy' && this.limit < this.price;
+    let moveSell = this.side === 'sell' && this.limit > this.price;
 
     if(moveBuy || moveSell) {
       this.sticking = true;
@@ -546,7 +544,7 @@ class StickyOrder extends BaseOrder {
 
       this.log(this.side + ' moving ' + this.id);
 
-      const timeToMove = new Date - this.limitRequested;
+      let timeToMove = new Date - this.limitRequested;
       if(timeToMove > 300) {
         console.log(new Date, this.side, 'long time to move:', timeToMove);
       }
@@ -665,7 +663,7 @@ class StickyOrder extends BaseOrder {
     if(!next)
       next = _.noop;
 
-    const checkOrders = _.keys(this.orders)
+    let checkOrders = _.keys(this.orders)
       .map(id => next => {
 
         if(!this.orders[id].filled) {
@@ -679,7 +677,7 @@ class StickyOrder extends BaseOrder {
       // note this is a standalone function after the order is
       // completed, as such we do not use the handleError flow.
       if(err) {
-        console.log(new Date, 'error createSummary (checkOrder)')
+        console.log(new Date, 'error createSummary (checkOrder)');
         return next(err);
       }
 
@@ -698,15 +696,15 @@ class StickyOrder extends BaseOrder {
         amount += +trade.amount;
       });
 
-      const summary = {
+      let summary = {
         price,
         amount,
         date,
         side: this.side,
         orders: trades.length
-      }
+      };
 
-      const first = _.first(trades);
+      let first = _.first(trades);
 
       if(first && first.fees) {
         summary.fees = {};
@@ -748,7 +746,7 @@ class StickyOrder extends BaseOrder {
       next(undefined, summary);
     });
   }
- 
+
 }
 
 module.exports = StickyOrder;

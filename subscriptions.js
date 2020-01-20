@@ -1,9 +1,9 @@
-// 
+//
 // Subscriptions glue plugins to events
 // flowing through the Gekko.
-// 
+//
 
-var subscriptions = [
+let subscriptions = [
   {
     emitter: 'market',
     event: 'candle',

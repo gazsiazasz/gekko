@@ -1,36 +1,39 @@
-var _ = require('lodash');
-var fs = require('fs');
+let _ = require('lodash');
+let fs = require('fs');
 
-var util = require('../../core/util.js');
-var config = util.getConfig();
-var dirs = util.dirs();
+let util = require('../../core/util.js');
+let config = util.getConfig();
+let dirs = util.dirs();
 
-var adapter = config.sqlite;
+let adapter = config.sqlite;
 
 // verify the correct dependencies are installed
-var pluginHelper = require(dirs.core + 'pluginUtil');
-var pluginMock = {
+let pluginHelper = require(dirs.core + 'pluginUtil');
+let pluginMock = {
   slug: 'sqlite adapter',
   dependencies: adapter.dependencies,
 };
 
-var cannotLoad = pluginHelper.cannotLoad(pluginMock);
+let cannotLoad = pluginHelper.cannotLoad(pluginMock);
 if (cannotLoad) util.die(cannotLoad);
 
 // should be good now
-if (config.debug) var sqlite3 = require('sqlite3').verbose();
-else var sqlite3 = require('sqlite3');
+let sqlite3;
+if (config.debug)
+  sqlite3 = require('sqlite3').verbose();
+else
+  sqlite3 = require('sqlite3');
 
-var plugins = require(util.dirs().gekko + 'plugins');
+let plugins = require(util.dirs().gekko + 'plugins');
 
-var version = adapter.version;
+let version = adapter.version;
 
-var dbName = config.watch.exchange.toLowerCase() + '_' + version + '.db';
-var dir = dirs.gekko + adapter.dataDirectory;
+let dbName = config.watch.exchange.toLowerCase() + '_' + version + '.db';
+let dir = dirs.gekko + adapter.dataDirectory;
 
-var fullPath = [dir, dbName].join('/');
+let fullPath = [dir, dbName].join('/');
 
-var mode = util.gekkoMode();
+let mode = util.gekkoMode();
 if (mode === 'realtime' || mode === 'importer') {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 } else if (mode === 'backtest') {
@@ -46,10 +49,10 @@ if (mode === 'realtime' || mode === 'importer') {
 
 module.exports = {
   initDB: () => {
-    var journalMode = config.sqlite.journalMode || 'PERSIST';
-    var syncMode = journalMode === 'WAL' ? 'NORMAL' : 'FULL';
-  
-    var db = new sqlite3.Database(fullPath);
+    let journalMode = config.sqlite.journalMode || 'PERSIST';
+    let syncMode = journalMode === 'WAL' ? 'NORMAL' : 'FULL';
+
+    let db = new sqlite3.Database(fullPath);
     db.run('PRAGMA synchronous = ' + syncMode);
     db.run('PRAGMA journal_mode = ' + journalMode);
     db.configure('busyTimeout', 10000);

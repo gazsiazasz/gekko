@@ -7,23 +7,22 @@
 // > As much as I wanted to be Gordon Gekko, I'll *always* be Bud Fox.
 // > [tosses back the handkerchief and walks away]
 
-var _ = require('lodash');
-var async = require('async');
+let _ = require('lodash');
 
-var util = require(__dirname + '/../util');
-var dirs = util.dirs();
+let util = require(__dirname + '/../util');
+let dirs = util.dirs();
 
-var Heart = require(dirs.budfox + 'heart');
-var MarketDataProvider =  require(dirs.budfox + 'marketDataProvider');
-var CandleManager = require(dirs.budfox + 'candleManager');
+let Heart = require(dirs.budfox + 'heart');
+let MarketDataProvider =  require(dirs.budfox + 'marketDataProvider');
+let CandleManager = require(dirs.budfox + 'candleManager');
 
-var BudFox = function(config) {
+let BudFox = function(config) {
   _.bindAll(this);
 
   Readable.call(this, {objectMode: true});
 
   // BudFox internal modules:
-  
+
   this.heart = new Heart;
   this.marketDataProvider = new MarketDataProvider(config);
   this.candleManager = new CandleManager;
@@ -61,18 +60,18 @@ var BudFox = function(config) {
   );
 
   this.heart.pump();
-}
+};
 
-var Readable = require('stream').Readable;
+let Readable = require('stream').Readable;
 
 BudFox.prototype = Object.create(Readable.prototype, {
   constructor: { value: BudFox }
 });
 
-BudFox.prototype._read = function noop() {}
+BudFox.prototype._read = function noop() {};
 
 BudFox.prototype.pushCandles = function(candles) {
   _.each(candles, this.push);
-}
+};
 
 module.exports = BudFox;

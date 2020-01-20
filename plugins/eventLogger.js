@@ -1,9 +1,9 @@
-const log = require('../core/log');
-const _ = require('lodash');
-const subscriptions = require('../subscriptions');
-const config = require('../core/util').getConfig().eventLogger;
+let log = require('../core/log');
+let _ = require('lodash');
+let subscriptions = require('../subscriptions');
+let config = require('../core/util').getConfig().eventLogger;
 
-const EventLogger = function() {}
+let EventLogger = function() {};
 
 _.each(subscriptions, sub => {
   if(config.whitelist && !config.whitelist.includes(sub.event)) {

@@ -1,11 +1,11 @@
 // helpers
-var _ = require('lodash');
-var log = require('../core/log.js');
+let _ = require('lodash');
+let log = require('../core/log.js');
 
-var TSI = require('./indicators/TSI.js');
+let TSI = require('./indicators/TSI.js');
 
 // let's create our own method
-var method = {};
+let method = {};
 
 // prepare everything our method needs
 method.init = function() {
@@ -22,22 +22,22 @@ method.init = function() {
 
   // define the indicators we need
   this.addIndicator('tsi', 'TSI', this.settings);
-}
+};
 
 // for debugging purposes log the last
 // calculated parameters.
 method.log = function(candle) {
-  var digits = 8;
-  var tsi = this.indicators.tsi;
+  let digits = 8;
+  let tsi = this.indicators.tsi;
 
   log.debug('calculated TSI properties for candle:');
   log.debug('\t', 'tsi:', tsi.tsi.toFixed(digits));
   log.debug('\t', 'price:', candle.close.toFixed(digits));
-}
+};
 
 method.check = function() {
-  var tsi = this.indicators.tsi;
-  var tsiVal = tsi.tsi;
+  let tsi = this.indicators.tsi;
+  let tsiVal = tsi.tsi;
 
   if(tsiVal > this.settings.thresholds.high) {
 
@@ -93,6 +93,6 @@ method.check = function() {
 
     this.advice();
   }
-}
+};
 
 module.exports = method;

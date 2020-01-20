@@ -1,22 +1,22 @@
-var moment = require('moment');
-var _ = require('lodash');
-var path = require('path');
-var fs = require('fs');
-var semver = require('semver');
-var program = require('commander');
+let moment = require('moment');
+let _ = require('lodash');
+let path = require('path');
+let fs = require('fs');
+let semver = require('semver');
+let program = require('commander');
 
-var startTime = moment();
+let startTime = moment();
 
-var _config = false;
-var _package = false;
-var _nodeVersion = false;
-var _gekkoMode = false;
-var _gekkoEnv = false;
+let _config = false;
+let _package = false;
+let _nodeVersion = false;
+let _gekkoMode = false;
+let _gekkoEnv = false;
 
-var _args = false;
+let _args = false;
 
 // helper functions
-var util = {
+let util = {
   getConfig: function() {
     // cache
     if(_config)
@@ -56,7 +56,7 @@ var util = {
     return util.getPackage().engines.node;
   },
   recentNode: function() {
-    var required = util.getRequiredNodeVersion();
+    let required = util.getRequiredNodeVersion();
     return semver.satisfies(process.version, required);
   },
   // check if two moments are corresponding
@@ -83,7 +83,7 @@ var util = {
       return process.send({type: 'error', error: '\n ERROR: ' + m + '\n'});
     }
 
-    var log = console.log.bind(console);
+    let log = console.log.bind(console);
 
     if(m) {
       if(soft) {
@@ -100,7 +100,7 @@ var util = {
     process.exit(1);
   },
   dirs: function() {
-    var ROOT = __dirname + '/../';
+    let ROOT = __dirname + '/../';
 
     return {
       gekko: ROOT,
@@ -156,15 +156,12 @@ var util = {
     return _gekkoEnv || 'standalone';
   },
   launchUI: function() {
-    if(program['ui'])
-      return true;
-    else
-      return false;
+    return !!program['ui'];
   },
   getStartTime: function() {
     return startTime;
   },
-}
+};
 
 // NOTE: those options are only used
 // in stand alone mode

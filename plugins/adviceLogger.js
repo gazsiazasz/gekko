@@ -1,15 +1,15 @@
-var log = require('../core/log');
-var moment = require('moment');
-var _ = require('lodash');
-var util = require('../core/util.js');
-var config = util.getConfig();
-var adviceLoggerConfig = config.adviceLogger;
+let log = require('../core/log');
+let moment = require('moment');
+let _ = require('lodash');
+let util = require('../core/util.js');
+let config = util.getConfig();
+let adviceLoggerConfig = config.adviceLogger;
 
-var Actor = function() {
+let Actor = function() {
   this.price = 'N/A';
   this.marketTime = {format: function() {return 'N/A'}};
   _.bindAll(this);
-}
+};
 
 Actor.prototype.processCandle = function(candle, done) {
   this.price = candle.close;
@@ -19,8 +19,8 @@ Actor.prototype.processCandle = function(candle, done) {
 };
 
 Actor.prototype.processAdvice = function(advice) {
-  if (adviceLoggerConfig.muteSoft && advice.recommendation == 'soft') return;
-  console.log()
+  if (adviceLoggerConfig.muteSoft && advice.recommendation === 'soft') return;
+  console.log();
   log.info('We have new trading advice!');
   log.info('\t Position:', advice.recommendation);
   log.info('\t Market price:', this.price);

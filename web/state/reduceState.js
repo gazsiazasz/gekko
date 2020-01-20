@@ -1,18 +1,18 @@
 // Redux/vuex inspired reducer, reduces an event into a gekko state.
 // NOTE: this is used by the backend as well as the frontend.
 
-const skipInitialEvents = ['marketUpdate'];
-const skipLatestEvents = ['marketStart', 'stratWarmupCompleted'];
-const trackAllEvents = ['tradeCompleted', 'advice', 'roundtrip'];
+let skipInitialEvents = ['marketUpdate'];
+let skipLatestEvents = ['marketStart', 'stratWarmupCompleted'];
+let trackAllEvents = ['tradeCompleted', 'advice', 'roundtrip'];
 
-const reduce = (state, event) => {
-  const type = event.type;
-  const payload = event.payload;
+let reduce = (state, event) => {
+  let type = event.type;
+  let payload = event.payload;
 
   state = {
     ...state,
     latestUpdate: new Date()
-  }
+  };
 
   if(trackAllEvents.includes(type)) {
     if(!state.events[type]) {
@@ -61,7 +61,7 @@ const reduce = (state, event) => {
   }
 
   return state;
-}
+};
 
 // export default reduce;
 module.exports = reduce;

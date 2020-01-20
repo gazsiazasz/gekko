@@ -1,12 +1,12 @@
-const cache = require('../state/cache');
-const manager = cache.get('apiKeyManager');
+let cache = require('../state/cache');
+let manager = cache.get('apiKeyManager');
 
 module.exports = {
   get: function *() {
     this.body = manager.get();
   },
   add: function *() {
-    const content = this.request.body;
+    let content = this.request.body;
 
     manager.add(content.exchange, content.values);
 
@@ -15,7 +15,7 @@ module.exports = {
     };
   },
   remove: function *() {
-    const exchange = this.request.body.exchange;
+    let exchange = this.request.body.exchange;
 
     manager.remove(exchange);
 
@@ -23,4 +23,4 @@ module.exports = {
       status: 'ok'
     };
   }
-}
+};

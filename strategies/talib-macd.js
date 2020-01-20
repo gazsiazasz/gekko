@@ -5,11 +5,11 @@
 // https://github.com/askmike/gekko/blob/stable/docs/trading_methods.md
 
 // Let's create our own method
-var method = {};
+let method = {};
 
 // Prepare everything our method needs
 method.init = function() {
-  this.name = 'talib-macd'
+  this.name = 'talib-macd';
   this.input = 'candle';
   // keep state about the current trend
   // here, on every new candle we use this
@@ -21,29 +21,29 @@ method.init = function() {
   // before we can start giving advice?
   this.requiredHistory = this.tradingAdvisor.historySize;
 
-  var customMACDSettings = this.settings.parameters;
+  let customMACDSettings = this.settings.parameters;
 
   // define the indicators we need
   this.addTalibIndicator('mymacd', 'macd', customMACDSettings);
-}
+};
 
 // What happens on every new candle?
 method.update = function(candle) {
   // nothing!
-}
+};
 
 
 method.log = function() {
   // nothing!
-}
+};
 
 // Based on the newly calculated
 // information, check if we should
 // update or not.
 method.check = function(candle) {
-  var price = candle.close;
-  var result = this.talibIndicators.mymacd.result;
-  var macddiff = result['outMACD'] - result['outMACDSignal'];
+  let price = candle.close;
+  let result = this.talibIndicators.mymacd.result;
+  let macddiff = result['outMACD'] - result['outMACDSignal'];
 
   if(this.settings.thresholds.down > macddiff && this.trend !== 'short') {
     this.trend = 'short';
@@ -54,6 +54,6 @@ method.check = function(candle) {
     this.advice('long');
 
   }
-}
+};
 
 module.exports = method;

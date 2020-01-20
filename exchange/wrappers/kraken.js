@@ -1,25 +1,25 @@
-const Kraken = require('kraken-api');
-const moment = require('moment');
-const _ = require('lodash');
-const exchangeUtils = require('../exchangeUtils');
-const retry = exchangeUtils.retry;
-const scientificToDecimal = exchangeUtils.scientificToDecimal;
+let Kraken = require('kraken-api');
+let moment = require('moment');
+let _ = require('lodash');
+let exchangeUtils = require('../exchangeUtils');
+let retry = exchangeUtils.retry;
+let scientificToDecimal = exchangeUtils.scientificToDecimal;
 
-const marketData = require('./kraken-markets.json');
+let marketData = require('./kraken-markets.json');
 
-const Trader = function(config) {
+let Trader = function(config) {
   _.bindAll(this);
 
   if(_.isObject(config)) {
     this.key = config.key;
     this.secret = config.secret;
-    this.currency = config.currency.toUpperCase()
+    this.currency = config.currency.toUpperCase();
     this.asset = config.asset.toUpperCase();
   }
 
   this.name = 'kraken';
   this.since = null;
-  
+
   this.market = _.find(Trader.getCapabilities().markets, (market) => {
     return market.pair[0] === this.currency && market.pair[1] === this.asset
   });
@@ -32,9 +32,9 @@ const Trader = function(config) {
     this.secret,
     {timeout: +moment.duration(60, 'seconds')}
   );
-}
+};
 
-const recoverableErrors = [
+let recoverableErrors = [
   'SOCKETTIMEDOUT',
   'TIMEDOUT',
   'CONNRESET',
@@ -51,19 +51,19 @@ const recoverableErrors = [
 
 // errors that might mean
 // the API call succeeded.
-const unknownResultErrors = [
+let unknownResultErrors = [
   'Response code 502',
   'Response code 504',
   'Response code 522',
   'Response code 520',
-]
+];
 
-const includes = (str, list) => {
+let includes = (str, list) => {
   if(!_.isString(str))
     return false;
 
   return _.some(list, item => str.includes(item));
-}
+};
 
 Trader.prototype.handleResponse = function(funcName, callback, nonMutating, payload) {
   return (error, body) => {
@@ -89,7 +89,7 @@ Trader.prototype.handleResponse = function(funcName, callback, nonMutating, payl
 
       if(funcName === 'addOrder' && includes(error.message, unknownResultErrors)) {
 
-        const { tradeType, amount, price } = payload;
+        let { tradeType, amount, price } = payload;
 
         return setTimeout(() => {
           this.getRawOpenOrders((err2, orders) => {
@@ -102,27 +102,23 @@ Trader.prototype.handleResponse = function(funcName, callback, nonMutating, payl
               o.id = id;
             });
 
-            const order = _.find(orders, o => {
+            let order = _.find(orders, o => {
               if(o.descr.type !== tradeType) {
                 return false;
               }
 
-              const ts = moment.unix((o.opentm + '').split('.')[0])
+              let ts = moment.unix((o.opentm + '').split('.')[0]);
               if(moment().diff(ts, 'm') > 10) {
                 return false;
               }
 
               // string vs float
-              if(+o.descr.price != price) {
+              if(+o.descr.price !== price) {
                 return false;
               }
 
               // string vs float
-              if(o.vol != amount) {
-                return false;
-              }
-
-              return true;
+              return o.vol === amount;
             });
 
             if(!order) {
@@ -139,13 +135,13 @@ Trader.prototype.handleResponse = function(funcName, callback, nonMutating, payl
         console.log('broken cancel');
 
         return setTimeout(() => {
-          const handle = (err2, data) => {
+          let handle = (err2, data) => {
             if(err2) {
               console.log('err2', err2);
               return callback(err2);
             }
 
-            const order = _.get(data, `result["${payload}"]`);
+            let order = _.get(data, `result["${payload}"]`);
 
             if(!_.isObject(order)) {
               console.log('refetched broken cancel, cannot find order...', data);
@@ -164,9 +160,9 @@ Trader.prototype.handleResponse = function(funcName, callback, nonMutating, payl
 
           };
 
-          const reqData = {txid: payload};
+          let reqData = {txid: payload};
 
-          const fetch = cb => this.kraken.api('QueryOrders', reqData, this.handleResponse('checkOrder', cb, true));
+          let fetch = cb => this.kraken.api('QueryOrders', reqData, this.handleResponse('checkOrder', cb, true));
           retry(null, fetch, handle);
         }, 5000);
       }
@@ -179,12 +175,12 @@ Trader.prototype.handleResponse = function(funcName, callback, nonMutating, payl
 };
 
 Trader.prototype.getTrades = function(since, callback, descending) {
-  const startTs = since ? moment(since).valueOf() : null;
+  let startTs = since ? moment(since).valueOf() : null;
 
-  const handle = (err, trades) => {
+  let handle = (err, trades) => {
     if (err) return callback(err);
 
-    var parsedTrades = [];
+    let parsedTrades = [];
     _.each(trades.result[this.pair], function(trade) {
       // Even when you supply 'since' you can still get more trades than you asked for, it needs to be filtered
       if (_.isNull(startTs) || startTs < moment.unix(trade[2]).valueOf()) {
@@ -203,7 +199,7 @@ Trader.prototype.getTrades = function(since, callback, descending) {
       callback(undefined, parsedTrades);
   };
 
-  const reqData = {
+  let reqData = {
     pair: this.pair
   };
 
@@ -212,12 +208,12 @@ Trader.prototype.getTrades = function(since, callback, descending) {
     reqData.since = startTs * 1000000;
   }
 
-  const fetch = cb => this.kraken.api('Trades', reqData, this.handleResponse('getTrades', cb, true));
+  let fetch = cb => this.kraken.api('Trades', reqData, this.handleResponse('getTrades', cb, true));
   retry(null, fetch, handle);
 };
 
 Trader.prototype.getPortfolio = function(callback) {
-  const handle = (err, data) => {
+  let handle = (err, data) => {
     if(err) return callback(err);
 
     let assetAmount = parseFloat( data.result[this.market.prefixed[1]] );
@@ -233,7 +229,7 @@ Trader.prototype.getPortfolio = function(callback) {
       currencyAmount = 0;
     }
 
-    const portfolio = [
+    let portfolio = [
       { name: this.asset, amount: assetAmount },
       { name: this.currency, amount: currencyAmount }
     ];
@@ -241,7 +237,7 @@ Trader.prototype.getPortfolio = function(callback) {
     return callback(undefined, portfolio);
   };
 
-  const fetch = cb => this.kraken.api('Balance', {}, this.handleResponse('getPortfolio', cb, true));
+  let fetch = cb => this.kraken.api('Balance', {}, this.handleResponse('getPortfolio', cb, true));
   retry(null, fetch, handle);
 };
 
@@ -249,24 +245,24 @@ Trader.prototype.getPortfolio = function(callback) {
 // It does not take into account volume discounts.
 // Base maker fee is 0.16%, taker fee is 0.26%.
 Trader.prototype.getFee = function(callback) {
-  const makerFee = 0.16;
+  let makerFee = 0.16;
   callback(undefined, makerFee / 100);
 };
 
 Trader.prototype.getTicker = function(callback) {
-  const handle = (err, data) => {
+  let handle = (err, data) => {
     if (err) return callback(err);
 
-    const result = data.result[this.pair];
-    const ticker = {
+    let result = data.result[this.pair];
+    let ticker = {
       ask: result.a[0],
       bid: result.b[0]
     };
     callback(undefined, ticker);
   };
 
-  const reqData = {pair: this.pair}
-  const fetch = cb => this.kraken.api('Ticker', reqData, this.handleResponse('getTicker', cb, true));
+  let reqData = {pair: this.pair};
+  let fetch = cb => this.kraken.api('Ticker', reqData, this.handleResponse('getTicker', cb, true));
   retry(null, fetch, handle);
 };
 
@@ -281,7 +277,7 @@ Trader.prototype.roundPrice = function(amount) {
 Trader.prototype.addOrder = function(tradeType, amount, price, callback) {
   price = this.roundPrice(price); // only round price, not amount
 
-  const handle = (err, data) => {
+  let handle = (err, data) => {
     if(err) {
       return callback(err);
     }
@@ -302,7 +298,7 @@ Trader.prototype.addOrder = function(tradeType, amount, price, callback) {
     callback(undefined, txid);
   };
 
-  const reqData = {
+  let reqData = {
     pair: this.pair,
     type: tradeType.toLowerCase(),
     ordertype: 'limit',
@@ -310,7 +306,7 @@ Trader.prototype.addOrder = function(tradeType, amount, price, callback) {
     volume: amount
   };
 
-  const fetch = cb => this.kraken.api('AddOrder', reqData, this.handleResponse('addOrder', cb, false, { tradeType, amount, price }));
+  let fetch = cb => this.kraken.api('AddOrder', reqData, this.handleResponse('addOrder', cb, false, { tradeType, amount, price }));
   retry(null, fetch, handle);
 };
 
@@ -324,12 +320,12 @@ Trader.prototype.sell = function(amount, price, callback) {
 
 
 Trader.prototype.getOrder = function(order, callback) {
-  const handle = (err, data) => {
+  let handle = (err, data) => {
     if(err) return callback(err);
 
-    const price = parseFloat( data.result[ order ].price );
-    const amount = parseFloat( data.result[ order ].vol_exec );
-    const date = moment.unix( data.result[ order ].closetm );
+    let price = parseFloat( data.result[ order ].price );
+    let amount = parseFloat( data.result[ order ].vol_exec );
+    let date = moment.unix( data.result[ order ].closetm );
 
     // TODO: figure out fees, kraken is reporting 0 fees:
     // { 'OF6L2D-6LIKD-4OOHR7':
@@ -360,17 +356,17 @@ Trader.prototype.getOrder = function(order, callback) {
     });
   };
 
-  const reqData = {txid: order};
+  let reqData = {txid: order};
 
-  const fetch = cb => this.kraken.api('QueryOrders', reqData, this.handleResponse('getOrder', cb, true));
+  let fetch = cb => this.kraken.api('QueryOrders', reqData, this.handleResponse('getOrder', cb, true));
   retry(null, fetch, handle);
-}
+};
 
 Trader.prototype.checkOrder = function(order, callback) {
-  const handle = (err, data) => {
+  let handle = (err, data) => {
     if(err) return callback(err);
 
-    const result = data.result[order];
+    let result = data.result[order];
 
     callback(undefined, {
       executed: result.vol === result.vol_exec,
@@ -379,16 +375,16 @@ Trader.prototype.checkOrder = function(order, callback) {
     });
   };
 
-  const reqData = {txid: order};
+  let reqData = {txid: order};
 
-  const fetch = cb => this.kraken.api('QueryOrders', reqData, this.handleResponse('checkOrder', cb, true));
+  let fetch = cb => this.kraken.api('QueryOrders', reqData, this.handleResponse('checkOrder', cb, true));
   retry(null, fetch, handle);
 };
 
 Trader.prototype.cancelOrder = function(order, callback) {
-  const reqData = {txid: order};
+  let reqData = {txid: order};
 
-  const handle = (err, data) => {
+  let handle = (err, data) => {
     if(err) {
       if(err.message.includes('Unknown order')) {
         return callback(undefined, true);
@@ -411,25 +407,25 @@ Trader.prototype.cancelOrder = function(order, callback) {
     }
 
     callback(undefined, false);
-  }
+  };
 
-  const fetch = cb => this.kraken.api('CancelOrder', reqData, this.handleResponse('cancelOrder', cb, false, order));
+  let fetch = cb => this.kraken.api('CancelOrder', reqData, this.handleResponse('cancelOrder', cb, false, order));
   retry(null, fetch, handle);
 };
 
 
 Trader.prototype.getRawOpenOrders = function(callback) {
-  const handle = (err, data) => {
+  let handle = (err, data) => {
     if(err) {
       return callback(err)
     }
 
     callback(undefined, data.result.open);
-  }
+  };
 
-  const fetch = cb => this.kraken.api('OpenOrders', {}, this.handleResponse('getOpenOrders', cb, true));
+  let fetch = cb => this.kraken.api('OpenOrders', {}, this.handleResponse('getOpenOrders', cb, true));
   retry(null, fetch, handle);
-}
+};
 
 Trader.prototype.getOpenOrders = function(callback) {
 
@@ -440,7 +436,7 @@ Trader.prototype.getOpenOrders = function(callback) {
       return callback(err)
     }
 
-    const orders = [];
+    let orders = [];
 
     _.each(allOrders, (o, id) => {
       if(o.descr.pair === this.pair) {
@@ -450,7 +446,7 @@ Trader.prototype.getOpenOrders = function(callback) {
 
     callback(undefined, orders);
   });
-}
+};
 
 Trader.getCapabilities = function () {
   return {
@@ -466,6 +462,6 @@ Trader.getCapabilities = function () {
     tradable: true,
     gekkoBroker: 0.6
   };
-}
+};
 
 module.exports = Trader;

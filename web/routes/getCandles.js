@@ -27,14 +27,14 @@
 //   candleSize: 100
 // }
 
-const _ = require('lodash');
-const promisify = require('tiny-promisify');
-const candleLoader = promisify(require('../../core/workers/loadCandles/parent'));
-const base = require('./baseConfig');
+let _ = require('lodash');
+let promisify = require('tiny-promisify');
+let candleLoader = promisify(require('../../core/workers/loadCandles/parent'));
+let base = require('./baseConfig');
 
 module.exports = function *() {
 
   config = {};
   _.merge(config, base, this.request.body);
   this.body = yield candleLoader(config);
-}
+};

@@ -1,9 +1,9 @@
-const async = require('async');
-var _ = require('lodash');
-var util = require('../../core/util.js');
-var log = require(`${util.dirs().core}log`);
+let async = require('async');
+let _ = require('lodash');
+let util = require('../../core/util.js');
+let log = require(`${util.dirs().core}log`);
 
-var handle = require('./handle');
+let handle = require('./handle');
 
 module.exports = done => {
     this.db = handle;
@@ -37,4 +37,4 @@ module.exports = done => {
             })
         }
     ], done)
-}
+};

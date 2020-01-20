@@ -1,10 +1,10 @@
-const moment = require('moment');
-const _ = require('lodash');
-const marketData = require('./coinfalcon-markets.json');
+let moment = require('moment');
+let _ = require('lodash');
+let marketData = require('./coinfalcon-markets.json');
 
-const CoinFalcon = require('coinfalcon');
+let CoinFalcon = require('coinfalcon');
 
-var Trader = function(config) {
+let Trader = function(config) {
   _.bindAll(this, [
     'roundAmount',
     'roundPrice'
@@ -31,14 +31,14 @@ var Trader = function(config) {
   this.interval = 1500;
 };
 
-const includes = (str, list) => {
+let includes = (str, list) => {
   if(!_.isString(str))
     return false;
 
   return _.some(list, item => str.includes(item));
-}
+};
 
-const recoverableErrors = [
+let recoverableErrors = [
   'SOCKETTIMEDOUT',
   'TIMEDOUT',
   'CONNRESET',
@@ -66,23 +66,23 @@ const recoverableErrors = [
 
 // errors that might mean
 // the API call succeeded.
-const unknownResultErrors = [
+let unknownResultErrors = [
   '524',
-]
+];
 
 Trader.prototype.processResponse = function(method, args, next) {
 
-  const requestAt = moment();
+  let requestAt = moment();
 
-  const checkTime = () => {
-    const diff = moment().diff(requestAt, 's');
+  let checkTime = () => {
+    let diff = moment().diff(requestAt, 's');
     if(diff > 10) {
       console.log(new Date,  '[CF] API CALL TOOK', diff, 'SECONDS!');
       console.log(new Date,  '[CF]', {method, args, next});
     }
-  }
+  };
 
-  const catcher = err => {
+  let catcher = err => {
     if(!err || !err.message) {
       err = new Error(err || 'Empty error');
     }
@@ -94,7 +94,7 @@ Trader.prototype.processResponse = function(method, args, next) {
     console.log(new Date, '[cf] big error!', err.message, method);
 
     return next(err);
-  }
+  };
 
   return {
     failure: catcher,
@@ -114,10 +114,10 @@ Trader.prototype.processResponse = function(method, args, next) {
       next(undefined, data);
     }
   }
-}
+};
 
 Trader.prototype.retry = function(method, args) {
-  var wait = +moment.duration(1, 'seconds');
+  let wait = +moment.duration(1, 'seconds');
 
   // run the failed method again with the same arguments after wait
   setTimeout(() => {
@@ -126,14 +126,14 @@ Trader.prototype.retry = function(method, args) {
 };
 
 Trader.prototype.getTicker = function(callback) {
-  const handle = this.processResponse(this.getTicker, [callback], (err, res) => {
+  let handle = this.processResponse(this.getTicker, [callback], (err, res) => {
     if(err)
       return callback(err);
 
     callback(null, {bid: +res.data.bids[0].price, ask: +res.data.asks[0].price})
   });
 
-  var url = "markets/" + this.pair + "/orders?level=1"
+  let url = "markets/" + this.pair + "/orders?level=1";
 
   this.coinfalcon.get(url).then(handle.success).catch(handle.failure);
 };
@@ -143,11 +143,11 @@ Trader.prototype.getFee = function(callback) {
 };
 
 Trader.prototype.getPortfolio = function(callback) {
-  const handle = this.processResponse(this.getPortfolio, [callback], (err, res) => {
+  let handle = this.processResponse(this.getPortfolio, [callback], (err, res) => {
     if(err)
       return callback(err);
 
-    var portfolio = res.data.map(account => ({
+    let portfolio = res.data.map(account => ({
       name: account.currency_code.toUpperCase(),
       amount: parseFloat(account.available_balance)
     }));
@@ -159,7 +159,7 @@ Trader.prototype.getPortfolio = function(callback) {
 };
 
 Trader.prototype.getOpenOrders = function(callback) {
-  const handle = this.processResponse(this.getOpenOrders, [callback], (err, res) => {
+  let handle = this.processResponse(this.getOpenOrders, [callback], (err, res) => {
     if(err)
       return callback(err);
 
@@ -172,9 +172,9 @@ Trader.prototype.getOpenOrders = function(callback) {
 };
 
 Trader.prototype.addOrder = function(type, amount, price, callback) {
-  const args = _.toArray(arguments);
+  let args = _.toArray(arguments);
 
-  const handle = this.processResponse(this.addOrder, args, (err, res) => {
+  let handle = this.processResponse(this.addOrder, args, (err, res) => {
     if(err)
       return callback(err);
 
@@ -185,13 +185,13 @@ Trader.prototype.addOrder = function(type, amount, price, callback) {
     callback(false, res.data.id);
   });
 
-  const payload = {
+  let payload = {
     order_type: type,
     operation_type: 'limit_order',
     market: this.pair,
     size: amount + '',
     price: price + ''
-  }
+  };
 
   this.coinfalcon.post('user/orders', payload).then(handle.success).catch(handle.failure);
 };
@@ -202,10 +202,10 @@ Trader.prototype.addOrder = function(type, amount, price, callback) {
   };
 });
 
-const round = function(number, precision) {
-  var factor = Math.pow(10, precision);
-  var tempNumber = number * factor;
-  var roundedTempNumber = Math.round(tempNumber);
+let round = function(number, precision) {
+  let factor = Math.pow(10, precision);
+  let tempNumber = number * factor;
+  let roundedTempNumber = Math.round(tempNumber);
   return roundedTempNumber / factor;
 };
 
@@ -214,8 +214,8 @@ Trader.prototype.getPrecision = function(tickSize) {
   if (!isFinite(tickSize)) {
     return 0;
   }
-  var e = 1;
-  var p = 0;
+  let e = 1;
+  let p = 0;
   while (Math.round(tickSize * e) / e !== tickSize) {
     e *= 10; p++;
   }
@@ -224,11 +224,11 @@ Trader.prototype.getPrecision = function(tickSize) {
 
 Trader.prototype.roundAmount = function(amount) {
   return round(amount, this.getPrecision(this.market.minimalOrder.amount));
-}
+};
 
 Trader.prototype.roundPrice = function(price) {
   return round(price, this.getPrecision(this.market.minimalOrder.price));
-}
+};
 
 Trader.prototype.outbidPrice = function(price, isUp) {
   let newPrice;
@@ -240,19 +240,19 @@ Trader.prototype.outbidPrice = function(price, isUp) {
   }
 
   return this.roundPrice(newPrice);
-}
+};
 
 Trader.prototype.getOrder = function(order, callback) {
-  const args = _.toArray(arguments);
-  const handle = this.processResponse(this.getOrder, args, (err, res) => {
+  let args = _.toArray(arguments);
+  let handle = this.processResponse(this.getOrder, args, (err, res) => {
     if(err)
       return callback(err);
 
-    const price = parseFloat(res.data.price);
-    const amount = parseFloat(res.data.size_filled);
-    const date = moment(res.data.created_at);
-    const fees = {};
-    const feePercent = this.makerFee;
+    let price = parseFloat(res.data.price);
+    let amount = parseFloat(res.data.size_filled);
+    let date = moment(res.data.created_at);
+    let fees = {};
+    let feePercent = this.makerFee;
     callback(false, { price, amount, date, fees, feePercent });
   });
 
@@ -260,14 +260,14 @@ Trader.prototype.getOrder = function(order, callback) {
 };
 
 Trader.prototype.checkOrder = function(order, callback) {
-  const args = _.toArray(arguments);
+  let args = _.toArray(arguments);
 
-  const handle = this.processResponse(this.checkOrder, args, (err, res) => {
+  let handle = this.processResponse(this.checkOrder, args, (err, res) => {
     if(err)
       return callback(err);
 
     // https://docs.coinfalcon.com/#list-orders
-    const status = res.data.status;
+    let status = res.data.status;
 
     if(status === 'canceled') {
       return callback(undefined, { executed: false, open: false });
@@ -289,9 +289,9 @@ Trader.prototype.checkOrder = function(order, callback) {
 };
 
 Trader.prototype.cancelOrder = function(order, callback) {
-  const args = _.toArray(arguments);
+  let args = _.toArray(arguments);
 
-  const handle = this.processResponse(this.cancelOrder, args, (err, res) => {
+  let handle = this.processResponse(this.cancelOrder, args, (err, res) => {
 
     if(err) {
       if(err.message.includes('has wrong status.')) {
@@ -327,10 +327,10 @@ Trader.prototype.cancelOrder = function(order, callback) {
 };
 
 Trader.prototype.getTrades = function(since, callback, descending) {
-  var args = _.toArray(arguments);
+  let args = _.toArray(arguments);
 
-  var success = function(res) {
-    var parsedTrades = [];
+  let success = function(res) {
+    let parsedTrades = [];
     _.each(
       res.data,
       function(trade) {
@@ -351,12 +351,12 @@ Trader.prototype.getTrades = function(since, callback, descending) {
     }
   }.bind(this);
 
-  var failure = function (err) {
+  let failure = function (err) {
     err = new Error(err);
     return this.retry(this.getTrades, args, err);
   }.bind(this);
 
-  var url = "markets/" + this.pair + "/trades"
+  let url = "markets/" + this.pair + "/trades";
 
   if (since) {
     url += '?since_time=' + (_.isString(since) ? since : since.format());
@@ -380,6 +380,6 @@ Trader.getCapabilities = function () {
     forceReorderDelay: false,
     gekkoBroker: 0.6
   };
-}
+};
 
 module.exports = Trader;

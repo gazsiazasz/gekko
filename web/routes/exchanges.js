@@ -1,10 +1,10 @@
-const _ = require('lodash');
-const fs = require('co-fs');
+let _ = require('lodash');
+let fs = require('co-fs');
 
-const gekkoRoot = __dirname + '/../../';
-var util = require(__dirname + '/../../core/util');
+let gekkoRoot = __dirname + '/../../';
+let util = require(__dirname + '/../../core/util');
 
-var config = {};
+let config = {};
 
 config.debug = false;
 config.silent = false;
@@ -12,8 +12,8 @@ config.silent = false;
 util.setConfig(config);
 
 module.exports = function *() {
-  const exchangesDir = yield fs.readdir(gekkoRoot + 'exchange/wrappers/');
-  const exchanges = exchangesDir
+  let exchangesDir = yield fs.readdir(gekkoRoot + 'exchange/wrappers/');
+  let exchanges = exchangesDir
     .filter(f => _.last(f, 3).join('') === '.js')
     .map(f => f.slice(0, -3));
 
@@ -36,4 +36,4 @@ module.exports = function *() {
   });
 
   this.body = allCapabilities;
-}
+};

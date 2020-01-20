@@ -1,14 +1,14 @@
 
-const Bitfinex = require("bitfinex-api-node");
-const _ = require('lodash');
-const moment = require('moment');
+let Bitfinex = require("bitfinex-api-node");
+let _ = require('lodash');
+let moment = require('moment');
 
-const Errors = require('../exchangeErrors');
-const retry = require('../exchangeUtils').retry;
+let Errors = require('../exchangeErrors');
+let retry = require('../exchangeUtils').retry;
 
-const marketData = require('./bitfinex-markets.json');
+let marketData = require('./bitfinex-markets.json');
 
-var Trader = function(config) {
+let Trader = function(config) {
   _.bindAll(this);
   if(_.isObject(config)) {
     this.key = config.key;
@@ -23,16 +23,16 @@ var Trader = function(config) {
   this.bitfinex = new Bitfinex.RESTv1({apiKey: this.key, apiSecret: this.secret, transform: true});
 
   this.interval = 4000;
-}
+};
 
-const includes = (str, list) => {
+let includes = (str, list) => {
   if(!_.isString(str))
     return false;
 
   return _.some(list, item => str.includes(item));
-}
+};
 
-const recoverableErrors = [
+let recoverableErrors = [
   'SOCKETTIMEDOUT',
   'ESOCKETTIMEDOUT',
   'TIMEDOUT',
@@ -55,7 +55,7 @@ Trader.prototype.handleResponse = function(funcName, callback) {
     }
 
     if(error) {
-      const message = error.message;
+      let message = error.message;
 
       console.log('handleResponse', funcName, message);
 
@@ -104,14 +104,14 @@ Trader.prototype.handleResponse = function(funcName, callback) {
 };
 
 Trader.prototype.getPortfolio = function(callback) {
-  const processResponse = (err, data) => {
+  let processResponse = (err, data) => {
     if (err) return callback(err);
 
     // We are only interested in funds in the "exchange" wallet
     data = data.filter(c => c.type === 'exchange');
 
-    const asset = _.find(data, c => c.currency.toUpperCase() === this.asset);
-    const currency = _.find(data, c => c.currency.toUpperCase() === this.currency);
+    let asset = _.find(data, c => c.currency.toUpperCase() === this.asset);
+    let currency = _.find(data, c => c.currency.toUpperCase() === this.currency);
 
     let assetAmount, currencyAmount;
 
@@ -127,7 +127,7 @@ Trader.prototype.getPortfolio = function(callback) {
       currencyAmount = 0;
     }
 
-    const portfolio = [
+    let portfolio = [
       { name: this.asset, amount: assetAmount },
       { name: this.currency, amount: currencyAmount },
     ];
@@ -135,46 +135,46 @@ Trader.prototype.getPortfolio = function(callback) {
     callback(undefined, portfolio);
   };
 
-  const fetch = cb => this.bitfinex.wallet_balances(this.handleResponse('getPortfolio', cb));
+  let fetch = cb => this.bitfinex.wallet_balances(this.handleResponse('getPortfolio', cb));
   retry(null, fetch, processResponse);
-}
+};
 
 Trader.prototype.getTicker = function(callback) {
-  const processResponse = (err, data) => {
+  let processResponse = (err, data) => {
     if (err)
       return callback(err);
 
     callback(undefined, {bid: +data.bid, ask: +data.ask});
   };
 
-  const fetch = cb => this.bitfinex.ticker(this.pair, this.handleResponse('getTicker', cb));
+  let fetch = cb => this.bitfinex.ticker(this.pair, this.handleResponse('getTicker', cb));
   retry(null, fetch, processResponse);
-}
+};
 
 Trader.prototype.getFee = function(callback) {
-  const makerFee = 0.1;
-  // const takerFee = 0.2;
+  let makerFee = 0.1;
+  // let takerFee = 0.2;
   callback(undefined, makerFee / 100);
-}
+};
 
 Trader.prototype.roundAmount = function(amount) {
   return Math.floor(amount*100000000)/100000000;
-}
+};
 
 Trader.prototype.roundPrice = function(price) {
   // todo: calc significant digits
   return price;
-}
+};
 
 Trader.prototype.submitOrder = function(type, amount, price, callback) {
-  const processResponse = (err, data) => {
+  let processResponse = (err, data) => {
     if (err)
       return callback(err);
 
     callback(null, data.order_id);
-  }
+  };
 
-  const fetch = cb => this.bitfinex.new_order(this.pair,
+  let fetch = cb => this.bitfinex.new_order(this.pair,
     amount + '',
     price + '',
     this.name.toLowerCase(),
@@ -184,18 +184,18 @@ Trader.prototype.submitOrder = function(type, amount, price, callback) {
   );
 
   retry(null, fetch, processResponse);
-}
+};
 
 Trader.prototype.buy = function(amount, price, callback) {
   this.submitOrder('buy', amount, price, callback);
-}
+};
 
 Trader.prototype.sell = function(amount, price, callback) {
   this.submitOrder('sell', amount, price, callback);
-}
+};
 
 Trader.prototype.checkOrder = function(order_id, callback) {
-  const processResponse = (err, data) => {
+  let processResponse = (err, data) => {
     if (err) {
       console.log('this is after we have retried fetching it');
       // this is after we have retried fetching it
@@ -215,20 +215,20 @@ Trader.prototype.checkOrder = function(order_id, callback) {
       executed: data.original_amount === data.executed_amount,
       filledAmount: +data.executed_amount
     });
-  }
+  };
 
-  const fetcher = cb => this.bitfinex.order_status(order_id, this.handleResponse('checkOrder', cb));
+  let fetcher = cb => this.bitfinex.order_status(order_id, this.handleResponse('checkOrder', cb));
   retry(null, fetcher, processResponse);
-}
+};
 
 
 Trader.prototype.getOrder = function(order_id, callback) {
-  const processResponse = (err, data) => {
+  let processResponse = (err, data) => {
     if (err) return callback(err);
 
-    var price = parseFloat(data.avg_execution_price);
-    var amount = parseFloat(data.executed_amount);
-    var date = moment.unix(data.timestamp);
+    let price = parseFloat(data.avg_execution_price);
+    let amount = parseFloat(data.executed_amount);
+    let date = moment.unix(data.timestamp);
 
     console.log('getOrder', data);
 
@@ -237,53 +237,53 @@ Trader.prototype.getOrder = function(order_id, callback) {
     // any data.
     return callback(undefined, {price, amount, date});
 
-    const processPastTrade = (err, data) => {
+    let processPastTrade = (err, data) => {
       if (err) return callback(err);
 
       console.log('processPastTrade', data);
-      const trade = _.first(data);
+      let trade = _.first(data);
 
-      const fees = {
+      let fees = {
         [trade.fee_currency]: trade.fee_amount
-      }
+      };
 
       callback(undefined, {price, amount, date, fees});
-    }
+    };
 
     // we need another API call to fetch the fees
-    const feeFetcher = cb => this.bitfinex.past_trades(this.currency, {since: data.timestamp}, this.handleResponse('pastTrades', cb));
+    let feeFetcher = cb => this.bitfinex.past_trades(this.currency, {since: data.timestamp}, this.handleResponse('pastTrades', cb));
     retry(null, feeFetcher, processPastTrade);
 
     callback(undefined, {price, amount, date});
   };
 
-  const fetcher = cb => this.bitfinex.order_status(order_id, this.handleResponse('getOrder', cb));
+  let fetcher = cb => this.bitfinex.order_status(order_id, this.handleResponse('getOrder', cb));
   retry(null, fetcher, processResponse);
-}
+};
 
 
 Trader.prototype.cancelOrder = function(order_id, callback) {
-  const processResponse = (err, data) => {
+  let processResponse = (err, data) => {
     if (err) {
       return callback(err);
     }
 
     return callback(undefined, false);
-  }
+  };
 
-  const handler = cb => this.bitfinex.cancel_order(order_id, this.handleResponse('cancelOrder', cb));
+  let handler = cb => this.bitfinex.cancel_order(order_id, this.handleResponse('cancelOrder', cb));
   retry(null, handler, processResponse);
-}
+};
 
 Trader.prototype.getTrades = function(since, callback, descending) {
-  const processResponse = (err, data) => {  
+  let processResponse = (err, data) => {
     if (err) return callback(err);
 
-    var trades = _.map(data, function(trade) {
+    let trades = _.map(data, function(trade) {
       return {
-        tid: trade.tid, 
-        date:  trade.timestamp, 
-        price: +trade.price, 
+        tid: trade.tid,
+        date:  trade.timestamp,
+        price: +trade.price,
         amount: +trade.amount
       }
     });
@@ -291,13 +291,13 @@ Trader.prototype.getTrades = function(since, callback, descending) {
     callback(undefined, descending ? trades : trades.reverse());
   };
 
-  var path = this.pair; 
-  if(since) 
-    path += '?limit_trades=2000'; 
+  let path = this.pair;
+  if(since)
+    path += '?limit_trades=2000';
 
-  const handler = cb => this.bitfinex.trades(path, this.handleResponse('getTrades', cb));
+  let handler = cb => this.bitfinex.trades(path, this.handleResponse('getTrades', cb));
   retry(null, handler, processResponse);
-}
+};
 
 Trader.getCapabilities = function () {
   return {
@@ -314,6 +314,6 @@ Trader.getCapabilities = function () {
     forceReorderDelay: true,
     gekkoBroker: 0.6
   };
-}
+};
 
 module.exports = Trader;

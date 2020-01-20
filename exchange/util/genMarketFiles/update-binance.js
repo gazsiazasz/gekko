@@ -1,7 +1,7 @@
-const _ = require('lodash');
-const fs = require('fs');
-const request = require('request-promise');
-const Promise = require('bluebird');
+let _ = require('lodash');
+let fs = require('fs');
+let request = require('request-promise');
+let Promise = require('bluebird');
 
 
 let getOrderMinSize = currency => {
@@ -11,7 +11,7 @@ let getOrderMinSize = currency => {
   else return 1;
 };
 
-const options = {
+let options = {
   url: 'https://www.binance.com/exchange/public/product',
   headers: {
     Connection: 'keep-alive',

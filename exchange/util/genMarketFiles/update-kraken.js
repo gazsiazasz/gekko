@@ -1,80 +1,80 @@
-const _ = require('lodash');
-const fs = require('fs');
-const request = require('request-promise');
-const Promise = require('bluebird');
+let _ = require('lodash');
+let fs = require('fs');
+let request = require('request-promise');
+let Promise = require('bluebird');
 
-// Minimum amounts are not queryable, get them here 
+// Minimum amounts are not queryable, get them here
 // https://support.kraken.com/hc/en-us/articles/205893708-What-is-the-minimum-order-size-
 
 let getMinTradeSize = asset => {
   let minTradeSize = 0.01;
   switch (asset) {
   case 'XREP':
-    minTradeSize = '0.3'
+    minTradeSize = '0.3';
     break;
   case 'XXBT':
-    minTradeSize = '0.002'
+    minTradeSize = '0.002';
     break;
   case 'BCH':
-    minTradeSize = '0.002'
+    minTradeSize = '0.002';
     break;
   case 'ADA':
-    minTradeSize = '1'
+    minTradeSize = '1';
     break;
   case 'DASH':
-    minTradeSize = '0.03'
+    minTradeSize = '0.03';
     break;
   case 'XXDG':
-    minTradeSize = '3000'
+    minTradeSize = '3000';
     break;
   case 'EOS':
-    minTradeSize = '3.0'
+    minTradeSize = '3.0';
     break;
   case 'XETH':
-    minTradeSize = '0.02'
+    minTradeSize = '0.02';
     break;
   case 'XETC':
-    minTradeSize = '0.3'
+    minTradeSize = '0.3';
     break;
   case 'GNO':
-    minTradeSize = '0.03'
+    minTradeSize = '0.03';
     break;
   case 'XICN':
-    minTradeSize = '2'
+    minTradeSize = '2';
     break;
   case 'XLTC':
-    minTradeSize = '0.1'
+    minTradeSize = '0.1';
     break;
   case 'XMLN':
-    minTradeSize = '0.1'
+    minTradeSize = '0.1';
     break;
   case 'XXMR':
-    minTradeSize = '0.1'
+    minTradeSize = '0.1';
     break;
   case 'QTUM':
-    minTradeSize = '0.1'
+    minTradeSize = '0.1';
     break;
   case 'XXRP':
-    minTradeSize = '30'
+    minTradeSize = '30';
     break;
   case 'XXLM':
-    minTradeSize = '30'
+    minTradeSize = '30';
     break;
   case 'USDT':
-    minTradeSize = '5'
+    minTradeSize = '5';
     break;
   case 'XTZ':
-    minTradeSize = '1'
+    minTradeSize = '1';
     break;
   case 'XZEC':
-    minTradeSize = '0.03'
+    minTradeSize = '0.03';
     break;
   default:
     break;
   }
 
   return minTradeSize;
-}
+};
 
 let assetPromise = request({
   url: 'https://api.kraken.com/0/public/Assets',
@@ -148,5 +148,3 @@ Promise.all([assetPromise, assetPairsPromise])
     console.log(`Couldn't import products from Kraken`);
     console.log(err);
   });
-
-  

@@ -2,36 +2,36 @@
 // if you need to test Gekko against real mocked data
 // uncomment the following:
 
-// var fs = require('fs');
-// var bitstamp = require('bitstamp');
-// var bs = new bitstamp;
+// let fs = require('fs');
+// let bitstamp = require('bitstamp');
+// let bs = new bitstamp;
 // bs.transactions('btcusd', (err, data) => {
 //   if(err)
 //     throw err;
 
-//   var json = JSON.stringify(data, null, 4);
+//   let json = JSON.stringify(data, null, 4);
 //   fs.writeFileSync('./data/bitstamp_trades.json', json);
 // });
 // return;
 
-var chai = require('chai');
-var expect = chai.expect;
-var should = chai.should;
-var sinon = require('sinon');
-var proxyquire = require('proxyquire');
+let chai = require('chai');
+let expect = chai.expect;
+let should = chai.should;
+let sinon = require('sinon');
+let proxyquire = require('proxyquire');
 
-var _ = require('lodash');
-var moment = require('moment');
+let _ = require('lodash');
+let moment = require('moment');
 
-var util = require(__dirname + '/../../core/util');
-var config = util.getConfig();
-var dirs = util.dirs();
+let util = require(__dirname + '/../../core/util');
+let config = util.getConfig();
+let dirs = util.dirs();
 
-var TRADES = require('./data/bitstamp_trades.json');
+let TRADES = require('./data/bitstamp_trades.json');
 
 return; // TEMP
 
-var FakeExchange = function() {};
+let FakeExchange = function() {};
 FakeExchange.prototype = {
   transactions: function(since, handler, descending) {
     handler(
@@ -39,15 +39,15 @@ FakeExchange.prototype = {
       TRADES
     );
   }
-}
-var transactionsSpy = sinon.spy(FakeExchange.prototype, 'transactions');
+};
+let transactionsSpy = sinon.spy(FakeExchange.prototype, 'transactions');
 spoofer = {
   bitstamp: FakeExchange
-}
+};
 
 describe('exchanges/bitstamp', function() {
-  var Bitstamp = proxyquire(dirs.gekko + 'exchange/wrappers/bitstamp', spoofer);
-  var bs;
+  let Bitstamp = proxyquire(dirs.gekko + 'exchange/wrappers/bitstamp', spoofer);
+  let bs;
 
   it('should instantiate', function() {
     bs = new Bitstamp(config.watch);
@@ -58,14 +58,14 @@ describe('exchanges/bitstamp', function() {
 
     expect(transactionsSpy.callCount).to.equal(1);
 
-    var args = transactionsSpy.lastCall.args;
+    let args = transactionsSpy.lastCall.args;
     expect(args.length).to.equal(2);
 
     expect(args[0]).to.equal('btcusd');
   });
 
   it('should retry on exchange error', function() {
-    var ErrorFakeExchange = function() {};
+    let ErrorFakeExchange = function() {};
     ErrorFakeExchange.prototype = {
       transactions: function(since, handler, descending) {
         handler('Auth error');
@@ -75,30 +75,30 @@ describe('exchanges/bitstamp', function() {
       bitstamp: ErrorFakeExchange
     }
 
-    var ErroringBitstamp = proxyquire(dirs.exchanges + 'bitstamp', spoofer);
-    var ebs = new ErroringBitstamp(config.watch);
+    let ErroringBitstamp = proxyquire(dirs.exchanges + 'bitstamp', spoofer);
+    let ebs = new ErroringBitstamp(config.watch);
 
     ebs.retry = _.noop;
-    var retrySpy = sinon.spy(ebs, 'retry');
+    let retrySpy = sinon.spy(ebs, 'retry');
 
     ebs.getTrades(null, _.noop)
 
     expect(retrySpy.callCount).to.equal(1);
 
-    var args = retrySpy.lastCall.args;
+    let args = retrySpy.lastCall.args;
     expect(args[1].length).to.equal(2);
     expect(args[1][0]).to.equal(null);
-  })
+  });
 
   it('should correctly parse historical trades', function(done) {
-    var check = function(err, trades) {
+    let check = function(err, trades) {
 
       expect(err).to.equal(null);
 
       expect(trades.length).to.equal(TRADES.length);
 
-      var oldest = _.first(trades);
-      var OLDEST = _.last(TRADES);
+      let oldest = _.first(trades);
+      let OLDEST = _.last(TRADES);
 
       expect(oldest.tid).to.equal(+OLDEST.tid);
       expect(oldest.price).to.equal(+OLDEST.price);
@@ -106,7 +106,7 @@ describe('exchanges/bitstamp', function() {
       expect(oldest.date).to.equal(OLDEST.date);
 
       done();
-    }
+    };
 
     bs.getTrades(null, check, false);
 

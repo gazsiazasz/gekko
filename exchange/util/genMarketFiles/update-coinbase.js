@@ -1,7 +1,7 @@
-const _ = require('lodash');
-const fs = require('fs');
-const request = require('request-promise');
-const Promise = require('bluebird');
+let _ = require('lodash');
+let fs = require('fs');
+let request = require('request-promise');
+let Promise = require('bluebird');
 
 request({
   url: 'https://api.pro.coinbase.com/products',
@@ -50,5 +50,3 @@ request({
   console.log(`Couldn't import products from Coinbase`);
   console.log(err);
 });
-
-  

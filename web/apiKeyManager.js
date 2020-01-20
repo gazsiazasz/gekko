@@ -1,12 +1,12 @@
-const fs = require('fs');
-const _ = require('lodash');
-const cache = require('./state/cache');
-const broadcast = cache.get('broadcast');
+let fs = require('fs');
+let _ = require('lodash');
+let cache = require('./state/cache');
+let broadcast = cache.get('broadcast');
 
-const apiKeysFile = __dirname + '/../SECRET-api-keys.json';
+let apiKeysFile = __dirname + '/../SECRET-api-keys.json';
 
 // on init:
-const noApiKeysFile = !fs.existsSync(apiKeysFile);
+let noApiKeysFile = !fs.existsSync(apiKeysFile);
 
 if(noApiKeysFile)
   fs.writeFileSync(
@@ -14,7 +14,7 @@ if(noApiKeysFile)
     JSON.stringify({})
   );
 
-const apiKeys = JSON.parse( fs.readFileSync(apiKeysFile, 'utf8') );
+let apiKeys = JSON.parse( fs.readFileSync(apiKeysFile, 'utf8') );
 
 module.exports = {
   get: () => _.keys(apiKeys),
@@ -45,4 +45,4 @@ module.exports = {
   // retrieve api keys
   // this cannot touch the frontend for security reaons.
   _getApiKeyPair: key => apiKeys[key]
-}
+};

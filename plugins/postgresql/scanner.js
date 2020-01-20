@@ -1,17 +1,17 @@
-const _ = require('lodash');
-const async = require('async');
-var pg = require('pg');
+let _ = require('lodash');
+let async = require('async');
+let pg = require('pg');
 
-const util = require('../../core/util.js');
-const config = util.getConfig();
-const dirs = util.dirs();
-var postgresUtil = require('./util');
+let util = require('../../core/util.js');
+let config = util.getConfig();
+let dirs = util.dirs();
+let postgresUtil = require('./util');
 
-var connectionString = config.postgresql.connectionString;
+let connectionString = config.postgresql.connectionString;
 
 
 module.exports = done => {
-  var scanClient = new pg.Client(connectionString+"/postgres");
+  let scanClient = new pg.Client(connectionString+"/postgres");
 
   let markets = [];
 
@@ -20,26 +20,26 @@ module.exports = done => {
       util.die(err);
     }
 
-    var sql = "select datname from pg_database";
+    let sql = "select datname from pg_database";
 
     // In single DB setup we don't need to go look into other DBs
     if (postgresUtil.useSingleDatabase()) {
       sql = "select datname from pg_database where datname='" + postgresUtil.database() + "'";
     }
 
-    var query = scanClient.query(sql, function (err, result) {
+    let query = scanClient.query(sql, function (err, result) {
 
       async.each(result.rows, (dbRow, next) => {
 
-        var scanTablesClient = new pg.Client(connectionString + "/" + dbRow.datname);
-        var dbName = dbRow.datname;
+        let scanTablesClient = new pg.Client(connectionString + "/" + dbRow.datname);
+        let dbName = dbRow.datname;
 
         scanTablesClient.connect(function (err) {
           if (err) {
             return next();
           }
 
-          var query = scanTablesClient.query(`
+          let query = scanTablesClient.query(`
             SELECT table_name
             FROM information_schema.tables
             WHERE table_schema='${postgresUtil.schema()}';
@@ -90,4 +90,4 @@ module.exports = done => {
     });
 
   });
-}
+};

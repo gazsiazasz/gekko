@@ -1,19 +1,19 @@
-var _ = require('lodash');
-var moment = require('moment');
-var async = require('async');
-var os = require('os');
+let _ = require('lodash');
+let moment = require('moment');
+let async = require('async');
+let os = require('os');
 
-var util = require('../../util');
-var dirs = util.dirs();
+let util = require('../../util');
+let dirs = util.dirs();
 
-var dateRangeScan = require('../dateRangeScan/parent');
+let dateRangeScan = require('../dateRangeScan/parent');
 
 module.exports = function(config, done) {
 
   util.setConfig(config);
 
-  var adapter = config[config.adapter];
-  var scan = require(dirs.gekko + adapter.path + '/scanner');
+  let adapter = config[config.adapter];
+  let scan = require(dirs.gekko + adapter.path + '/scanner');
 
   scan((err, markets) => {
 
@@ -41,14 +41,14 @@ module.exports = function(config, done) {
       let resp = {
         datasets: [],
         errors: []
-      }
+      };
       markets.forEach(market => {
         if(market.ranges)
           resp.datasets.push(market);
         else
           resp.errors.push(market);
-      })
+      });
       done(err, resp);
     })
   });
-}
+};

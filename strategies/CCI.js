@@ -1,9 +1,9 @@
 // helpers
-var _ = require('lodash');
-var log = require('../core/log.js');
+let _ = require('lodash');
+let log = require('../core/log.js');
 
 // let's create our own method
-var method = {};
+let method = {};
 
 // prepare everything our method needs
 method.init = function() {
@@ -26,16 +26,16 @@ method.init = function() {
   // log.debug("CCI started with:\nup:\t", this.uplevel, "\ndown:\t", this.downlevel, "\npersistence:\t", this.persisted);
   // define the indicators we need
   this.addIndicator('cci', 'CCI', this.settings);
-}
+};
 
 // what happens on every new candle?
 method.update = function(candle) {
-}
+};
 
 // for debugging purposes: log the last calculated
 // EMAs and diff.
 method.log = function(candle) {
-    var cci = this.indicators.cci;
+    let cci = this.indicators.cci;
     if (typeof(cci.result) == 'boolean') {
         log.debug('Insufficient data available. Age: ', cci.size, ' of ', cci.maxSize);
         return;
@@ -50,31 +50,31 @@ method.log = function(candle) {
         log.debug('\t In sufficient data available.');
     else
         log.debug('\t', 'CCI:\t\t', cci.result.toFixed(2));
-}
+};
 
 /*
  *
  */
 method.check = function(candle) {
 
-    var lastPrice = candle.close;
+    let lastPrice = candle.close;
 
     this.age++;
-    var cci = this.indicators.cci;
+    let cci = this.indicators.cci;
 
     if (typeof(cci.result) == 'number') {
 
         // overbought?
-        if (cci.result >= this.uplevel && (this.trend.persisted || this.persisted == 0) && !this.trend.adviced && this.trend.direction == 'overbought' ) {
+        if (cci.result >= this.uplevel && (this.trend.persisted || this.persisted === 0) && !this.trend.adviced && this.trend.direction === 'overbought' ) {
             this.trend.adviced = true;
             this.trend.duration++;
             this.advice('short');
-        } else if (cci.result >= this.uplevel && this.trend.direction != 'overbought') {
+        } else if (cci.result >= this.uplevel && this.trend.direction !== 'overbought') {
             this.trend.duration = 1;
             this.trend.direction = 'overbought';
             this.trend.persisted = false;
             this.trend.adviced = false;
-            if (this.persisted == 0) {
+            if (this.persisted === 0) {
                 this.trend.adviced = true;
                 this.advice('short');
             }
@@ -83,16 +83,16 @@ method.check = function(candle) {
             if (this.trend.duration >= this.persisted) {
                 this.trend.persisted = true;
             }
-        } else if (cci.result <= this.downlevel && (this.trend.persisted || this.persisted == 0) && !this.trend.adviced && this.trend.direction == 'oversold') {
+        } else if (cci.result <= this.downlevel && (this.trend.persisted || this.persisted === 0) && !this.trend.adviced && this.trend.direction === 'oversold') {
             this.trend.adviced = true;
             this.trend.duration++;
             this.advice('long');
-        } else if (cci.result <= this.downlevel && this.trend.direction != 'oversold') {
+        } else if (cci.result <= this.downlevel && this.trend.direction !== 'oversold') {
             this.trend.duration = 1;
             this.trend.direction = 'oversold';
             this.trend.persisted = false;
             this.trend.adviced = false;
-            if (this.persisted == 0) {
+            if (this.persisted === 0) {
                 this.trend.adviced = true;
                 this.advice('long');
             }
@@ -102,7 +102,7 @@ method.check = function(candle) {
                 this.trend.persisted = true;
             }
         } else {
-            if( this.trend.direction != 'nodirection') {
+            if( this.trend.direction !== 'nodirection') {
                 this.trend = {
                     direction: 'nodirection',
                     duration: 0,
@@ -120,6 +120,6 @@ method.check = function(candle) {
     }
 
     log.debug("Trend: ", this.trend.direction, " for ", this.trend.duration);
-}
+};
 
 module.exports = method;

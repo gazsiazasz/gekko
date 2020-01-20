@@ -1,15 +1,15 @@
 // Small plugin that subscribes to some events, stores
 // them and sends it to the parent process.
 
-const log = require('../core/log');
-const _ = require('lodash');
-const util = require('../core/util.js');
-const env = util.gekkoEnv();
-const config = util.getConfig();
-const moment = require('moment');
-const fs = require('fs');
+let log = require('../core/log');
+let _ = require('lodash');
+let util = require('../core/util.js');
+let env = util.gekkoEnv();
+let config = util.getConfig();
+let moment = require('moment');
+let fs = require('fs');
 
-const BacktestResultExporter = function() {
+let BacktestResultExporter = function() {
   this.performanceReport;
   this.roundtrips = [];
   this.stratUpdates = [];
@@ -34,11 +34,11 @@ const BacktestResultExporter = function() {
     this.processTradeCompleted = null;
 
   _.bindAll(this);
-}
+};
 
 BacktestResultExporter.prototype.processPortfolioValueChange = function(portfolio) {
   this.portfolioValue = portfolio.balance;
-}
+};
 
 BacktestResultExporter.prototype.processStratCandle = function(candle) {
   let strippedCandle;
@@ -81,14 +81,14 @@ BacktestResultExporter.prototype.processStratUpdate = function(stratUpdate) {
     ...stratUpdate,
     date: stratUpdate.date.unix()
   });
-}
+};
 
 BacktestResultExporter.prototype.processPerformanceReport = function(performanceReport) {
   this.performanceReport = performanceReport;
-}
+};
 
 BacktestResultExporter.prototype.finalize = function(done) {
-  const backtest = {
+  let backtest = {
     market: config.watch,
     tradingAdvisor: config.tradingAdvisor,
     strategyParameters: config[config.tradingAdvisor.method],
@@ -124,7 +124,7 @@ BacktestResultExporter.prototype.writeToDisk = function(backtest, next) {
   if(config.backtestResultExporter.filename) {
     filename = config.backtestResultExporter.filename;
   } else {
-    const now = moment().format('YYYY-MM-DD_HH-mm-ss');
+    let now = moment().format('YYYY-MM-DD_HH-mm-ss');
     filename = `backtest-${config.tradingAdvisor.method}-${now}.json`;
   }
 
@@ -141,6 +141,6 @@ BacktestResultExporter.prototype.writeToDisk = function(backtest, next) {
       next();
     }
   );
-}
+};
 
 module.exports = BacktestResultExporter;

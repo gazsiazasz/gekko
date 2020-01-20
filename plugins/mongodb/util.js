@@ -1,9 +1,9 @@
-var config = require('../../core/util.js').getConfig();
+let config = require('../../core/util.js').getConfig();
 
-var watch = config.watch;
-var exchangeLowerCase = watch ? watch.exchange.toLowerCase() : watch = {}; // Do not crash on this, not needed to read from db
+let watch = config.watch;
+let exchangeLowerCase = watch ? watch.exchange.toLowerCase() : watch = {}; // Do not crash on this, not needed to read from db
 
-var settings = {
+let settings = {
   exchange: watch.exchange,
   pair: [watch.currency, watch.asset],
   historyCollection: `${exchangeLowerCase}_candles`,

@@ -32,23 +32,23 @@
 // })
 
 
-const fork = require('child_process').fork;
-const _ = require('lodash');
+let fork = require('child_process').fork;
+let _ = require('lodash');
 
 module.exports = (config, callback) => {
-  var debug = typeof v8debug === 'object';
+  let debug = typeof v8debug === 'object';
   if (debug) {
     process.execArgv = [];
   }
 
-  const child = fork(__dirname + '/child');
+  let child = fork(__dirname + '/child');
 
-  const message = {
+  let message = {
     what: 'start',
     config
-  }
+  };
 
-  const done = _.once(callback);
+  let done = _.once(callback);
 
   child.on('message', function(m) {
     if(m === 'ready')
@@ -65,4 +65,4 @@ module.exports = (config, callback) => {
     if(code !== 0)
       done('ERROR, unable to load candles, please check the console.');
   });
-}
+};

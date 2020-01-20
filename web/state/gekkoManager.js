@@ -1,19 +1,19 @@
-const _ = require('lodash');
-const moment = require('moment');
+let _ = require('lodash');
+let moment = require('moment');
 
-const broadcast = require('./cache').get('broadcast');
-const Logger = require('./logger');
-const pipelineRunner = require('../../core/workers/pipeline/parent');
-const reduceState = require('./reduceState.js');
-const now = () => moment().format('YYYY-MM-DD HH:mm');
+let broadcast = require('./cache').get('broadcast');
+let Logger = require('./logger');
+let pipelineRunner = require('../../core/workers/pipeline/parent');
+let reduceState = require('./reduceState.js');
+let now = () => moment().format('YYYY-MM-DD HH:mm');
 
-const GekkoManager = function() {
+let GekkoManager = function() {
   this.gekkos = {};
   this.instances = {};
   this.loggers = {};
 
   this.archivedGekkos = {};
-}
+};
 
 GekkoManager.prototype.add = function({mode, config}) {
   // set type
@@ -35,14 +35,14 @@ GekkoManager.prototype.add = function({mode, config}) {
       logType = 'papertrader';
   }
 
-  const date = now().replace(' ', '-').replace(':', '-');
-  const n = (Math.random() + '').slice(3);
-  const id = `${date}-${logType}-${n}`;
+  let date = now().replace(' ', '-').replace(':', '-');
+  let n = (Math.random() + '').slice(3);
+  let id = `${date}-${logType}-${n}`;
 
   // make sure we catch events happening inside te gekko instance
   config.childToParent.enabled = true;
 
-  const state = {
+  let state = {
     mode,
     config,
     id,
@@ -57,7 +57,7 @@ GekkoManager.prototype.add = function({mode, config}) {
       latest: {}
     },
     start: moment()
-  }
+  };
 
   this.gekkos[id] = state;
 
@@ -81,10 +81,10 @@ GekkoManager.prototype.add = function({mode, config}) {
   });
 
   return state;
-}
+};
 
 GekkoManager.prototype.handleRawEvent = function(id) {
-  const logger = this.loggers[id];
+  let logger = this.loggers[id];
 
   return (err, event) => {
     if(err) {
@@ -103,7 +103,7 @@ GekkoManager.prototype.handleRawEvent = function(id) {
       this.handleGekkoEvent(id, event);
     }
   }
-}
+};
 
 GekkoManager.prototype.handleGekkoEvent = function(id, event) {
   this.gekkos[id] = reduceState(this.gekkos[id], event);
@@ -112,10 +112,10 @@ GekkoManager.prototype.handleGekkoEvent = function(id, event) {
     id,
     event
   });
-}
+};
 
 GekkoManager.prototype.handleFatalError = function(id, err) {
-  const state = this.gekkos[id];
+  let state = this.gekkos[id];
 
   if(!state || state.errored || state.stopped)
     return;
@@ -135,7 +135,7 @@ GekkoManager.prototype.handleFatalError = function(id, err) {
   if(state.logType === 'watcher') {
     this.handleWatcherError(state, id);
   }
-}
+};
 
 // There might be leechers depending on this watcher, if so
 // figure out it we can safely start a new watcher without
@@ -150,7 +150,7 @@ GekkoManager.prototype.handleWatcherError = function(state, id) {
   if(state.events.latest && state.events.latest.candle) {
     latestCandleTime = state.events.latest.candle.start;
   }
-  const leechers = _.values(this.gekkos)
+  let leechers = _.values(this.gekkos)
     .filter(gekko => {
       if(gekko.type !== 'leech') {
         return false;
@@ -167,8 +167,8 @@ GekkoManager.prototype.handleWatcherError = function(state, id) {
       console.log(`${now()} Watcher had recent data, starting a new one in a minute.`);
       // after a minute try to start a new one again..
       setTimeout(() => {
-        const mode = 'realtime';
-        const config = state.config;
+        let mode = 'realtime';
+        let config = state.config;
         this.add({mode, config});
       }, 1000 * 60);
     } else {
@@ -177,7 +177,7 @@ GekkoManager.prototype.handleWatcherError = function(state, id) {
     }
 
   }
-}
+};
 
 GekkoManager.prototype.stop = function(id) {
   if(!this.gekkos[id])
@@ -200,7 +200,7 @@ GekkoManager.prototype.stop = function(id) {
   this.archive(id);
 
   return true;
-}
+};
 
 GekkoManager.prototype.archive = function(id) {
   this.archivedGekkos[id] = this.gekkos[id];
@@ -212,7 +212,7 @@ GekkoManager.prototype.archive = function(id) {
     type: 'gekko_archived',
     id
   });
-}
+};
 
 GekkoManager.prototype.delete = function(id) {
   if(this.gekkos[id]) {
@@ -233,7 +233,7 @@ GekkoManager.prototype.delete = function(id) {
   delete this.archivedGekkos[id];
 
   return true;
-}
+};
 
 GekkoManager.prototype.archive = function(id) {
   this.archivedGekkos[id] = this.gekkos[id];
@@ -245,10 +245,10 @@ GekkoManager.prototype.archive = function(id) {
     type: 'gekko_archived',
     id
   });
-}
+};
 
 GekkoManager.prototype.list = function() {
   return { live: this.gekkos, archive: this.archivedGekkos };
-}
+};
 
 module.exports = GekkoManager;

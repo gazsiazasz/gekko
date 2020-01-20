@@ -1,15 +1,15 @@
-var _ = require('lodash');
-var util = require('../../core/util.js');
-var config = util.getConfig();
-var log = require(util.dirs().core + 'log');
+let _ = require('lodash');
+let util = require('../../core/util.js');
+let config = util.getConfig();
+let log = require(util.dirs().core + 'log');
 
-var sqlite = require('./handle');
-var sqliteUtil = require('./util');
+let sqlite = require('./handle');
+let sqliteUtil = require('./util');
 
-var Reader = function() {
+let Reader = function() {
   _.bindAll(this);
   this.db = sqlite.initDB(true);
-}
+};
 
 
 // returns the most recent window complete candle
@@ -18,7 +18,7 @@ Reader.prototype.mostRecentWindow = function(from, to, next) {
   to = to.unix();
   from = from.unix();
 
-  var maxAmount = to - from + 1;
+  let maxAmount = to - from + 1;
 
   this.db.all(`
     SELECT start from ${sqliteUtil.table('candles')}
@@ -51,16 +51,16 @@ Reader.prototype.mostRecentWindow = function(from, to, next) {
     }
 
     // we have at least one gap, figure out where
-    var mostRecent = _.first(rows).start;
+    let mostRecent = _.first(rows).start;
 
-    var gapIndex = _.findIndex(rows, function(r, i) {
+    let gapIndex = _.findIndex(rows, function(r, i) {
       return r.start !== mostRecent - i * 60;
     });
 
     // if there was no gap in the records, but
     // there were not enough records.
     if(gapIndex === -1) {
-      var leastRecent = _.last(rows).start;
+      let leastRecent = _.last(rows).start;
       return next({
         from: leastRecent,
         to: mostRecent
@@ -75,7 +75,7 @@ Reader.prototype.mostRecentWindow = function(from, to, next) {
     });
 
   })
-}
+};
 
 Reader.prototype.tableExists = function(name, next) {
 
@@ -89,7 +89,7 @@ Reader.prototype.tableExists = function(name, next) {
 
     next(null, rows.length === 1);
   });
-}
+};
 
 Reader.prototype.get = function(from, to, what, next) {
   if(what === 'full')
@@ -107,7 +107,7 @@ Reader.prototype.get = function(from, to, what, next) {
 
     next(null, rows);
   });
-}
+};
 
 Reader.prototype.count = function(from, to, next) {
   this.db.all(`
@@ -121,7 +121,7 @@ Reader.prototype.count = function(from, to, next) {
 
     next(null, _.first(res).count);
   });
-}
+};
 
 Reader.prototype.countTotal = function(next) {
   this.db.all(`
@@ -134,7 +134,7 @@ Reader.prototype.countTotal = function(next) {
 
     next(null, _.first(res).count);
   });
-}
+};
 
 Reader.prototype.getBoundry = function(next) {
 
@@ -159,11 +159,11 @@ Reader.prototype.getBoundry = function(next) {
 
     next(null, _.first(rows));
   });
-}
+};
 
 Reader.prototype.close = function() {
   this.db.close();
   this.db = null;
-}
+};
 
 module.exports = Reader;

@@ -7,11 +7,11 @@
  */
 
 // helpers
-var _ = require('lodash');
-var log = require('../core/log.js');
+let _ = require('lodash');
+let log = require('../core/log.js');
 
 // let's create our own method
-var method = {};
+let method = {};
 
 // prepare everything our method needs
 method.init = function() {
@@ -32,21 +32,21 @@ method.init = function() {
 
   // define the indicators we need
   this.addIndicator('macd', 'MACD', this.settings);
-}
+};
 
 // what happens on every new candle?
 method.update = function(candle) {
   // nothing!
-}
+};
 
 // for debugging purposes: log the last calculated
 // EMAs and diff.
 method.log = function() {
-  var digits = 8;
-  var macd = this.indicators.macd;
+  let digits = 8;
+  let macd = this.indicators.macd;
 
-  var diff = macd.diff;
-  var signal = macd.signal.result;
+  let diff = macd.diff;
+  let signal = macd.signal.result;
 
   log.debug('calculated MACD properties for candle:');
   log.debug('\t', 'short:', macd.short.result.toFixed(digits));
@@ -54,10 +54,10 @@ method.log = function() {
   log.debug('\t', 'macd:', diff.toFixed(digits));
   log.debug('\t', 'signal:', signal.toFixed(digits));
   log.debug('\t', 'macdiff:', macd.result.toFixed(digits));
-}
+};
 
 method.check = function() {
-  var macddiff = this.indicators.macd.result;
+  let macddiff = this.indicators.macd.result;
 
   if(macddiff > this.settings.thresholds.up) {
 
@@ -129,6 +129,6 @@ method.check = function() {
 
     this.advice();
   }
-}
+};
 
 module.exports = method;

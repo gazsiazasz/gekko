@@ -1,6 +1,6 @@
-const _ = require('lodash');
+let _ = require('lodash');
 
-const cache = {};
+let cache = {};
 
 module.exports = {
   set: (name, val) => {
@@ -11,4 +11,4 @@ module.exports = {
     if(_.has(cache, name))
       return cache[name];
   }
-}
+};

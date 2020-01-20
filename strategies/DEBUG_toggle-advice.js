@@ -1,16 +1,16 @@
-var settings = {
+let settings = {
   wait: 0,
   each: 6
 };
 
 // -------
 
-var _ = require('lodash');
-var log = require('../core/log.js');
+let _ = require('lodash');
+let log = require('../core/log.js');
 
-var i = 0;
+let i = 0;
 
-var method = {
+let method = {
   init: _.noop,
   update: _.noop,
   log: _.noop,

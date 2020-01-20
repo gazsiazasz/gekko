@@ -1,13 +1,13 @@
-const log = require('../core/log');
-const moment = require('moment');
-const _ = require('lodash');
-const config = require('../core/util').getConfig();
-const telegrambot = config.telegrambot;
-const emitTrades = telegrambot.emitTrades;
-const utc = moment.utc;
-const telegram = require("node-telegram-bot-api");
+let log = require('../core/log');
+let moment = require('moment');
+let _ = require('lodash');
+let config = require('../core/util').getConfig();
+let telegrambot = config.telegrambot;
+let emitTrades = telegrambot.emitTrades;
+let utc = moment.utc;
+let telegram = require("node-telegram-bot-api");
 
-const Actor = function() {
+let Actor = function() {
   _.bindAll(this);
 
   this.advice = null;
@@ -51,31 +51,31 @@ Actor.prototype.processAdvice = function(advice) {
 
 if(emitTrades) {
   Actor.prototype.processTradeInitiated = function (tradeInitiated) {
-    var message = 'Trade initiated. ID: ' + tradeInitiated.id +
+    let message = 'Trade initiated. ID: ' + tradeInitiated.id +
     '\nAction: ' + tradeInitiated.action + '\nPortfolio: ' +
     tradeInitiated.portfolio + '\nBalance: ' + tradeInitiated.balance;
     this.bot.sendMessage(this.chatId, message);
-  }
-  
+  };
+
   Actor.prototype.processTradeCancelled = function (tradeCancelled) {
-    var message = 'Trade cancelled. ID: ' + tradeCancelled.id;
+    let message = 'Trade cancelled. ID: ' + tradeCancelled.id;
     this.bot.sendMessage(this.chatId, message);
-  }
-  
+  };
+
   Actor.prototype.processTradeAborted = function (tradeAborted) {
-    var message = 'Trade aborted. ID: ' + tradeAborted.id +
+    let message = 'Trade aborted. ID: ' + tradeAborted.id +
     '\nNot creating order! Reason: ' + tradeAborted.reason;
     this.bot.sendMessage(this.chatId, message);
-  }
-  
+  };
+
   Actor.prototype.processTradeErrored = function (tradeErrored) {
-    var message = 'Trade errored. ID: ' + tradeErrored.id +
+    let message = 'Trade errored. ID: ' + tradeErrored.id +
     '\nReason: ' + tradeErrored.reason;
     this.bot.sendMessage(this.chatId, message);
-  }
-  
+  };
+
   Actor.prototype.processTradeCompleted = function (tradeCompleted) {
-    var message = 'Trade completed. ID: ' + tradeCompleted.id + 
+    let message = 'Trade completed. ID: ' + tradeCompleted.id +
     '\nAction: ' + tradeCompleted.action +
     '\nPrice: ' + tradeCompleted.price +
     '\nAmount: ' + tradeCompleted.amount +
@@ -84,7 +84,7 @@ if(emitTrades) {
     '\nBalance: ' + tradeCompleted.balance +
     '\nFee percent: ' + tradeCompleted.feePercent +
     '\nEffective price: ' + tradeCompleted.effectivePrice;
-    this.bot.sendMessage(this.chatId, message); 
+    this.bot.sendMessage(this.chatId, message);
   }
 }
 
@@ -155,7 +155,7 @@ Actor.prototype.emitAdvice = function(chatId) {
 
 // sent price over to the last chat
 Actor.prototype.emitPrice = function() {
-  const message = [
+  let message = [
     'Current price at ',
     config.watch.exchange,
     ' ',

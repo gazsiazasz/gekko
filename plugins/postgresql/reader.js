@@ -1,25 +1,25 @@
-var _ = require('lodash');
-var util = require('../../core/util.js');
-var config = util.getConfig();
-var log = require(util.dirs().core + 'log');
+let _ = require('lodash');
+let util = require('../../core/util.js');
+let config = util.getConfig();
+let log = require(util.dirs().core + 'log');
 
-var handle = require('./handle');
-var postgresUtil = require('./util');
+let handle = require('./handle');
+let postgresUtil = require('./util');
 
-const { Query } = require('pg');
+let { Query } = require('pg');
 
-var Reader = function() {
+let Reader = function() {
   _.bindAll(this);
   this.db = handle;
-}
+};
 
 // returns the furthest point (up to `from`) in time we have valid data from
 Reader.prototype.mostRecentWindow = function(from, to, next) {
   to = to.unix();
   from = from.unix();
 
-  var maxAmount = to - from + 1;
-  
+  let maxAmount = to - from + 1;
+
   this.db.connect((err, client, done) => {
 
     if(err) {
@@ -27,7 +27,7 @@ Reader.prototype.mostRecentWindow = function(from, to, next) {
       return util.die(err.message);
     }
 
-    var query = client.query(new Query(`
+    let query = client.query(new Query(`
       SELECT start from ${postgresUtil.table('candles')}
       WHERE start <= ${to} AND start >= ${from}
       ORDER BY start DESC
@@ -42,7 +42,7 @@ Reader.prototype.mostRecentWindow = function(from, to, next) {
       }
     });
 
-    var rows = [];
+    let rows = [];
     query.on('row', function(row) {
       rows.push(row);
     });
@@ -66,16 +66,16 @@ Reader.prototype.mostRecentWindow = function(from, to, next) {
       }
 
       // we have at least one gap, figure out where
-      var mostRecent = _.first(rows).start;
+      let mostRecent = _.first(rows).start;
 
-      var gapIndex = _.findIndex(rows, function(r, i) {
+      let gapIndex = _.findIndex(rows, function(r, i) {
         return r.start !== mostRecent - i * 60;
       });
 
       // if there was no gap in the records, but
       // there were not enough records.
       if(gapIndex === -1) {
-        var leastRecent = _.last(rows).start;
+        let leastRecent = _.last(rows).start;
         return next({
           from: leastRecent,
           to: mostRecent
@@ -89,8 +89,8 @@ Reader.prototype.mostRecentWindow = function(from, to, next) {
         to: mostRecent
       });
     });
-  });  
-}
+  });
+};
 
 Reader.prototype.tableExists = function (name, next) {
   this.db.connect((err,client,done) => {
@@ -107,22 +107,22 @@ Reader.prototype.tableExists = function (name, next) {
 
       next(null, result.rows.length === 1);
     });
-  });  
-}
+  });
+};
 
 Reader.prototype.get = function(from, to, what, next) {
   if(what === 'full'){
     what = '*';
   }
-  
+
   this.db.connect((err,client,done) => {
-    var query = client.query(new Query(`
+    let query = client.query(new Query(`
     SELECT ${what} from ${postgresUtil.table('candles')}
     WHERE start <= ${to} AND start >= ${from}
     ORDER BY start ASC
     `));
 
-    var rows = [];
+    let rows = [];
     query.on('row', function(row) {
       rows.push(row);
     });
@@ -131,8 +131,8 @@ Reader.prototype.get = function(from, to, what, next) {
       done();
       next(null, rows);
     });
-  });  
-}
+  });
+};
 
 Reader.prototype.count = function(from, to, next) {
   this.db.connect((err,client,done) => {
@@ -141,11 +141,11 @@ Reader.prototype.count = function(from, to, next) {
       return util.die(err.message);
     }
 
-    var query = client.query(new Query(`
+    let query = client.query(new Query(`
       SELECT COUNT(*) as count from ${postgresUtil.table('candles')}
       WHERE start <= ${to} AND start >= ${from}
     `));
-    var rows = [];
+    let rows = [];
     query.on('row', function(row) {
       rows.push(row);
     });
@@ -154,15 +154,15 @@ Reader.prototype.count = function(from, to, next) {
       done();
       next(null, _.first(rows).count);
     });
-  });  
-}
+  });
+};
 
 Reader.prototype.countTotal = function(next) {
   this.db.connect((err,client,done) => {
-    var query = client.query(new Query(`
+    let query = client.query(new Query(`
     SELECT COUNT(*) as count from ${postgresUtil.table('candles')}
     `));
-    var rows = [];
+    let rows = [];
     query.on('row', function(row) {
       rows.push(row);
     });
@@ -171,12 +171,12 @@ Reader.prototype.countTotal = function(next) {
       done();
       next(null, _.first(rows).count);
     });
-  });  
-}
+  });
+};
 
 Reader.prototype.getBoundry = function(next) {
   this.db.connect((err,client,done) => {
-    var query = client.query(new Query(`
+    let query = client.query(new Query(`
     SELECT (
       SELECT start
       FROM ${postgresUtil.table('candles')}
@@ -189,7 +189,7 @@ Reader.prototype.getBoundry = function(next) {
       LIMIT 1
     ) as last
     `));
-    var rows = [];
+    let rows = [];
     query.on('row', function(row) {
       rows.push(row);
     });
@@ -198,12 +198,12 @@ Reader.prototype.getBoundry = function(next) {
       done();
       next(null, _.first(rows));
     });
-  });  
-}
+  });
+};
 
 Reader.prototype.close = function() {
   //obsolete due to connection pooling
   //this.db.end();
-}
+};
 
 module.exports = Reader;

@@ -1,40 +1,40 @@
-const moment = require('moment');
-const util = require('../../core/util.js');
-const _ = require('lodash');
-const log = require('../../core/log');
+let moment = require('moment');
+let util = require('../../core/util.js');
+let _ = require('lodash');
+let log = require('../../core/log');
 
-var config = util.getConfig();
-var dirs = util.dirs();
+let config = util.getConfig();
+let dirs = util.dirs();
 
-var Fetcher = require(dirs.exchanges + 'coinfalcon');
+let Fetcher = require(dirs.exchanges + 'coinfalcon');
 
 util.makeEventEmitter(Fetcher);
 
-var end = false;
-var done = false;
-var from = false;
+let end = false;
+let done = false;
+let from = false;
 
-var fetcher = new Fetcher(config.watch);
+let fetcher = new Fetcher(config.watch);
 
-var fetch = () => {
+let fetch = () => {
   fetcher.import = true;
   log.debug('[CoinFalcon] Getting trades from: ', from);
   fetcher.getTrades(from, handleFetch, true);
 };
 
-var handleFetch = (unk, trades) => {
+let handleFetch = (unk, trades) => {
   if (trades.length > 0) {
-    var last = moment.unix(_.last(trades).date).utc();
-    var next = last.clone();
+    let last = moment.unix(_.last(trades).date).utc();
+    let next = last.clone();
   } else {
-    var next = from.clone().add(1, 'h');
+    let next = from.clone().add(1, 'h');
     log.debug('Import step returned no results, moving to the next 1h period');
   }
 
   if (from.add(1, 'h') >= end) {
     fetcher.emit('done');
 
-    var endUnix = end.unix();
+    let endUnix = end.unix();
     trades = _.filter(trades, t => t.date <= endUnix);
   }
 

@@ -1,11 +1,11 @@
 // helpers
-var _ = require('lodash');
-var log = require('../core/log.js');
+let _ = require('lodash');
+let log = require('../core/log.js');
 
-var UO = require('./indicators/UO.js');
+let UO = require('./indicators/UO.js');
 
 // let's create our own method
-var method = {};
+let method = {};
 
 // prepare everything our method needs
 method.init = function() {
@@ -22,22 +22,22 @@ method.init = function() {
 
   // define the indicators we need
   this.addIndicator('uo', 'UO', this.settings);
-}
+};
 
 // for debugging purposes log the last
 // calculated parameters.
 method.log = function(candle) {
-  var digits = 8;
-  var uo = this.indicators.uo;
+  let digits = 8;
+  let uo = this.indicators.uo;
 
   log.debug('calculated Ultimate Oscillator properties for candle:');
   log.debug('\t', 'UO:', uo.uo.toFixed(digits));
   log.debug('\t', 'price:', candle.close.toFixed(digits));
-}
+};
 
 method.check = function() {
-  var uo = this.indicators.uo;
-  var uoVal = uo.uo;
+  let uo = this.indicators.uo;
+  let uoVal = uo.uo;
 
   if(uoVal > this.settings.thresholds.high) {
 
@@ -93,6 +93,6 @@ method.check = function() {
 
     this.advice();
   }
-}
+};
 
 module.exports = method;

@@ -1,20 +1,20 @@
-const moment = require('moment');
-const util = require('../../core/util.js');
-const _ = require('lodash');
-const retry = require('../../exchange/exchangeUtils').retry;
+let moment = require('moment');
+let util = require('../../core/util.js');
+let _ = require('lodash');
+let retry = require('../../exchange/exchangeUtils').retry;
 
-const config = util.getConfig();
-const dirs = util.dirs();
-const Fetcher = require(dirs.exchanges + 'luno');
+let config = util.getConfig();
+let dirs = util.dirs();
+let Fetcher = require(dirs.exchanges + 'luno');
 
 util.makeEventEmitter(Fetcher);
 
-var end = false;
-var from = false;
-const REQUEST_INTERVAL = 5 * 1000;
+let end = false;
+let from = false;
+let REQUEST_INTERVAL = 5 * 1000;
 
 Fetcher.prototype.getTrades = function(since, callback, descending) {
-  const recoverableErrors = [
+  let recoverableErrors = [
     'SOCKETTIMEDOUT',
     'TIMEDOUT',
     'CONNRESET',
@@ -22,7 +22,7 @@ Fetcher.prototype.getTrades = function(since, callback, descending) {
     'NOTFOUND'
   ];
 
-  const processResponse = function(funcName, callback) {
+  let processResponse = function(funcName, callback) {
     return (error, body) => {
       if (!error && !body) {
         error = new Error('Empty response');
@@ -46,39 +46,39 @@ Fetcher.prototype.getTrades = function(since, callback, descending) {
     }
   };
 
-  const process = (err, result) => {
+  let process = (err, result) => {
     if (err) {
       console.log('Error importing trades:', err);
       return;
     }
-    trades = _.map(result.trades, function(t) {
+    let trades = _.map(result.trades, function(t) {
       return {
         price: t.price,
         date: Math.round(t.timestamp / 1000),
         amount: t.volume,
-        tid: t.timestamp
+        tid: t.timestamp,
       };
     });
     callback(null, trades.reverse());
-  }
+  };
 
   if (moment.isMoment(since)) since = since.valueOf();
   (_.isNumber(since) && since > 0) ? since: since = 0;
 
   console.log('importer getting trades from Luno since', moment.utc(since).format('YYYY-MM-DD HH:mm:ss'), 'UTC');
 
-  const handler = cb => this.luno.getTrades({ since: since, pair: this.pair }, processResponse('getTrades', cb));
+  let handler = cb => this.luno.getTrades({ since: since, pair: this.pair }, processResponse('getTrades', cb));
   retry(null, handler, process);
-}
+};
 
-const fetcher = new Fetcher(config.watch);
+let fetcher = new Fetcher(config.watch);
 
-const fetch = () => {
+let fetch = () => {
   fetcher.import = true;
   setTimeout(() => fetcher.getTrades(from, handleFetch), REQUEST_INTERVAL);
 };
 
-const handleFetch = (err, trades) => {
+let handleFetch = (err, trades) => {
   if (err) {
     console.log(`There was an error importing from Luno: ${err}`);
     fetcher.emit('done');
@@ -93,7 +93,7 @@ const handleFetch = (err, trades) => {
 
   if (from >= end) {
     fetcher.emit('done');
-    const endUnix = end.unix();
+    let endUnix = end.unix();
     trades = _.filter(trades, t => t.date <= endUnix);
   }
 

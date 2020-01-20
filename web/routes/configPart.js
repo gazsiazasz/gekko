@@ -1,20 +1,20 @@
-const _ = require('lodash');
-const fs = require('co-fs');
+let _ = require('lodash');
+let fs = require('co-fs');
 
-const parts = {
+let parts = {
   paperTrader: 'config/plugins/paperTrader',
   candleWriter: 'config/plugins/candleWriter',
   performanceAnalyzer: 'config/plugins/performanceAnalyzer'
-}
+};
 
-const gekkoRoot = __dirname + '/../../';
+let gekkoRoot = __dirname + '/../../';
 
 module.exports = function *() {
   if(!_.has(parts, this.params.part))
     return this.body = 'error :(';
 
-  const fileName = gekkoRoot + '/' + parts[this.params.part] + '.toml';
+  let fileName = gekkoRoot + '/' + parts[this.params.part] + '.toml';
   this.body = {
-    part: yield fs.readFile(fileName, 'utf8') 
+    part: yield fs.readFile(fileName, 'utf8')
   }
-}
+};

@@ -1,10 +1,10 @@
-var _ = require('lodash');
-var Moment = require('moment');
-var Ranger = require('ranger');
+let _ = require('lodash');
+let Moment = require('moment');
+let Ranger = require('ranger');
 
-var config = require('../core/util').getConfig().campfire;
+let config = require('../core/util').getConfig().campfire;
 
-var Actor = function() {
+let Actor = function() {
   _.bindAll(this);
 
   this.commands = [{
@@ -54,7 +54,7 @@ Actor.prototype = {
   },
 
   sayAdvice: function() {
-    var message;
+    let message;
 
     if (this.advice !== null) {
       message = ["We think you should", this.advice + ".", "(" + this.adviceTime.fromNow() + ")"];
@@ -66,7 +66,7 @@ Actor.prototype = {
   },
 
   sayPrice: function() {
-    var message;
+    let message;
 
     if (this.price !== null) {
       message = ["The price at the moment is", this.price + ".", "(" + this.priceTime.fromNow() + ")"];
@@ -86,7 +86,7 @@ Actor.prototype = {
   },
 
   pasteDescriptions: function() {
-    var descriptions = _.map(this.commands, function(command) {
+    let descriptions = _.map(this.commands, function(command) {
       return [command.handler + ':', command.description].join(' ');
     }, this).join('\n');
 
@@ -114,11 +114,11 @@ Actor.prototype = {
   },
 
   textHasCommandForBot: function(text, nickname, handler) {
-    var normalizedText = text.toLowerCase(),
+    let normalizedText = text.toLowerCase(),
         normalizedNickname = nickname.toLowerCase(),
         normalizedHandler = handler.toLowerCase();
 
-    var nicknameWasMentioned = normalizedText.indexOf(normalizedNickname) >= 0,
+    let nicknameWasMentioned = normalizedText.indexOf(normalizedNickname) >= 0,
         handlerWasMentioned = normalizedText.indexOf(normalizedHandler) >= 0;
 
     return nicknameWasMentioned && handlerWasMentioned;

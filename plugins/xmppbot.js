@@ -1,21 +1,21 @@
-var log = require('../core/log');
-var moment = require('moment');
-var _ = require('lodash');
-var xmpp = require('node-xmpp-client');
-var config = require('../core/util').getConfig();
-var xmppbot = config.xmppbot;
-var utc = moment.utc;
+let log = require('../core/log');
+let moment = require('moment');
+let _ = require('lodash');
+let xmpp = require('node-xmpp-client');
+let config = require('../core/util').getConfig();
+let xmppbot = config.xmppbot;
+let utc = moment.utc;
 
 
 
-var Actor = function() {
+let Actor = function() {
   _.bindAll(this);
 
   this.bot = new xmpp.Client({ jid: xmppbot.client_id,
                password: xmppbot.client_pwd,
                host: xmppbot.client_host,
                port: xmppbot.client_port
-               });  
+               });
 
   this.advice = 'Dont got one yet :(';
   this.adviceTime = utc();
@@ -36,18 +36,18 @@ var Actor = function() {
   this.bot.addListener('online', this.setState);
   this.bot.addListener('stanza', this.rawStanza);
   this.bot.addListener("error", this.logError);
-  this.bot.connection.socket.setTimeout(0)
-  this.bot.connection.socket.setKeepAlive(true, 10000)
+  this.bot.connection.socket.setTimeout(0);
+  this.bot.connection.socket.setKeepAlive(true, 10000);
 
-}
+};
 
 Actor.prototype.setState = function() {
-    var elem = new xmpp.Element('presence', { }).c('show').t('chat').up().c('status').t(this.state)
+    let elem = new xmpp.Element('presence', { }).c('show').t('chat').up().c('status').t(this.state);
     this.bot.send(elem);
 };
 
 Actor.prototype.rawStanza = function(stanza) {
- if (stanza.is('presence') && (stanza.attrs.type == 'subscribe')) {
+ if (stanza.is('presence') && (stanza.attrs.type === 'subscribe')) {
             this.bot.send(new xmpp.Element('presence', { to: stanza.attrs.from, type: 'subscribed' }));
  }
  if (stanza.is('message') &&
@@ -55,14 +55,14 @@ Actor.prototype.rawStanza = function(stanza) {
      stanza.attrs.type !== 'error') {
 
      // Swap addresses...
-     var from = stanza.attrs.from;
-     var body = stanza.getChild('body');
+     let from = stanza.attrs.from;
+     let body = stanza.getChild('body');
      if (!body) {
        return;
      }
 
-     var message_recv = body.getText();   //Get Incoming Message
-     this.verifyQuestion(from, message_recv);	
+     let message_recv = body.getText();   //Get Incoming Message
+     this.verifyQuestion(from, message_recv);
   }
 };
 
@@ -92,16 +92,16 @@ Actor.prototype.processAdvice = function(advice) {
 Actor.prototype.verifyQuestion = function(receiver, text) {
   if(text in this.commands)
     this[this.commands[text]](receiver);
-}
+};
 
 Actor.prototype.newAdvice = function(receiver) {
   this.sendMessageTo(receiver, 'Important news!');
   this.emitAdvice(receiver);
-}
+};
 
-// sent advice 
+// sent advice
 Actor.prototype.emitAdvice = function(receiver) {
-  var message = [
+  let message = [
     'Advice for ',
     config.watch.exchange,
     ' ',
@@ -124,10 +124,10 @@ Actor.prototype.emitAdvice = function(receiver) {
   this.sendMessageTo(receiver, message);
 };
 
-// sent price 
+// sent price
 Actor.prototype.emitPrice = function(receiver) {
 
-  var message = [
+  let message = [
     'Current price at ',
     config.watch.exchange,
     ' ',
@@ -146,16 +146,16 @@ Actor.prototype.emitPrice = function(receiver) {
   this.sendMessageTo(receiver, message);
 };
 
-// sent donation info 
+// sent donation info
 Actor.prototype.emitDonation = function(receiver) {
-  var message = 'You want to donate? How nice of you! You can send your coins here:';
+  let message = 'You want to donate? How nice of you! You can send your coins here:';
   message += '\nBTC:\t19UGvmFPfFyFhPMHu61HTMGJqXRdVcHAj3';
 
   this.sendMessageTo(receiver, message);
 };
 
 Actor.prototype.emitHelp = function(receiver) {
-  var message = _.reduce(
+  let message = _.reduce(
     this.rawCommands,
     function(message, command) {
       return message + ' ' + command + ',';
@@ -167,12 +167,12 @@ Actor.prototype.emitHelp = function(receiver) {
 
   this.sendMessageTo(receiver, message);
 
-}
+};
 
 Actor.prototype.emitRealAdvice = function(receiver) {
   // http://www.examiner.com/article/uncaged-a-look-at-the-top-10-quotes-of-gordon-gekko
   // http://elitedaily.com/money/memorable-gordon-gekko-quotes/
-  var realAdvice = [
+  let realAdvice = [
     'I don\'t throw darts at a board. I bet on sure things. Read Sun-tzu, The Art of War. Every battle is won before it is ever fought.',
     'Ever wonder why fund managers can\'t beat the S&P 500? \'Cause they\'re sheep, and sheep get slaughtered.',
     'If you\'re not inside, you\'re outside!',
@@ -183,7 +183,7 @@ Actor.prototype.emitRealAdvice = function(receiver) {
   ];
 
   this.sendMessageTo(receiver, _.first(_.shuffle(realAdvice)));
-}
+};
 
 Actor.prototype.logError = function(message) {
   log.error('XMPP ERROR:', message);

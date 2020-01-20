@@ -1,8 +1,8 @@
 // simple POST request that returns the backtest result
 
-const _ = require('lodash');
-const promisify = require('tiny-promisify');
-const pipelineRunner = promisify(require('../../core/workers/pipeline/parent'));
+let _ = require('lodash');
+let promisify = require('tiny-promisify');
+let pipelineRunner = promisify(require('../../core/workers/pipeline/parent'));
 
 // starts a backtest
 // requires a post body like:
@@ -17,15 +17,15 @@ const pipelineRunner = promisify(require('../../core/workers/pipeline/parent'));
 //   }
 // }
 module.exports = function *() {
-  var mode = 'backtest';
+  let mode = 'backtest';
 
-  var config = {};
+  let config = {};
 
-  var base = require('./baseConfig');
+  let base = require('./baseConfig');
 
-  var req = this.request.body;
+  let req = this.request.body;
 
   _.merge(config, base, req);
 
   this.body = yield pipelineRunner(mode, config);
-}
+};

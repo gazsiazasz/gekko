@@ -6,13 +6,13 @@
 // Acts as ~fake~ stream: takes
 // 1m candles as input and emits
 // bigger candles.
-// 
+//
 // input are transported candles.
 
-var _ = require('lodash');
-var util = require(__dirname + '/util');
+let _ = require('lodash');
+let util = require(__dirname + '/util');
 
-var CandleBatcher = function(candleSize) {
+let CandleBatcher = function(candleSize) {
   if(!_.isNumber(candleSize))
     throw new Error('candleSize is not a number');
 
@@ -21,7 +21,7 @@ var CandleBatcher = function(candleSize) {
   this.calculatedCandles = [];
 
   _.bindAll(this);
-}
+};
 
 util.makeEventEmitter(CandleBatcher);
 
@@ -38,7 +38,7 @@ CandleBatcher.prototype.write = function(candles) {
   }, this);
 
   return this.emitted;
-}
+};
 
 CandleBatcher.prototype.check = function() {
   if(_.size(this.smallCandles) % this.candleSize !== 0)
@@ -47,7 +47,7 @@ CandleBatcher.prototype.check = function() {
   this.emitted++;
   this.calculatedCandles.push(this.calculate());
   this.smallCandles = [];
-}
+};
 
 CandleBatcher.prototype.flush = function() {
   _.each(
@@ -56,15 +56,15 @@ CandleBatcher.prototype.flush = function() {
   );
 
   this.calculatedCandles = [];
-}
+};
 
 CandleBatcher.prototype.calculate = function() {
   // remove the id property of the small candle
-  var { id, ...first } = this.smallCandles.shift();
+  let { id, ...first } = this.smallCandles.shift();
 
   first.vwp = first.vwp * first.volume;
 
-  var candle = _.reduce(
+  let candle = _.reduce(
     this.smallCandles,
     function(candle, m) {
       candle.high = _.max([candle.high, m.high]);
@@ -88,6 +88,6 @@ CandleBatcher.prototype.calculate = function() {
 
   candle.start = first.start;
   return candle;
-}
+};
 
 module.exports = CandleBatcher;

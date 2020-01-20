@@ -1,25 +1,25 @@
 
-const _ = require('lodash');
-const moment = require('moment');
+let _ = require('lodash');
+let moment = require('moment');
 
-const statslite = require('stats-lite');
-const util = require('../../core/util');
-const log = require(util.dirs().core + 'log')
-const ENV = util.gekkoEnv();
+let statslite = require('stats-lite');
+let util = require('../../core/util');
+let log = require(util.dirs().core + 'log');
+let ENV = util.gekkoEnv();
 
-const config = util.getConfig();
-const perfConfig = config.performanceAnalyzer;
-const watchConfig = config.watch;
+let config = util.getConfig();
+let perfConfig = config.performanceAnalyzer;
+let watchConfig = config.watch;
 
-const Logger = require('./logger');
+let Logger = require('./logger');
 
-const PerformanceAnalyzer = function() {
+let PerformanceAnalyzer = function() {
   _.bindAll(this);
 
   this.dates = {
     start: false,
     end: false
-  }
+  };
 
   this.startPrice = 0;
   this.endPrice = 0;
@@ -39,7 +39,7 @@ const PerformanceAnalyzer = function() {
     id: 0,
     entry: false,
     exit: false
-  }
+  };
 
   this.portfolio = {};
   this.balance;
@@ -48,7 +48,7 @@ const PerformanceAnalyzer = function() {
   this.openRoundTrip = false;
 
   this.warmupCompleted = false;
-}
+};
 
 PerformanceAnalyzer.prototype.processPortfolioValueChange = function(event) {
   if(!this.start.balance) {
@@ -56,18 +56,18 @@ PerformanceAnalyzer.prototype.processPortfolioValueChange = function(event) {
   }
 
   this.balance = event.balance;
-}
+};
 
 PerformanceAnalyzer.prototype.processPortfolioChange = function(event) {
   if(!this.start.portfolio) {
     this.start.portfolio = event;
   }
-}
+};
 
 PerformanceAnalyzer.prototype.processStratWarmupCompleted = function() {
   this.warmupCompleted = true;
   this.processCandle(this.warmupCandle, _.noop);
-}
+};
 
 PerformanceAnalyzer.prototype.processCandle = function(candle, done) {
   if(!this.warmupCompleted) {
@@ -90,10 +90,10 @@ PerformanceAnalyzer.prototype.processCandle = function(candle, done) {
   }
 
   done();
-}
+};
 
 PerformanceAnalyzer.prototype.emitRoundtripUpdate = function() {
-  const uPnl = this.price - this.roundTrip.entry.price;
+  let uPnl = this.price - this.roundTrip.entry.price;
 
   this.deferredEmit('roundtripUpdate', {
     at: this.dates.end,
@@ -101,7 +101,7 @@ PerformanceAnalyzer.prototype.emitRoundtripUpdate = function() {
     uPnl,
     uProfit: uPnl / this.roundTrip.entry.total * 100
   })
-}
+};
 
 PerformanceAnalyzer.prototype.processTradeCompleted = function(trade) {
   this.trades++;
@@ -110,12 +110,12 @@ PerformanceAnalyzer.prototype.processTradeCompleted = function(trade) {
 
   this.registerRoundtripPart(trade);
 
-  const report = this.calculateReportStatistics();
+  let report = this.calculateReportStatistics();
   if(report) {
     this.logger.handleTrade(trade, report);
     this.deferredEmit('performanceReport', report);
   }
-}
+};
 
 PerformanceAnalyzer.prototype.registerRoundtripPart = function(trade) {
   if(this.trades === 1 && trade.action === 'sell') {
@@ -133,22 +133,22 @@ PerformanceAnalyzer.prototype.registerRoundtripPart = function(trade) {
       date: trade.date,
       price: trade.price,
       total: trade.portfolio.currency + (trade.portfolio.asset * trade.price),
-    }
+    };
     this.openRoundTrip = true;
   } else if(trade.action === 'sell') {
     this.roundTrip.exit = {
       date: trade.date,
       price: trade.price,
       total: trade.portfolio.currency + (trade.portfolio.asset * trade.price),
-    }
+    };
     this.openRoundTrip = false;
 
     this.handleCompletedRoundtrip();
   }
-}
+};
 
 PerformanceAnalyzer.prototype.handleCompletedRoundtrip = function() {
-  var roundtrip = {
+  let roundtrip = {
     id: this.roundTrip.id,
 
     entryAt: this.roundTrip.entry.date,
@@ -160,7 +160,7 @@ PerformanceAnalyzer.prototype.handleCompletedRoundtrip = function() {
     exitBalance: this.roundTrip.exit.total,
 
     duration: this.roundTrip.exit.date.diff(this.roundTrip.entry.date)
-  }
+  };
 
   roundtrip.pnl = roundtrip.exitBalance - roundtrip.entryBalance;
   roundtrip.profit = (100 * roundtrip.exitBalance / roundtrip.entryBalance) - 100;
@@ -177,7 +177,7 @@ PerformanceAnalyzer.prototype.handleCompletedRoundtrip = function() {
   if (roundtrip.exitBalance < roundtrip.entryBalance)
     this.losses.push(roundtrip);
 
-}
+};
 
 PerformanceAnalyzer.prototype.calculateReportStatistics = function() {
   if(!this.start.balance || !this.start.portfolio) {
@@ -187,26 +187,26 @@ PerformanceAnalyzer.prototype.calculateReportStatistics = function() {
   }
 
   // the portfolio's balance is measured in {currency}
-  const profit = this.balance - this.start.balance;
+  let profit = this.balance - this.start.balance;
 
-  const timespan = moment.duration(
+  let timespan = moment.duration(
     this.dates.end.diff(this.dates.start)
   );
-  const relativeProfit = this.balance / this.start.balance * 100 - 100;
-  const relativeYearlyProfit = relativeProfit / timespan.asYears();
+  let relativeProfit = this.balance / this.start.balance * 100 - 100;
+  let relativeYearlyProfit = relativeProfit / timespan.asYears();
 
-  const percentExposure = this.exposure / (Date.parse(this.dates.end) - Date.parse(this.dates.start));
+  let percentExposure = this.exposure / (Date.parse(this.dates.end) - Date.parse(this.dates.start));
 
-  const sharpe = (relativeYearlyProfit - perfConfig.riskFreeReturn)
+  let sharpe = (relativeYearlyProfit - perfConfig.riskFreeReturn)
     / statslite.stdev(this.roundTrips.map(r => r.profit))
     / Math.sqrt(this.trades / (this.trades - 2));
 
-  const downside = statslite.percentile(this.losses.map(r => r.profit), 0.25)
+  let downside = statslite.percentile(this.losses.map(r => r.profit), 0.25)
     * Math.sqrt(this.trades / (this.trades - 2));
 
-  const ratioRoundTrips = this.roundTrips.length > 0 ? (this.roundTrips.filter(roundTrip => roundTrip.pnl > 0 ).length / this.roundTrips.length * 100).toFixed(4) : 100;
+  let ratioRoundTrips = this.roundTrips.length > 0 ? (this.roundTrips.filter(roundTrip => roundTrip.pnl > 0 ).length / this.roundTrips.length * 100).toFixed(4) : 100;
 
-  const report = {
+  let report = {
     startTime: this.dates.start.utc().format('YYYY-MM-DD HH:mm:ss'),
     endTime: this.dates.end.utc().format('YYYY-MM-DD HH:mm:ss'),
     timespan: timespan.humanize(),
@@ -227,25 +227,24 @@ PerformanceAnalyzer.prototype.calculateReportStatistics = function() {
     sharpe,
     downside,
     ratioRoundTrips
-  }
+  };
 
   report.alpha = report.relativeProfit - report.market;
 
   return report;
-}
+};
 
 PerformanceAnalyzer.prototype.finalize = function(done) {
   if(!this.trades) {
     return done();
   }
 
-  const report = this.calculateReportStatistics();
+  let report = this.calculateReportStatistics();
   if(report) {
     this.logger.finalize(report);
     this.emit('performanceReport', report);
   }
   done();
-}
-
+};
 
 module.exports = PerformanceAnalyzer;

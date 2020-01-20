@@ -1,6 +1,6 @@
-const EventEmitter = require('events');
+let EventEmitter = require('events');
 
-// Note: as of now only supports trailing the price going up (after 
+// Note: as of now only supports trailing the price going up (after
 // a buy), on trigger (when the price moves down) you should sell.
 
 

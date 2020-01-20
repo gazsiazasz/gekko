@@ -1,5 +1,5 @@
-var start = (config, candleSize, daterange) => {
-  var util = require(__dirname + '/../../util');
+let start = (config, candleSize, daterange) => {
+  let util = require(__dirname + '/../../util');
 
   // force correct gekko env
   util.setGekkoEnv('child-process');
@@ -8,13 +8,13 @@ var start = (config, candleSize, daterange) => {
   config.debug = false;
   util.setConfig(config);
 
-  var dirs = util.dirs();
+  let dirs = util.dirs();
 
-  var load = require(dirs.tools + 'candleLoader');
+  let load = require(dirs.tools + 'candleLoader');
   load(config.candleSize, candles => {
     process.send(candles);
   })
-}
+};
 
 process.send('ready');
 
@@ -25,4 +25,4 @@ process.on('message', (m) => {
 
 process.on('disconnect', function() {
   process.exit(0);
-})
+});

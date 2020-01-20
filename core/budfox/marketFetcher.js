@@ -6,24 +6,24 @@
 // - `trades batch` - all new trades.
 // - `trade` - the most recent trade after every fetch
 
-const _ = require('lodash');
-const moment = require('moment');
-const utc = moment.utc;
-const util = require(__dirname + '/../util');
-const dirs = util.dirs();
+let _ = require('lodash');
+let moment = require('moment');
+let utc = moment.utc;
+let util = require(__dirname + '/../util');
+let dirs = util.dirs();
 
-const config = util.getConfig();
-const log = require(dirs.core + 'log');
-const exchangeChecker = require(dirs.gekko + 'exchange/exchangeChecker');
+let config = util.getConfig();
+let log = require(dirs.core + 'log');
+let exchangeChecker = require(dirs.gekko + 'exchange/exchangeChecker');
 
-const TradeBatcher = require(util.dirs().budfox + 'tradeBatcher');
+let TradeBatcher = require(util.dirs().budfox + 'tradeBatcher');
 
-const Fetcher = function(config) {
+let Fetcher = function(config) {
   if(!_.isObject(config))
     throw new Error('TradeFetcher expects a config');
 
-  const exchangeName = config.watch.exchange.toLowerCase();
-  const DataProvider = require(util.dirs().gekko + 'exchange/wrappers/' + exchangeName);
+  let exchangeName = config.watch.exchange.toLowerCase();
+  let DataProvider = require(util.dirs().gekko + 'exchange/wrappers/' + exchangeName);
   _.bindAll(this);
 
   // Create a public dataProvider object which can retrieve live
@@ -32,7 +32,7 @@ const Fetcher = function(config) {
 
   this.exchange = exchangeChecker.settings(config.watch);
 
-  var requiredHistory = config.tradingAdvisor.candleSize * config.tradingAdvisor.historySize;
+  let requiredHistory = config.tradingAdvisor.candleSize * config.tradingAdvisor.historySize;
 
   // If the trading adviser is enabled we might need a very specific fetch since
   // to line up [local db, trading method, and fetching]
@@ -65,7 +65,7 @@ const Fetcher = function(config) {
   this.firstFetch = true;
 
   this.batcher.on('new batch', this.relayTrades);
-}
+};
 
 util.makeEventEmitter(Fetcher);
 
@@ -74,10 +74,10 @@ Fetcher.prototype._fetch = function(since) {
     return;
 
   this.exchangeTrader.getTrades(since, this.processTrades, false);
-}
+};
 
 Fetcher.prototype.fetch = function() {
-  var since = false;
+  let since = false;
   if(this.firstFetch) {
     since = this.firstSince;
     this.firstFetch = false;
@@ -87,7 +87,7 @@ Fetcher.prototype.fetch = function() {
   this.tries = 0;
   log.debug('Requested', this.pair, 'trade data from', this.exchange.name, '...');
   this._fetch(since);
-}
+};
 
 Fetcher.prototype.processTrades = function(err, trades) {
   if(err || _.isEmpty(trades)) {
@@ -96,14 +96,14 @@ Fetcher.prototype.processTrades = function(err, trades) {
       log.debug('refetching...');
     } else
       log.debug('Trade fetch came back empty, refetching...');
-    setTimeout(this._fetch, +moment.duration('s', 1));
+    setTimeout(this._fetch, +moment.duration(1, 's'));
     return;
   }
   this.batcher.write(trades);
-}
+};
 
 Fetcher.prototype.relayTrades = function(batch) {
   this.emit('trades batch', batch);
-}
+};
 
 module.exports = Fetcher;

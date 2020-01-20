@@ -1,50 +1,51 @@
-var semver = require("semver");
-var _ = require('lodash');
+let semver = require("semver");
+let _ = require('lodash');
 
 // validate that talib is installed, if not we'll throw an exception which will
 // prevent further loading or out outside this module
+let tulind;
 try {
-    var tulind = require("tulind");
+    tulind = require("tulind");
 } catch (e) {
     module.exports = null;
     return;
 }
 
-var tulindError = 'Gekko was unable to configure Tulip Indicators:\n\t';
+let tulindError = 'Gekko was unable to configure Tulip Indicators:\n\t';
 
 // Wrapper that executes a tulip indicator
-var execute = function(callback, params) {
-    var tulindCallback = function(err, result) {
+let execute = function(callback, params) {
+    let tulindCallback = function(err, result) {
         if (err) return callback(err);
-        var table = {}
-        for (var i = 0; i < params.results.length; ++i) {
+        let table = {};
+        for (let i = 0; i < params.results.length; ++i) {
             table[params.results[i]] = result[i];
         }
         callback(null, table);
     };
 
     return params.indicator.indicator(params.inputs, params.options, tulindCallback);
-}
+};
 
 // Helper that makes sure all required parameters
 // for a specific talib indicator are present.
-var verifyParams = (methodName, params) => {
-    var requiredParams = methods[methodName].requires;
+let verifyParams = (methodName, params) => {
+    let requiredParams = methods[methodName].requires;
 
     _.each(requiredParams, paramName => {
         if(!_.has(params, paramName)) {
             throw new Error(tulindError + methodName + ' requires ' + paramName + '.');
         }
 
-        var val = params[paramName];
+        let val = params[paramName];
 
         if(!_.isNumber(val)) {
             throw new Error(tulindError + paramName + ' needs to be a number');
         }
     });
-}
+};
 
-var methods = {};
+let methods = {};
 
 methods.ad = {
     requires: [],
@@ -58,7 +59,7 @@ methods.ad = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.adosc = {
     requires: ['optInFastPeriod', 'optInSlowPeriod'],
@@ -72,7 +73,7 @@ methods.adosc = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.adx = {
     requires: ['optInTimePeriod'],
@@ -86,7 +87,7 @@ methods.adx = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.adxr = {
     requires: ['optInTimePeriod'],
@@ -100,7 +101,7 @@ methods.adxr = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.ao = {
     requires: [],
@@ -114,7 +115,7 @@ methods.ao = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.apo = {
     requires: ['optInFastPeriod', 'optInSlowPeriod'],
@@ -128,7 +129,7 @@ methods.apo = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.aroon = {
     requires: ['optInTimePeriod'],
@@ -142,7 +143,7 @@ methods.aroon = {
             results: ['aroonDown', 'aroonUp'],
         });
     }
-}
+};
 
 methods.aroonosc = {
     requires: ['optInTimePeriod'],
@@ -156,7 +157,7 @@ methods.aroonosc = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.atr = {
     requires: ['optInTimePeriod'],
@@ -170,7 +171,7 @@ methods.atr = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.avgprice = {
     requires: [],
@@ -184,7 +185,7 @@ methods.avgprice = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.bbands = {
     requires: ['optInTimePeriod', 'optInNbStdDevs'],
@@ -198,7 +199,7 @@ methods.bbands = {
             results: ['bbandsLower', 'bbandsMiddle', 'bbandsUpper'],
         });
     }
-}
+};
 
 methods.bop = {
     requires: [],
@@ -212,7 +213,7 @@ methods.bop = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.cci = {
     requires: ['optInTimePeriod'],
@@ -226,7 +227,7 @@ methods.cci = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.cmo = {
     requires: ['optInTimePeriod'],
@@ -240,7 +241,7 @@ methods.cmo = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.cvi = {
     requires: ['optInTimePeriod'],
@@ -254,7 +255,7 @@ methods.cvi = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.dema = {
     requires: ['optInTimePeriod'],
@@ -268,7 +269,7 @@ methods.dema = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.di = {
     requires: ['optInTimePeriod'],
@@ -282,7 +283,7 @@ methods.di = {
             results: ['diPlus', 'diMinus'],
         });
     }
-}
+};
 
 methods.dm = {
     requires: ['optInTimePeriod'],
@@ -296,7 +297,7 @@ methods.dm = {
             results: ['dmPlus', 'dmLow'],
         });
     }
-}
+};
 
 methods.dpo = {
     requires: ['optInTimePeriod'],
@@ -310,7 +311,7 @@ methods.dpo = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.dx = {
     requires: ['optInTimePeriod'],
@@ -324,7 +325,7 @@ methods.dx = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.ema = {
     requires: ['optInTimePeriod'],
@@ -338,7 +339,7 @@ methods.ema = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.emv = {
     requires: [],
@@ -352,7 +353,7 @@ methods.emv = {
             results: [],
         });
     }
-}
+};
 
 methods.fisher = {
     requires: ['optInTimePeriod'],
@@ -366,7 +367,7 @@ methods.fisher = {
             results: ['fisher', 'fisherPeriod'],
         });
     }
-}
+};
 
 methods.fosc = {
     requires: ['optInTimePeriod'],
@@ -380,7 +381,7 @@ methods.fosc = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.hma = {
     requires: ['optInTimePeriod'],
@@ -394,7 +395,7 @@ methods.hma = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.kama = {
     requires: ['optInTimePeriod'],
@@ -408,7 +409,7 @@ methods.kama = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.kvo = {
     requires: ['optInFastPeriod', 'optInSlowPeriod'],
@@ -422,7 +423,7 @@ methods.kvo = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.linreg = {
     requires: ['optInTimePeriod'],
@@ -436,7 +437,7 @@ methods.linreg = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.linregintercept = {
     requires: ['optInTimePeriod'],
@@ -450,7 +451,7 @@ methods.linregintercept = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.linregslope = {
     requires: ['optInTimePeriod'],
@@ -464,7 +465,7 @@ methods.linregslope = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.macd = {
     requires: ['optInFastPeriod', 'optInSlowPeriod', 'optInSignalPeriod'],
@@ -478,7 +479,7 @@ methods.macd = {
             results: ['macd', 'macdSignal', 'macdHistogram'],
         });
     }
-}
+};
 
 methods.marketfi = {
     requires: [],
@@ -492,7 +493,7 @@ methods.marketfi = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.mass = {
     requires: ['optInTimePeriod'],
@@ -506,7 +507,7 @@ methods.mass = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.medprice = {
     requires: [],
@@ -520,7 +521,7 @@ methods.medprice = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.mfi = {
     requires: ['optInTimePeriod'],
@@ -534,7 +535,7 @@ methods.mfi = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.msw = {
     requires: ['optInTimePeriod'],
@@ -548,7 +549,7 @@ methods.msw = {
             results: ['mswSine', 'mswLead'],
         });
     }
-}
+};
 
 methods.natr = {
     requires: ['optInTimePeriod'],
@@ -562,7 +563,7 @@ methods.natr = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.nvi = {
     requires: [],
@@ -576,7 +577,7 @@ methods.nvi = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.obv = {
     requires: [],
@@ -590,7 +591,7 @@ methods.obv = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.ppo = {
     requires: ['optInFastPeriod', 'optInSlowPeriod'],
@@ -604,7 +605,7 @@ methods.ppo = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.psar = {
     requires: ['optInAcceleration', 'optInMaximum'],
@@ -618,7 +619,7 @@ methods.psar = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.pvi = {
     requires: [],
@@ -632,7 +633,7 @@ methods.pvi = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.qstick = {
     requires: ['optInTimePeriod'],
@@ -646,7 +647,7 @@ methods.qstick = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.roc = {
     requires: ['optInTimePeriod'],
@@ -660,7 +661,7 @@ methods.roc = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.rocr = {
     requires: ['optInTimePeriod'],
@@ -674,7 +675,7 @@ methods.rocr = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.rsi = {
     requires: ['optInTimePeriod'],
@@ -688,7 +689,7 @@ methods.rsi = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.sma = {
     requires: ['optInTimePeriod'],
@@ -702,7 +703,7 @@ methods.sma = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.stddev = {
     requires: ['optInTimePeriod'],
@@ -716,7 +717,7 @@ methods.stddev = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.stoch = {
     requires: ['optInFastKPeriod', 'optInSlowKPeriod', 'optInSlowDPeriod'],
@@ -730,7 +731,7 @@ methods.stoch = {
             results: ['stochK', 'stochD'],
         });
     }
-}
+};
 
 methods.sum = {
     requires: ['optInTimePeriod'],
@@ -744,7 +745,7 @@ methods.sum = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.tema = {
     requires: ['optInTimePeriod'],
@@ -758,7 +759,7 @@ methods.tema = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.tr = {
     requires: [],
@@ -772,7 +773,7 @@ methods.tr = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.trima = {
     requires: ['optInTimePeriod'],
@@ -786,7 +787,7 @@ methods.trima = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.trix = {
     requires: ['optInTimePeriod'],
@@ -800,7 +801,7 @@ methods.trix = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.tsf = {
     requires: ['optInTimePeriod'],
@@ -814,7 +815,7 @@ methods.tsf = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.typprice = {
     requires: [],
@@ -828,7 +829,7 @@ methods.typprice = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.ultosc = {
     requires: ['optInTimePeriod1', 'optInTimePeriod2', 'optInTimePeriod3'],
@@ -842,7 +843,7 @@ methods.ultosc = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.vhf = {
     requires: ['optInTimePeriod'],
@@ -856,7 +857,7 @@ methods.vhf = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.vidya = {
     requires: ['optInFastPeriod', 'optInSlowPeriod', 'optInAlpha'],
@@ -870,7 +871,7 @@ methods.vidya = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.volatility = {
     requires: ['optInTimePeriod'],
@@ -884,7 +885,7 @@ methods.volatility = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.vosc = {
     requires: ['optInFastPeriod', 'optInSlowPeriod'],
@@ -898,7 +899,7 @@ methods.vosc = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.vwma = {
     requires: ['optInTimePeriod'],
@@ -912,7 +913,7 @@ methods.vwma = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.wad = {
     requires: [],
@@ -926,7 +927,7 @@ methods.wad = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.wcprice = {
     requires: [],
@@ -940,7 +941,7 @@ methods.wcprice = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.wilders = {
     requires: ['optInTimePeriod'],
@@ -954,7 +955,7 @@ methods.wilders = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.willr = {
     requires: ['optInTimePeriod'],
@@ -968,7 +969,7 @@ methods.willr = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.wma = {
     requires: ['optInTimePeriod'],
@@ -982,7 +983,7 @@ methods.wma = {
             results: ['result'],
         });
     }
-}
+};
 
 methods.zlema = {
     requires: ['optInTimePeriod'],
@@ -996,7 +997,7 @@ methods.zlema = {
             results: ['result'],
         });
     }
-}
+};
 
 module.exports = methods;
 

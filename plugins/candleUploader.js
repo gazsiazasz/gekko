@@ -1,10 +1,10 @@
-const axios = require('axios');
-const _ = require('lodash');
-const log = require('../core/log.js');
-const util = require('../core/util.js');
-const config = util.getConfig();
+let axios = require('axios');
+let _ = require('lodash');
+let log = require('../core/log.js');
+let util = require('../core/util.js');
+let config = util.getConfig();
 
-const CandleUploader = function(done) {
+let CandleUploader = function(done) {
   _.bindAll(this);
 
   done();
@@ -19,11 +19,11 @@ CandleUploader.prototype.processCandle = function(candle, done) {
 
 CandleUploader.prototype.schedule = function() {
   this.timer = setTimeout(this.upload, 10 * 1000);
-}
+};
 
 CandleUploader.prototype.rawUpload = function(candles, count, next) {
 
-  const amount = candles.length;
+  let amount = candles.length;
 
   axios({
     url: config.candleUploader.url,
@@ -54,10 +54,10 @@ CandleUploader.prototype.rawUpload = function(candles, count, next) {
 
       setTimeout(() => this.rawUpload(candles, count, next), 2000);
     });
-}
+};
 
 CandleUploader.prototype.upload = function() {
-  const amount = this.candles.length;
+  let amount = this.candles.length;
   if(!amount) {
     return this.schedule();
   }
@@ -67,11 +67,11 @@ CandleUploader.prototype.upload = function() {
   });
 
   this.candles = [];
-}
+};
 
 CandleUploader.prototype.finish = function(next) {
   this.upload();
   clearTimeout(this.timer);
-}
+};
 
 module.exports = CandleUploader;

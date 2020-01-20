@@ -1,12 +1,12 @@
 // wraps around a low level trigger and feeds
 // it live market data.
 
-const _ = require('lodash');
+let _ = require('lodash');
 
-const exchangeUtils = require('./exchangeUtils');
-const bindAll = exchangeUtils.bindAll;
+let exchangeUtils = require('./exchangeUtils');
+let bindAll = exchangeUtils.bindAll;
 
-const triggers = require('./triggers');
+let triggers = require('./triggers');
 
 // @param api: a gekko broker wrapper instance
 // @param type: type of trigger to wrap
@@ -32,7 +32,7 @@ class Trigger {
     this.trigger = new triggers[type]({
       onTrigger: this.propogateTrigger,
       ...props
-    })
+    });
 
     this.scheduleFetch();
   }
@@ -52,7 +52,7 @@ class Trigger {
     if(!this.isLive) {
       return;
     }
-    
+
     if(err) {
       return console.log('[GB/trigger] failed to fetch ticker:', err);
     }

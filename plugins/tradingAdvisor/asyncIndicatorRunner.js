@@ -1,17 +1,17 @@
-const _ = require('lodash');
-const fs = require('fs');
-const util = require('../../core/util');
-const config = util.getConfig();
-const dirs = util.dirs();
-const log = require(dirs.core + 'log');
+let _ = require('lodash');
+let fs = require('fs');
+let util = require('../../core/util');
+let config = util.getConfig();
+let dirs = util.dirs();
+let log = require(dirs.core + 'log');
 
-const talib = require(dirs.core + 'talib');
-const tulind = require(dirs.core + 'tulind');
+let talib = require(dirs.core + 'talib');
+let tulind = require(dirs.core + 'tulind');
 
-const allowedTalibIndicators = _.keys(talib);
-const allowedTulipIndicators = _.keys(tulind);
+let allowedTalibIndicators = _.keys(talib);
+let allowedTulipIndicators = _.keys(tulind);
 
-const AsyncIndicatorRunner = function() {
+let AsyncIndicatorRunner = function() {
   this.talibIndicators = {};
   this.tulipIndicators = {};
 
@@ -28,7 +28,7 @@ const AsyncIndicatorRunner = function() {
   this.inflight = false;
   this.backlog = [];
   this.age = 0;
-}
+};
 
 AsyncIndicatorRunner.prototype.processCandle = function(candle, next) {
   if(this.inflight) {
@@ -36,7 +36,7 @@ AsyncIndicatorRunner.prototype.processCandle = function(candle, next) {
   }
 
   this.age++;
-  this.inflight = true;  
+  this.inflight = true;
 
   this.candleProps.open.push(candle.open);
   this.candleProps.high.push(candle.high);
@@ -53,22 +53,22 @@ AsyncIndicatorRunner.prototype.processCandle = function(candle, next) {
   }
 
   this.calculateIndicators(next);
-}
+};
 
 AsyncIndicatorRunner.prototype.calculateIndicators = function(next) {
-  const done = _.after(
+  let done = _.after(
     _.size(this.talibIndicators) + _.size(this.tulipIndicators),
     this.handlePostFlight(next)
   );
 
   // handle result from talib
-  const talibResultHander = name => (err, result) => {
+  let talibResultHander = name => (err, result) => {
     if(err)
       util.die('TALIB ERROR:', err);
 
     this.talibIndicators[name].result = _.mapValues(result, v => _.last(v));
     done();
-  }
+  };
 
   // handle result from talib
   _.each(
@@ -80,13 +80,13 @@ AsyncIndicatorRunner.prototype.calculateIndicators = function(next) {
   );
 
   // handle result from tulip
-  var tulindResultHander = name => (err, result) => {
+  let tulindResultHander = name => (err, result) => {
     if(err)
       util.die('TULIP ERROR:', err);
 
     this.tulipIndicators[name].result = _.mapValues(result, v => _.last(v));
     done();
-  }
+  };
 
   // handle result from tulip indicators
   _.each(
@@ -96,7 +96,7 @@ AsyncIndicatorRunner.prototype.calculateIndicators = function(next) {
       tulindResultHander(name)
     )
   );
-}
+};
 
 AsyncIndicatorRunner.prototype.handlePostFlight = function(next) {
   return () => {
@@ -104,11 +104,11 @@ AsyncIndicatorRunner.prototype.handlePostFlight = function(next) {
     this.inflight = false;
 
     if(this.backlog.length) {
-      const { candle, next } = this.backlog.shift();
+      let { candle, next } = this.backlog.shift();
       this.processCandle(candle, next);
     }
   }
-}
+};
 
 AsyncIndicatorRunner.prototype.addTalibIndicator = function(name, type, parameters) {
   if(!talib)
@@ -120,13 +120,13 @@ AsyncIndicatorRunner.prototype.addTalibIndicator = function(name, type, paramete
   if(this.setup)
     util.die('Can only add talib indicators in the init method!');
 
-  var basectx = this;
+  let basectx = this;
 
   this.talibIndicators[name] = {
     run: talib[type].create(parameters),
     result: NaN
   }
-}
+};
 
 AsyncIndicatorRunner.prototype.addTulipIndicator = function(name, type, parameters) {
   if(!tulind) {
@@ -139,12 +139,12 @@ AsyncIndicatorRunner.prototype.addTulipIndicator = function(name, type, paramete
   if(this.setup)
     util.die('Can only add tulip indicators in the init method!');
 
-  var basectx = this;
+  let basectx = this;
 
   this.tulipIndicators[name] = {
     run: tulind[type].create(parameters),
     result: NaN
   }
-}
+};
 
 module.exports = AsyncIndicatorRunner;

@@ -1,12 +1,12 @@
-var _ = require('lodash');
-var config = require('../../core/util.js').getConfig();
+let _ = require('lodash');
+let config = require('../../core/util.js').getConfig();
 
-var sqlite = require('./handle');
-var sqliteUtil = require('./util');
-var util = require('../../core/util');
-var log = require('../../core/log');
+let sqlite = require('./handle');
+let sqliteUtil = require('./util');
+let util = require('../../core/util');
+let log = require('../../core/log');
 
-var Store = function(done, pluginMeta) {
+let Store = function(done, pluginMeta) {
   _.bindAll(this);
   this.done = done;
 
@@ -15,10 +15,10 @@ var Store = function(done, pluginMeta) {
 
   this.cache = [];
   this.buffered = util.gekkoMode() === "importer";
-}
+};
 
 Store.prototype.upsertTables = function() {
-  var createQueries = [
+  let createQueries = [
     `
       CREATE TABLE IF NOT EXISTS
       ${sqliteUtil.table('candles')} (
@@ -41,21 +41,21 @@ Store.prototype.upsertTables = function() {
     // ``
   ];
 
-  var next = _.after(_.size(createQueries), this.done);
+  let next = _.after(_.size(createQueries), this.done);
 
   _.each(createQueries, function(q) {
     this.db.run(q, next);
   }, this);
-}
+};
 
 Store.prototype.writeCandles = function() {
   if(_.isEmpty(this.cache))
     return;
 
-  const transaction = () => {
+  let transaction = () => {
     this.db.run("BEGIN TRANSACTION");
 
-    var stmt = this.db.prepare(`
+    let stmt = this.db.prepare(`
       INSERT OR IGNORE INTO ${sqliteUtil.table('candles')}
       VALUES (?,?,?,?,?,?,?,?,?)
     `, function(err, rows) {
@@ -83,26 +83,26 @@ Store.prototype.writeCandles = function() {
     this.db.run("COMMIT");
     // TEMP: should fix https://forum.gekko.wizb.it/thread-57279-post-59194.html#pid59194
     this.db.run("pragma wal_checkpoint;");
-    
+
     this.cache = [];
-  }
+  };
 
   this.db.serialize(transaction);
-}
+};
 
-var processCandle = function(candle, done) {
+let processCandle = function(candle, done) {
   this.cache.push(candle);
-  if (!this.buffered || this.cache.length > 1000) 
+  if (!this.buffered || this.cache.length > 1000)
     this.writeCandles();
 
   done();
 };
 
-var finalize = function(done) {
+let finalize = function(done) {
   this.writeCandles();
   this.db.close(() => { done(); });
   this.db = null;
-}
+};
 
 if(config.candleWriter.enabled) {
   Store.prototype.processCandle = processCandle;
@@ -111,11 +111,11 @@ if(config.candleWriter.enabled) {
 
 // TODO: add storing of trades / advice?
 
-// var processTrades = function(candles) {
+// let processTrades = function(candles) {
 //   util.die('NOT IMPLEMENTED');
 // }
 
-// var processAdvice = function(candles) {
+// let processAdvice = function(candles) {
 //   util.die('NOT IMPLEMENTED');
 // }
 

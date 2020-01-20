@@ -6,13 +6,13 @@
 
  */
 // helpers
-var _ = require('lodash');
-var log = require('../core/log.js');
+let _ = require('lodash');
+let log = require('../core/log.js');
 
-var RSI = require('./indicators/RSI.js');
+let RSI = require('./indicators/RSI.js');
 
 // let's create our own method
-var method = {};
+let method = {};
 
 // prepare everything our method needs
 method.init = function() {
@@ -29,22 +29,22 @@ method.init = function() {
 
   // define the indicators we need
   this.addIndicator('rsi', 'RSI', this.settings);
-}
+};
 
 // for debugging purposes log the last
 // calculated parameters.
 method.log = function(candle) {
-  var digits = 8;
-  var rsi = this.indicators.rsi;
+  let digits = 8;
+  let rsi = this.indicators.rsi;
 
   log.debug('calculated RSI properties for candle:');
   log.debug('\t', 'rsi:', rsi.result.toFixed(digits));
   log.debug('\t', 'price:', candle.close.toFixed(digits));
-}
+};
 
 method.check = function() {
-  var rsi = this.indicators.rsi;
-  var rsiVal = rsi.result;
+  let rsi = this.indicators.rsi;
+  let rsiVal = rsi.result;
 
   if(rsiVal > this.settings.thresholds.high) {
 
@@ -100,6 +100,6 @@ method.check = function() {
 
     this.advice();
   }
-}
+};
 
 module.exports = method;

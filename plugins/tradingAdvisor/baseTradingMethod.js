@@ -1,23 +1,23 @@
-const _ = require('lodash');
-const fs = require('fs');
-const util = require('../../core/util');
-const config = util.getConfig();
-const dirs = util.dirs();
-const log = require(dirs.core + 'log');
+let _ = require('lodash');
+let fs = require('fs');
+let util = require('../../core/util');
+let config = util.getConfig();
+let dirs = util.dirs();
+let log = require(dirs.core + 'log');
 
-const ENV = util.gekkoEnv();
-const mode = util.gekkoMode();
-const startTime = util.getStartTime();
+let ENV = util.gekkoEnv();
+let mode = util.gekkoMode();
+let startTime = util.getStartTime();
 
-const indicatorsPath = dirs.methods + 'indicators/';
-const indicatorFiles = fs.readdirSync(indicatorsPath);
-const Indicators = {};
+let indicatorsPath = dirs.methods + 'indicators/';
+let indicatorFiles = fs.readdirSync(indicatorsPath);
+let Indicators = {};
 
-const AsyncIndicatorRunner = require('./asyncIndicatorRunner');
+let AsyncIndicatorRunner = require('./asyncIndicatorRunner');
 
 _.each(indicatorFiles, function(indicator) {
-  const indicatorName = indicator.split(".")[0];
-  if (indicatorName[0] != "_")
+  let indicatorName = indicator.split(".")[0];
+  if (indicatorName[0] !== "_")
     try {
       Indicators[indicatorName] = require(indicatorsPath + indicator);
     } catch (e) {
@@ -25,9 +25,9 @@ _.each(indicatorFiles, function(indicator) {
     }
 });
 
-const allowedIndicators = _.keys(Indicators);
+let allowedIndicators = _.keys(Indicators);
 
-var Base = function(settings) {
+let Base = function(settings) {
   _.bindAll(this);
 
   // properties
@@ -82,7 +82,7 @@ var Base = function(settings) {
     this.asyncTick = true;
   else
     delete this.asyncIndicatorRunner;
-}
+};
 
 // teach our base trading method events
 util.makeEventEmitter(Base);
@@ -90,9 +90,9 @@ util.makeEventEmitter(Base);
 Base.prototype.tick = function(candle, done) {
   this.age++;
 
-  const afterAsync = () => {
+  let afterAsync = () => {
     this.calculateSyncIndicators(candle, done);
-  }
+  };
 
   if(this.asyncTick) {
     this.asyncIndicatorRunner.processCandle(candle, () => {
@@ -107,18 +107,18 @@ Base.prototype.tick = function(candle, done) {
   } else {
     afterAsync();
   }
-}
+};
 
 Base.prototype.isBusy = function() {
   if(!this.asyncTick)
     return false;
 
   return this.asyncIndicatorRunner.inflight;
-}
+};
 
 Base.prototype.calculateSyncIndicators = function(candle, done) {
   // update all indicators
-  var price = candle[this.priceValue];
+  let price = candle[this.priceValue];
   _.each(this.indicators, function(i) {
     if(i.input === 'price')
       i.update(price);
@@ -129,24 +129,24 @@ Base.prototype.calculateSyncIndicators = function(candle, done) {
   this.propogateTick(candle);
 
   return done();
-}
+};
 
 Base.prototype.propogateTick = function(candle) {
   this.candle = candle;
   this.update(candle);
 
   this.processedTicks++;
-  var isAllowedToCheck = this.requiredHistory <= this.age;
+  let isAllowedToCheck = this.requiredHistory <= this.age;
 
   if(!this.completedWarmup) {
 
     // in live mode we might receive more candles
     // than minimally needed. In that case check
     // whether candle start time is > startTime
-    var isPremature = false;
+    let isPremature = false;
 
     if(mode === 'realtime') {
-      const startTimeMinusCandleSize = startTime
+      let startTimeMinusCandleSize = startTime
         .clone()
         .subtract(this.tradingAdvisor.candleSize, "minutes");
 
@@ -175,11 +175,11 @@ Base.prototype.propogateTick = function(candle) {
     }
   }
 
-  const indicators = {};
+  let indicators = {};
   _.each(this.indicators, (indicator, name) => {
     indicators[name] = indicator.result;
   });
-  
+
   _.each(this.tulipIndicators, (indicator, name) => {
     indicators[name] = indicator.result.result
       ? indicator.result.result
@@ -198,10 +198,10 @@ Base.prototype.propogateTick = function(candle) {
   });
 
   // are we totally finished?
-  const completed = this.age === this.processedTicks;
+  let completed = this.age === this.processedTicks;
   if(completed && this.finishCb)
     this.finishCb();
-}
+};
 
 Base.prototype.processTrade = function(trade) {
   if(
@@ -216,15 +216,15 @@ Base.prototype.processTrade = function(trade) {
   }
 
   this.onTrade(trade);
-}
+};
 
 Base.prototype.addTalibIndicator = function(name, type, parameters) {
   this.asyncIndicatorRunner.addTalibIndicator(name, type, parameters);
-}
+};
 
 Base.prototype.addTulipIndicator = function(name, type, parameters) {
   this.asyncIndicatorRunner.addTulipIndicator(name, type, parameters);
-}
+};
 
 Base.prototype.addIndicator = function(name, type, parameters) {
   if(!_.contains(allowedIndicators, type))
@@ -236,7 +236,7 @@ Base.prototype.addIndicator = function(name, type, parameters) {
   return this.indicators[name] = new Indicators[type](parameters);
 
   // some indicators need a price stream, others need full candles
-}
+};
 
 Base.prototype.advice = function(newDirection) {
   // ignore legacy soft advice
@@ -288,7 +288,7 @@ Base.prototype.advice = function(newDirection) {
 
   this.propogatedAdvices++;
 
-  const advice = {
+  let advice = {
     id: 'advice-' + this.propogatedAdvices,
     recommendation: newDirection
   };
@@ -303,14 +303,14 @@ Base.prototype.advice = function(newDirection) {
   this.emit('advice', advice);
 
   return this.propogatedAdvices;
-}
+};
 
 Base.prototype.notify = function(content) {
   this.emit('stratNotification', {
     content,
     date: new Date(),
   })
-}
+};
 
 Base.prototype.finish = function(done) {
   // Because the strategy might be async we need
@@ -329,6 +329,6 @@ Base.prototype.finish = function(done) {
   // we are not done, register cb
   // and call after we are..
   this.finishCb = done;
-}
+};
 
 module.exports = Base;

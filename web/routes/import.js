@@ -1,19 +1,19 @@
-const _ = require('lodash');
-const promisify = require('tiny-promisify');
-const pipelineRunner = promisify(require('../../core/workers/pipeline/parent'));
+let _ = require('lodash');
+let promisify = require('tiny-promisify');
+let pipelineRunner = promisify(require('../../core/workers/pipeline/parent'));
 
-const cache = require('../state/cache');
-const broadcast = cache.get('broadcast');
-const importManager = cache.get('imports');
+let cache = require('../state/cache');
+let broadcast = cache.get('broadcast');
+let importManager = cache.get('imports');
 
-const base = require('./baseConfig');
+let base = require('./baseConfig');
 
 // starts an import
 // requires a post body with a config object
 module.exports = function *() {
   let mode = 'importer';
 
-  let config = {}
+  let config = {};
 
   _.merge(config, base, this.request.body);
 
@@ -56,20 +56,20 @@ module.exports = function *() {
         latest: event.latest,
         done: event.done
       }
-    }
+    };
     broadcast(wsEvent);
   });
 
   let daterange = this.request.body.importer.daterange;
 
-  const _import = {
+  let _import = {
     watch: config.watch,
     id: importId,
     latest: '',
     from: daterange.from,
     to: daterange.to
-  }
+  };
 
   importManager.add(_import);
   this.body = _import;
-}
+};

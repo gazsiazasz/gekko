@@ -1,9 +1,9 @@
 /*
 
-  Gekko is a Bitcoin trading bot for popular Bitcoin exchanges written 
+  Gekko is a Bitcoin trading bot for popular Bitcoin exchanges written
   in node, it features multiple trading methods using technical analysis.
 
-  If you are interested in how Gekko works, read more about Gekko's 
+  If you are interested in how Gekko works, read more about Gekko's
   architecture here:
 
   https://gekko.wizb.it/docs/internals/architecture.html
@@ -12,10 +12,10 @@
 
   USE AT YOUR OWN RISK!
 
-  The author of this project is NOT responsible for any damage or loss caused 
-  by this software. There can be bugs and the bot may not perform as expected 
-  or specified. Please consider testing it first with paper trading and/or 
-  backtesting on historical data. Also look at the code to see what how 
+  The author of this project is NOT responsible for any damage or loss caused
+  by this software. There can be bugs and the bot may not perform as expected
+  or specified. Please consider testing it first with paper trading and/or
+  backtesting on historical data. Also look at the code to see what how
   it is working.
 
 */
@@ -28,24 +28,24 @@ console.log(`
   $$ |/    |$$    |   $$  $$<   $$  $$<   $$ |  $$ |
   $$ |$$$$ |$$$$$/    $$$$$  \\  $$$$$  \\  $$ |  $$ |
   $$ \\__$$ |$$ |_____ $$ |$$  \\ $$ |$$  \\ $$ \\__$$ |
-  $$    $$/ $$       |$$ | $$  |$$ | $$  |$$    $$/ 
+  $$    $$/ $$       |$$ | $$  |$$ | $$  |$$    $$/
    $$$$$$/  $$$$$$$$/ $$/   $$/ $$/   $$/  $$$$$$/
 `);
 
-const util = require(__dirname + '/core/util');
+let util = require(__dirname + '/core/util');
 
 console.log('\tGekko v' + util.getVersion());
 console.log('\tI\'m gonna make you rich, Bud Fox.', '\n\n');
 
-const dirs = util.dirs();
+let dirs = util.dirs();
 
 if(util.launchUI()) {
   return require(util.dirs().web + 'server');
 }
 
-const pipeline = require(dirs.core + 'pipeline');
-const config = util.getConfig();
-const mode = util.gekkoMode();
+let pipeline = require(dirs.core + 'pipeline');
+let config = util.getConfig();
+let mode = util.gekkoMode();
 
 if(
   config.trader &&

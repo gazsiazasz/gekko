@@ -1,15 +1,15 @@
-const moment = require('moment');
-const _ = require('lodash');
+let moment = require('moment');
+let _ = require('lodash');
 
-const Errors = require('../exchangeErrors');
-const marketData = require('./binance-markets.json');
-const exchangeUtils = require('../exchangeUtils');
-const retry = exchangeUtils.retry;
-const scientificToDecimal = exchangeUtils.scientificToDecimal;
+let Errors = require('../exchangeErrors');
+let marketData = require('./binance-markets.json');
+let exchangeUtils = require('../exchangeUtils');
+let retry = exchangeUtils.retry;
+let scientificToDecimal = exchangeUtils.scientificToDecimal;
 
-const Binance = require('binance');
+let Binance = require('binance');
 
-const Trader = function(config) {
+let Trader = function(config) {
   _.bindAll(this, [
     'roundAmount',
     'roundPrice',
@@ -71,7 +71,7 @@ const Trader = function(config) {
   }
 };
 
-const recoverableErrors = [
+let recoverableErrors = [
   'SOCKETTIMEDOUT',
   'TIMEDOUT',
   'CONNRESET',
@@ -88,12 +88,12 @@ const recoverableErrors = [
   'ENETUNREACH'
 ];
 
-const includes = (str, list) => {
+let includes = (str, list) => {
   if(!_.isString(str))
     return false;
 
   return _.some(list, item => str.includes(item));
-}
+};
 
 Trader.prototype.handleResponse = function(funcName, callback) {
   return (error, body) => {
@@ -135,10 +135,10 @@ Trader.prototype.handleResponse = function(funcName, callback) {
 };
 
 Trader.prototype.getTrades = function(since, callback, descending) {
-  const processResults = (err, data) => {
+  let processResults = (err, data) => {
     if (err) return callback(err);
 
-    var parsedTrades = [];
+    let parsedTrades = [];
     _.each(
       data,
       function(trade) {
@@ -156,33 +156,33 @@ Trader.prototype.getTrades = function(since, callback, descending) {
     else callback(undefined, parsedTrades);
   };
 
-  var reqData = {
+  let reqData = {
     symbol: this.pair,
   };
 
   if (since) {
-    var endTs = moment(since)
+    let endTs = moment(since)
       .add(1, 'h')
       .valueOf();
-    var nowTs = moment().valueOf();
+    let nowTs = moment().valueOf();
 
     reqData.startTime = moment(since).valueOf();
     reqData.endTime = endTs > nowTs ? nowTs : endTs;
   }
 
-  const fetch = cb => this.binance.aggTrades(reqData, this.handleResponse('getTrades', cb));
+  let fetch = cb => this.binance.aggTrades(reqData, this.handleResponse('getTrades', cb));
   retry(undefined, fetch, processResults);
 };
 
 Trader.prototype.getPortfolio = function(callback) {
-  const setBalance = (err, data) => {
+  let setBalance = (err, data) => {
     if (err) return callback(err);
 
-    const findAsset = item => item.asset === this.asset;
-    const assetAmount = parseFloat(_.find(data.balances, findAsset).free);
+    let findAsset = item => item.asset === this.asset;
+    let assetAmount = parseFloat(_.find(data.balances, findAsset).free);
 
-    const findCurrency = item => item.asset === this.currency;
-    const currencyAmount = parseFloat(_.find(data.balances, findCurrency).free);
+    let findCurrency = item => item.asset === this.currency;
+    let currencyAmount = parseFloat(_.find(data.balances, findCurrency).free);
 
     if (!_.isNumber(assetAmount) || _.isNaN(assetAmount)) {
       assetAmount = 0;
@@ -192,7 +192,7 @@ Trader.prototype.getPortfolio = function(callback) {
       currencyAmount = 0;
     }
 
-    const portfolio = [
+    let portfolio = [
       { name: this.asset, amount: assetAmount },
       { name: this.currency, amount: currencyAmount },
     ];
@@ -200,7 +200,7 @@ Trader.prototype.getPortfolio = function(callback) {
     return callback(undefined, portfolio);
   };
 
-  const fetch = cb => this.binance.account({}, this.handleResponse('getPortfolio', cb));
+  let fetch = cb => this.binance.account({}, this.handleResponse('getPortfolio', cb));
   retry(undefined, fetch, setBalance);
 };
 
@@ -208,11 +208,11 @@ Trader.prototype.getFee = function(callback) {
 
   // binance does NOT tell us whether the user is using BNB to pay
   // for fees, which means a discount (effectively lower fees)
-  const handle = (err, data) => {
+  let handle = (err, data) => {
     if(err)  {
       return callback(err);
     }
-    const basepoints = data.makerCommission;
+    let basepoints = data.makerCommission;
 
     /** Binance raw response
     { makerCommission: 10,
@@ -228,23 +228,23 @@ Trader.prototype.getFee = function(callback) {
     this.fee = basepoints / 10000;
 
     callback(undefined, this.fee);
-  }
+  };
 
-  const fetch = cb => this.binance.account({}, this.handleResponse('getFee', cb));
+  let fetch = cb => this.binance.account({}, this.handleResponse('getFee', cb));
   retry(undefined, fetch, handle);
 };
 
 Trader.prototype.getTicker = function(callback) {
-  const setTicker = (err, data) => {
+  let setTicker = (err, data) => {
     if (err)
       return callback(err);
 
-    var result = _.find(data, ticker => ticker.symbol === this.pair);
+    let result = _.find(data, ticker => ticker.symbol === this.pair);
 
     if(!result)
       return callback(new Error(`Market ${this.pair} not found on Binance`));
 
-    var ticker = {
+    let ticker = {
       ask: parseFloat(result.askPrice),
       bid: parseFloat(result.bidPrice),
     };
@@ -252,21 +252,21 @@ Trader.prototype.getTicker = function(callback) {
     callback(undefined, ticker);
   };
 
-  const handler = cb => this.binance._makeRequest({}, this.handleResponse('getTicker', cb), 'api/v1/ticker/allBookTickers');
+  let handler = cb => this.binance._makeRequest({}, this.handleResponse('getTicker', cb), 'api/v1/ticker/allBookTickers');
   retry(undefined, handler, setTicker);
 };
 
 // Effectively counts the number of decimal places, so 0.001 or 0.234 results in 3
 Trader.prototype.getPrecision = function(tickSize) {
   if (!isFinite(tickSize)) return 0;
-  var e = 1, p = 0;
+  let e = 1, p = 0;
   while (Math.round(tickSize * e) / e !== tickSize) { e *= 10; p++; }
   return p;
 };
 
 Trader.prototype.round = function(amount, tickSize) {
-  var precision = 100000000;
-  var t = this.getPrecision(tickSize);
+  let precision = 100000000;
+  let t = this.getPrecision(tickSize);
 
   if(Number.isInteger(t))
     precision = Math.pow(10, t);
@@ -283,19 +283,19 @@ Trader.prototype.round = function(amount, tickSize) {
 
 Trader.prototype.roundAmount = function(amount) {
   return this.round(amount, this.market.minimalOrder.amount);
-}
+};
 
 Trader.prototype.roundPrice = function(price) {
   return this.round(price, this.market.minimalOrder.price);
-}
+};
 
 Trader.prototype.isValidPrice = function(price) {
   return price >= this.market.minimalOrder.price;
-}
+};
 
 Trader.prototype.isValidLot = function(price, amount) {
   return amount * price >= this.market.minimalOrder.order;
-}
+};
 
 Trader.prototype.outbidPrice = function(price, isUp) {
   let newPrice;
@@ -307,18 +307,18 @@ Trader.prototype.outbidPrice = function(price, isUp) {
   }
 
   return this.roundPrice(newPrice);
-}
+};
 
 Trader.prototype.addOrder = function(tradeType, amount, price, callback) {
-  const setOrder = (err, data) => {
+  let setOrder = (err, data) => {
     if (err) return callback(err);
 
-    const txid = data.orderId;
+    let txid = data.orderId;
 
     callback(undefined, txid);
   };
 
-  const reqData = {
+  let reqData = {
     symbol: this.pair,
     side: tradeType.toUpperCase(),
     type: 'LIMIT',
@@ -328,51 +328,51 @@ Trader.prototype.addOrder = function(tradeType, amount, price, callback) {
     timestamp: new Date().getTime()
   };
 
-  const handler = cb => this.binance.newOrder(reqData, this.handleResponse('addOrder', cb));
+  let handler = cb => this.binance.newOrder(reqData, this.handleResponse('addOrder', cb));
   retry(undefined, handler, setOrder);
 };
 
 Trader.prototype.getOpenOrders = function(callback) {
 
-  const get = (err, data) => {
+  let get = (err, data) => {
     if(err) {
       return callback(err);
     }
 
     callback(null, data.map(o => o.orderId));
-  }
+  };
 
-  const reqData = {
+  let reqData = {
     symbol: this.pair
-  }
+  };
 
-  const handler = cb => this.binance.openOrders(reqData, this.handleResponse('getOpenOrders', cb));
+  let handler = cb => this.binance.openOrders(reqData, this.handleResponse('getOpenOrders', cb));
   retry(undefined, handler, get);
-}
+};
 
 Trader.prototype.getOrder = function(order, callback) {
-  const get = (err, data) => {
+  let get = (err, data) => {
     if (err) return callback(err);
 
     let price = 0;
     let amount = 0;
     let date = moment(0);
 
-    const fees = {};
+    let fees = {};
 
     if(!data.length) {
       return callback(new Error('Binance did not return any trades'));
     }
 
-    const trades = _.filter(data, t => {
+    let trades = _.filter(data, t => {
       // note: the API returns a string after creating
-      return t.orderId == order;
+      return t.orderId === order;
     });
 
     if(!trades.length) {
       console.log('cannot find trades!', { order, list: data.map(t => t.orderId).reverse() });
 
-      const reqData = {
+      let reqData = {
         symbol: this.pair,
         orderId: order,
       };
@@ -420,15 +420,15 @@ Trader.prototype.getOrder = function(order, callback) {
     }
 
     callback(undefined, { price, amount, date, fees, feePercent });
-  }
+  };
 
-  const reqData = {
+  let reqData = {
     symbol: this.pair,
     // if this order was not part of the last 500 trades we won't find it..
     limit: 1000,
   };
 
-  const handler = cb => this.binance.myTrades(reqData, this.handleResponse('getOrder', cb));
+  let handler = cb => this.binance.myTrades(reqData, this.handleResponse('getOrder', cb));
   retry(undefined, handler, get);
 };
 
@@ -442,7 +442,7 @@ Trader.prototype.sell = function(amount, price, callback) {
 
 Trader.prototype.checkOrder = function(order, callback) {
 
-  const check = (err, data) => {
+  let check = (err, data) => {
     if (err) {
       return callback(err);
     }
@@ -452,7 +452,7 @@ Trader.prototype.checkOrder = function(order, callback) {
       return callback(undefined, { executed: true, open: false });
     }
 
-    const status = data.status;
+    let status = data.status;
 
     if(
       status === 'CANCELED' ||
@@ -475,18 +475,18 @@ Trader.prototype.checkOrder = function(order, callback) {
     throw status;
   };
 
-  const reqData = {
+  let reqData = {
     symbol: this.pair,
     orderId: order,
   };
 
-  const fetcher = cb => this.binance.queryOrder(reqData, this.handleResponse('checkOrder', cb));
+  let fetcher = cb => this.binance.queryOrder(reqData, this.handleResponse('checkOrder', cb));
   retry(undefined, fetcher, check);
 };
 
 Trader.prototype.cancelOrder = function(order, callback) {
 
-  const cancel = (err, data) => {
+  let cancel = (err, data) => {
 
     this.oldOrder = order;
 
@@ -506,7 +506,7 @@ Trader.prototype.cancelOrder = function(order, callback) {
     orderId: order,
   };
 
-  const fetcher = cb => this.binance.cancelOrder(reqData, this.handleResponse('cancelOrder', cb));
+  let fetcher = cb => this.binance.cancelOrder(reqData, this.handleResponse('cancelOrder', cb));
   retry(undefined, fetcher, cancel);
 };
 

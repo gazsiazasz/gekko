@@ -1,16 +1,16 @@
 // helpers
-var _ = require('lodash');
-var log = require('../core/log');
+let _ = require('lodash');
+let log = require('../core/log');
 
 // configuration
-var config = require('../core/util').getConfig();
-var settings = config.varPPO;
-var momentum = settings.momentum;
-var momentumName = momentum.toLowerCase();
-var momentumSettings = config[momentum];
+let config = require('../core/util').getConfig();
+let settings = config.varPPO;
+let momentum = settings.momentum;
+let momentumName = momentum.toLowerCase();
+let momentumSettings = config[momentum];
 
 // let's create our own method
-var method = {};
+let method = {};
 
 // prepare everything our method needs
 method.init = function() {
@@ -26,37 +26,37 @@ method.init = function() {
   // define the indicators we need
   this.addIndicator('ppo', 'PPO', config.PPO);
   this.addIndicator(momentumName, momentum, momentumSettings);
-}
+};
 
 // what happens on every new candle?
 method.update = function(candle) {
   // nothing!
-}
+};
 
 // for debugging purposes log the last
 // calculated parameters.
 method.log = function(candle) {
-  var digits = 8;
-  var ppo = this.indicators.ppo.result;
-  var result = ppo.ppo;
-  var signal = ppo.PPOsignal;
-  var hist = ppo.PPOhist;
-  var momentumResult = this.indicators[momentumName][momentumName];
+  let digits = 8;
+  let ppo = this.indicators.ppo.result;
+  let result = ppo.ppo;
+  let signal = ppo.PPOsignal;
+  let hist = ppo.PPOhist;
+  let momentumResult = this.indicators[momentumName][momentumName];
 
   log.debug('\t', 'PPO:', result.toFixed(digits));
   log.debug('\t', 'PPOsignal:', signal.toFixed(digits));
   log.debug('\t', 'PPOhist:', hist.toFixed(digits));
   log.debug('\t', momentum + ':', momentumResult.toFixed(digits));
   log.debug('\t', 'price:', candle.close.toFixed(digits));
-}
+};
 
 method.check = function() {
-  var ppo = this.indicators.ppo.result;
-  var hist = ppo.PPOhist;
+  let ppo = this.indicators.ppo.result;
+  let hist = ppo.PPOhist;
 
-  var value = this.indicators[momentumName][momentumName];
+  let value = this.indicators[momentumName][momentumName];
 
-  var thresholds = {
+  let thresholds = {
     low: momentumSettings.thresholds.low + hist * settings.thresholds.weightLow,
     high: momentumSettings.thresholds.high + hist * settings.thresholds.weightHigh
   };
@@ -131,6 +131,6 @@ method.check = function() {
     this.advice();
   }
 
-}
+};
 
 module.exports = method;

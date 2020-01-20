@@ -1,19 +1,19 @@
-var Coingi = require('coingi');
-var moment = require('moment');
-var _ = require('lodash');
+let Coingi = require('coingi');
+let moment = require('moment');
+let _ = require('lodash');
 
-var util = require('../core/util');
-var Errors = require('../core/error');
-var log = require('../core/log');
+let util = require('exchange/exchangeUtils');
+let Errors = require('exchange/exchangeErrors');
+let log = require('../../core/log');
 
 
-var Trader = function (config) {
+let Trader = function (config) {
   _.bindAll(this);
 
   if (_.isObject(config)) {
     this.key = config.key;
     this.secret = config.secret;
-    this.currency = config.currency.toUpperCase()
+    this.currency = config.currency.toUpperCase();
     this.asset = config.asset.toUpperCase();
   }
 
@@ -26,23 +26,23 @@ var Trader = function (config) {
     this.secret,
     {timeout: +moment.duration(60, 'seconds')}
   );
-}
+};
 
-var retryCritical = {
+let retryCritical = {
   retries: 10,
   factor: 1.2,
-  minTimeout: 1 * 1000,
+  minTimeout: 1000,
   maxTimeout: 30 * 1000
 };
 
-var retryForever = {
+let retryForever = {
   forever: true,
   factor: 1.2,
   minTimeout: 10,
   maxTimeout: 30
 };
 
-var recoverableErrors = new RegExp(/(SOCKETTIMEDOUT|TIMEDOUT|CONNRESET|CONNREFUSED|NOTFOUND|API:Invalid nonce|Service:Unavailable|Request timed out|Response code 520|Response code 504|Response code 502)/)
+let recoverableErrors = new RegExp(/(SOCKETTIMEDOUT|TIMEDOUT|CONNRESET|CONNREFUSED|NOTFOUND|API:Invalid nonce|Service:Unavailable|Request timed out|Response code 520|Response code 504|Response code 502)/);
 
 Trader.prototype.processError = function (funcName, error) {
   if (!error)
@@ -77,11 +77,11 @@ Trader.prototype.handleResponse = function (funcName, callback) {
 /* PORTFOLIO MANAGER */
 
 Trader.prototype.getTicker = function (callback) {
-  var setTicker = function (err, data) {
+  let setTicker = function (err, data) {
     if (err)
       return callback(err);
 
-    var ticker = {
+    let ticker = {
       ask: data.asks[0].price,
       bid: data.bids[0].price
     };
@@ -89,19 +89,19 @@ Trader.prototype.getTicker = function (callback) {
   };
 
   let handler = (cb) => this.coingi.api('order-book', "/" + this.pair + "/1/1/1", this.handleResponse('getTicker', cb));
-  util.retryCustom(retryForever, _.bind(handler, this), _.bind(setTicker, this));
+  util.retry(retryForever, _.bind(handler, this), _.bind(setTicker, this));
 };
 
 
 Trader.prototype.getTrades = function (since, callback, ascending) {
-  var startTs = since ? moment(since).valueOf() : null;
+  let startTs = since ? moment(since).valueOf() : null;
 
-  var processResults = function (err, trades) {
+  let processResults = function (err, trades) {
     if (err) {
       return callback(err);
     }
 
-    var parsedTrades = [];
+    let parsedTrades = [];
     _.each(trades, function (trade) {
       // Even when you supply 'since' you can still get more trades than you asked for, it needs to be filtered
       if (_.isNull(startTs) || startTs < moment(trade.timestamp).valueOf()) {
@@ -121,24 +121,24 @@ Trader.prototype.getTrades = function (since, callback, ascending) {
       callback(undefined, parsedTrades.reverse());
   };
 
-  var optionalSince = "";
+  let optionalSince = "";
   if (since) {
     optionalSince = "/" + startTs;
   }
 
   let handler = (cb) => this.coingi.api('transactions', "/" + this.pair + "/512" + optionalSince, this.handleResponse('getTrades', cb));
-  util.retryCustom(retryForever, _.bind(handler, this), _.bind(processResults, this));
+  util.retry(retryForever, _.bind(handler, this), _.bind(processResults, this));
 };
 
 Trader.prototype.getPortfolio = function (callback) {
-  var setBalance = function (err, data) {
+  let setBalance = function (err, data) {
     if (err)
       return callback(err);
 
     log.debug('[coingi.js] entering "setBalance" callback after coingi-api call, data:', data);
 
-    const portfolio = [];
-    for (var i = 0; i < data.length; i++) {
+    let portfolio = [];
+    for (let i = 0; i < data.length; i++) {
       portfolio.push({
         name: data[i].currency.name.toUpperCase(),
         amount: data[i].available
@@ -149,23 +149,23 @@ Trader.prototype.getPortfolio = function (callback) {
   };
 
   let handler = (cb) => this.coingi.api('balance', {currencies: this.asset + "," + this.currency}, this.handleResponse('getPortfolio', cb));
-  util.retryCustom(retryForever, _.bind(handler, this), _.bind(setBalance, this));
+  util.retry(retryForever, _.bind(handler, this), _.bind(setBalance, this));
 };
 
 // Base fee is 0.2%
 Trader.prototype.getFee = function (callback) {
-  const fee = 0.2;
+  let fee = 0.2;
   callback(undefined, fee / 100);
 };
 
 Trader.prototype.addOrder = function (tradeType, amount, price, callback) {
   log.debug('[coingi.js] (add-order)', tradeType.toUpperCase(), amount, this.asset, '@', price, this.currency);
 
-  var setOrder = function (err, data) {
+  let setOrder = function (err, data) {
     if (err)
       return callback(err);
 
-    var uuid = data.result;
+    let uuid = data.result;
     log.debug('[coingi.js] (addOrder) added order with uuid:', uuid);
 
     callback(undefined, uuid);
@@ -179,19 +179,19 @@ Trader.prototype.addOrder = function (tradeType, amount, price, callback) {
   };
 
   let handler = (cb) => this.coingi.api('add-order', reqData, this.handleResponse('addOrder', cb));
-  util.retryCustom(retryCritical, _.bind(handler, this), _.bind(setOrder, this));
+  util.retry(retryCritical, _.bind(handler, this), _.bind(setOrder, this));
 };
 
 
 Trader.prototype.getOrder = function (orderId, callback) {
-  var getOrder = function (err, order) {
+  let getOrder = function (err, order) {
     if (err)
       return callback(err);
 
     if (order !== null) {
-      const price = parseFloat(order.price);
-      const amount = parseFloat(order.baseAmount);
-      const date = moment.unix(order.timestamp);
+      let price = parseFloat(order.price);
+      let amount = parseFloat(order.baseAmount);
+      let date = moment.unix(order.timestamp);
       callback(undefined, {price, amount, date});
     } else {
       log.error("Error! Order ID '" + orderId + "' couldn't be found in the result of get order!");
@@ -200,8 +200,8 @@ Trader.prototype.getOrder = function (orderId, callback) {
 
   let reqData = {ordeId: orderId};
   let handler = (cb) => this.coingi.api('get-order', reqData, this.handleResponse('getOrder', cb));
-  util.retryCustom(retryCritical, _.bind(handler, this), _.bind(getOrder, this));
-}
+  util.retry(retryCritical, _.bind(handler, this), _.bind(getOrder, this));
+};
 
 Trader.prototype.buy = function (amount, price, callback) {
   this.addOrder('buy', amount, price, callback);
@@ -212,7 +212,7 @@ Trader.prototype.sell = function (amount, price, callback) {
 };
 
 Trader.prototype.checkOrder = function (orderId, callback) {
-  var check = function (err, order) {
+  let check = function (err, order) {
     if (err)
       return callback(err);
 
@@ -225,13 +225,13 @@ Trader.prototype.checkOrder = function (orderId, callback) {
 
   let reqData = {orderId: orderId};
   let handler = (cb) => this.coingi.api('get-order', reqData, this.handleResponse('checkOrder', cb));
-  util.retryCustom(retryCritical, _.bind(handler, this), _.bind(check, this));
+  util.retry(retryCritical, _.bind(handler, this), _.bind(check, this));
 };
 
 Trader.prototype.cancelOrder = function (order, callback) {
   let reqData = {orderId: order};
   let handler = (cb) => this.coingi.api('cancel-order', reqData, this.handleResponse('cancelOrder', cb));
-  util.retryCustom(retryForever, _.bind(handler, this), callback);
+  util.retry(retryForever, _.bind(handler, this), callback);
 };
 
 Trader.getCapabilities = function () {
@@ -278,6 +278,6 @@ Trader.getCapabilities = function () {
     tid: 'date',
     tradable: true
   };
-}
+};
 
 module.exports = Trader;

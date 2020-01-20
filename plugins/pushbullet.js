@@ -29,16 +29,16 @@ config.pushbullet = {
 
  **/
 
-var pushbullet = require("pushbullet");
-var _ = require('lodash');
-const moment = require('moment');
-const request = require('request');
-var log = require('../core/log.js');
-var util = require('../core/util.js');
-var config = util.getConfig();
-var pbConf = config.pushbullet;
+let pushbullet = require("pushbullet");
+let _ = require('lodash');
+let moment = require('moment');
+let request = require('request');
+let log = require('../core/log.js');
+let util = require('../core/util.js');
+let config = util.getConfig();
+let pbConf = config.pushbullet;
 
-var Pushbullet = function(done) {
+let Pushbullet = function(done) {
   _.bindAll(this);
 
   this.pusher;
@@ -56,12 +56,12 @@ var Pushbullet = function(done) {
 
 Pushbullet.prototype.setup = function(done) {
 
-  var setupPushBullet = function(err, result) {
+  let setupPushBullet = function(err, result) {
     if (pbConf.sendMessageOnStart) {
-      var title = pbConf.tag;
-      var exchange = config.watch.exchange;
-      var currency = config.watch.currency;
-      var asset = config.watch.asset;
+      let title = pbConf.tag;
+      let exchange = config.watch.exchange;
+      let currency = config.watch.currency;
+      let asset = config.watch.asset;
       let tradeType = 'watching';
       if (config.trader.enabled) {
         tradeType = "Live Trading";
@@ -70,7 +70,7 @@ Pushbullet.prototype.setup = function(done) {
         tradeType = "Paper Trading";
       }
 
-      var body = `Gekko has started ${tradeType} ${asset}/${currency} on ${exchange}.`;
+      let body = `Gekko has started ${tradeType} ${asset}/${currency} on ${exchange}.`;
 
       //If trading Advisor is enabled, add strategy and candle size information
       if (config.tradingAdvisor.enabled) {
@@ -99,7 +99,7 @@ Pushbullet.prototype.processAdvice = function(advice) {
 
   if (pbConf.sendOnAdvice) {
 
-    var text = [
+    let text = [
       'Gekko has new advice for ',
       capF(config.watch.exchange),
       ', advice is to go ',
@@ -110,7 +110,7 @@ Pushbullet.prototype.processAdvice = function(advice) {
       this.advicePrice
     ].join('');
 
-    var subject = pbConf.tag + ' New advice: go ' + advice.recommendation;
+    let subject = pbConf.tag + ' New advice: go ' + advice.recommendation;
 
     this.mail(subject, text);
   }
@@ -121,7 +121,7 @@ Pushbullet.prototype.processTradeCompleted = function(trade) {
   //Check Starting balance is initialized - if 0, initialize it
   this.startingBalance = this.startingBalance ? this.startingBalance : trade.balance;
 
-  // If config variable doesn't exist (old config) defaults to send
+  // If config letiable doesn't exist (old config) defaults to send
   let sendOnTrade = pbConf.sendOnTrade === undefined ? 1 : pbConf.sendOnTrade;
 
   if (sendOnTrade) {
@@ -133,7 +133,7 @@ Pushbullet.prototype.processTradeCompleted = function(trade) {
     let subject = `${pbConf.tag} ${capF(trade.action)} complete`;
 
     if (trade.action === 'buy') {
-      this.hasBought = 1; // Flag to ensure that the following variables have been filled
+      this.hasBought = 1; // Flag to ensure that the following letiables have been filled
       this.lastBuyTime = trade.date;
       this.lastBuyBalance = trade.balance;
     } else if (this.hasBought) { //if sell and we have previous buy data
@@ -147,10 +147,10 @@ Pushbullet.prototype.processTradeCompleted = function(trade) {
 
 
       if (nBal >= oBal) { // profit!
-        balanceChangeStr = `\n\nRound trip profit of: \n${getNumStr(diffBal)}${config.watch.currency} \n${getNumStr(percDiffBal,2)}%\n`
+        balanceChangeStr = `\n\nRound trip profit of: \n${getNumStr(diffBal)}${config.watch.currency} \n${getNumStr(percDiffBal,2)}%\n`;
         subject = `${subject}: +${getNumStr(percDiffBal,2)}%`
       } else if (nBal < oBal) { //  Loss :(
-        balanceChangeStr = `\n\nRound trip loss of: \n-${getNumStr(diffBal)}${config.watch.currency} \n-${getNumStr(percDiffBal,2)}%\n`
+        balanceChangeStr = `\n\nRound trip loss of: \n-${getNumStr(diffBal)}${config.watch.currency} \n-${getNumStr(percDiffBal,2)}%\n`;
         subject = `${subject}: -${getNumStr(percDiffBal,2)}%`
       }
 
@@ -178,7 +178,7 @@ Pushbullet.prototype.processTradeCompleted = function(trade) {
       let timeToComplete = moment.duration(trade.date.diff(this.adviceTime)).humanize();
       orderFillTimeStr = `\nOrder fill Time: ${timeToComplete}`;
 
-      var slip;
+      let slip;
       //Slip direction is opposite for buy and sell
       if (trade.price === this.advicePrice) {
         slip = 0;
@@ -192,7 +192,7 @@ Pushbullet.prototype.processTradeCompleted = function(trade) {
 
     }
 
-    var text = [
+    let text = [
       capF(config.watch.exchange), ' ', config.watch.asset, '/', config.watch.currency,
       `\n\n${config.watch.asset} Trade Price: ${getNumStr(trade.price)}`,
       `\n${getPastTense(trade.action)} ${getNumStr(trade.amount)} ${config.watch.asset}`,
@@ -265,13 +265,12 @@ function getNumStr(num, fixed = 4) {
   }
 
   let insPos = dp - 3;
-  insCount = 0;
+  let insCount = 0;
   while (insPos > 0) {
     insCount++;
     numStr = numStr.slice(0, insPos) + ',' + numStr.slice(insPos);
     insPos -= 3;
   }
-
 
   return (numStr);
 }
@@ -291,7 +290,7 @@ function getPastTense(action) {
 }
 
 Pushbullet.prototype.mail = function(subject, content, done) {
-  var pusher = new pushbullet(pbConf.key);
+  let pusher = new pushbullet(pbConf.key);
   pusher.note(pbConf.email, subject, content, function(error, response) {
     if (error || !response) {
       log.error('Pushbullet ERROR:', error)

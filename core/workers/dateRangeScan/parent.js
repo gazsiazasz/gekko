@@ -1,13 +1,13 @@
-var ForkTask = require('relieve').tasks.ForkTask;
-var fork = require('child_process').fork;
+let ForkTask = require('relieve').tasks.ForkTask;
+let fork = require('child_process').fork;
 
 module.exports = function(config, done) {
-  var debug = typeof v8debug === 'object';
+  let debug = typeof v8debug === 'object';
   if (debug) {
     process.execArgv = [];
   }
 
-  task = new ForkTask(fork(__dirname + '/child'));
+  let task = new ForkTask(fork(__dirname + '/child'));
 
   task.send('start', config);
 
@@ -18,4 +18,4 @@ module.exports = function(config, done) {
     if(code !== 0)
       done('ERROR, unable to scan dateranges, please check the console.');
   });
-}
+};

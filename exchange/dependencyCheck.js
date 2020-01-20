@@ -1,6 +1,6 @@
-const deps = require('./package.json').dependencies;
+let deps = require('./package.json').dependencies;
 
-const missing = [];
+let missing = [];
 
 Object.keys(deps).forEach(dep => {
   try {

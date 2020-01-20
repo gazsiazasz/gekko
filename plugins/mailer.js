@@ -1,11 +1,11 @@
-var email = require("emailjs");
-var _ = require('lodash');
-var log = require('../core/log.js');
-var util = require('../core/util.js');
-var config = util.getConfig();
-var mailConfig = config.mailer;
+let email = require("emailjs");
+let _ = require('lodash');
+let log = require('../core/log.js');
+let util = require('../core/util.js');
+let config = util.getConfig();
+let mailConfig = config.mailer;
 
-var Mailer = function(done) {
+let Mailer = function(done) {
   _.bindAll(this);
 
   this.server;
@@ -16,7 +16,7 @@ var Mailer = function(done) {
 };
 
 Mailer.prototype.setup = function(done) {
-  var setupMail = function(err, result) {
+  let setupMail = function(err, result) {
     if(result) {
       console.log('Got it.');
       mailConfig.password = result.password;
@@ -63,9 +63,9 @@ Mailer.prototype.setup = function(done) {
 
   if(!mailConfig.password) {
     // ask for the mail password
-    var prompt = require('prompt-lite');
+    let prompt = require('prompt-lite');
     prompt.start();
-    var warning = [
+    let warning = [
       '\n\n\tYou configured Gekko to mail you advice, Gekko needs your email',
       'password to send emails (to you). Gekko is an opensource project',
       '[ http://github.com/askmike/gekko ], you can take my word but always',
@@ -98,9 +98,9 @@ Mailer.prototype.processCandle = function(candle, done) {
 
 Mailer.prototype.processAdvice = function(advice) {
 
-  if (advice.recommendation == "soft" && mailConfig.muteSoft) return;
+  if (advice.recommendation === "soft" && mailConfig.muteSoft) return;
 
-  var text = [
+  let text = [
     'Gekko is watching ',
     config.watch.exchange,
     ' and has detected a new trend, advice is to go ',
@@ -113,20 +113,20 @@ Mailer.prototype.processAdvice = function(advice) {
     this.price
   ].join('');
 
-  var subject = 'New advice: go ' + advice.recommendation;
+  let subject = 'New advice: go ' + advice.recommendation;
 
   this.mail(subject, text);
 };
 
 Mailer.prototype.processStratNotification = function({ content }) {
-  const subject = `New notification from ${config.tradingAdvisor.method}`;
-  const text = [
+  let subject = `New notification from ${config.tradingAdvisor.method}`;
+  let text = [
     'Gekko received new notification :\n\n',
     content
   ].join('');
 
   this.mail(subject, text);
-}
+};
 
 Mailer.prototype.checkResults = function(err) {
   if(err)

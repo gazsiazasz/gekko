@@ -1,7 +1,7 @@
-const _ = require('lodash');
-const fs = require('fs');
-const request = require('request-promise');
-const Promise = require('bluebird');
+let _ = require('lodash');
+let fs = require('fs');
+let request = require('request-promise');
+let Promise = require('bluebird');
 
 request({
   url: 'https://api.bitfinex.com/v1/symbols_details',
@@ -50,5 +50,3 @@ request({
   console.log(`Couldn't import products from Bitfinex`);
   console.log(err);
 });
-
-  

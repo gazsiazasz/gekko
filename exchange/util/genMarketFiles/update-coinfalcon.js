@@ -1,9 +1,9 @@
-const _ = require('lodash');
-const fs = require('fs');
-const request = require('request-promise');
-const Promise = require('bluebird');
+let _ = require('lodash');
+let fs = require('fs');
+let request = require('request-promise');
+let Promise = require('bluebird');
 
-const options = {
+let options = {
   url: 'https://coinfalcon.com/api/v1/markets',
   headers: {
     Connection: 'keep-alive',
@@ -21,8 +21,8 @@ request(options)
     let assets = _.uniq(_.map(body.data, market => market.name.split('-')[0]));
     let currencies = _.uniq(_.map(body.data, market => market.name.split('-')[1]));
     let pairs = _.map(body.data, market => {
-      var currency = market.name.split('-')[1];
-      var asset = market.name.split('-')[0];
+      let currency = market.name.split('-')[1];
+      let asset = market.name.split('-')[0];
       return {
         pair: [currency, asset],
         minimalOrder: {

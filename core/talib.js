@@ -1,39 +1,40 @@
-var semver = require("semver");
-var _ = require('lodash');
+let semver = require("semver");
+let _ = require('lodash');
 
 // validate that talib is installed, if not we'll throw an exception which will
 // prevent further loading or out outside this module
+let talib;
 try {
-    var talib = require("talib");
+    talib = require("talib");
 } catch (e) {
     module.exports = null;
     return;
 }
 
-var talibError = 'Gekko was unable to configure talib indicator:\n\t';
-var talibGTEv103 = semver.gte(talib.version, '1.0.3');
+let talibError = 'Gekko was unable to configure talib indicator:\n\t';
+let talibGTEv103 = semver.gte(talib.version, '1.0.3');
 
 // Wrapper that executes a talib indicator
-var execute = function(callback, params) {
+let execute = function(callback, params) {
     // talib callback style since talib-v1.0.3
-    var talibCallback = function(err, result) {
+    let talibCallback = function(err, result) {
         if(err) return callback(err);
         callback(null, result.result);
     };
 
     // talib legacy callback style before talib-v1.0.3
-    var talibLegacyCallback = function(result) {
-        var error = result.error;
+  let talibLegacyCallback = function(result) {
+    let error = result.error;
         talibCallback.apply(this, [error, result]);
     };
 
     return talib.execute(params, talibGTEv103 ? talibCallback : talibLegacyCallback);
-}
+};
 
 // Helper that makes sure all required parameters
 // for a specific talib indicator are present.
-var verifyParams = (methodName, params) => {
-    var requiredParams = methods[methodName].requires;
+let verifyParams = (methodName, params) => {
+  let requiredParams = methods[methodName].requires;
 
     _.each(requiredParams, paramName => {
         if(!_.has(params, paramName)) {
@@ -46,9 +47,9 @@ var verifyParams = (methodName, params) => {
             throw new Error(talibError + paramName + ' needs to be a number');
         }
     });
-}
+};
 
-var methods = {};
+let methods = {};
 
 
 //////////////////////////////Pattern Recognition//////////////////////////////
@@ -66,7 +67,7 @@ methods.cdl2crows = {
             close: data.close
         });
     }
-}
+};
 methods.cdl3blackcrows = {
     requires: [],
     create: (params) => {
@@ -81,7 +82,7 @@ methods.cdl3blackcrows = {
             close: data.close
         });
     }
-}
+};
 methods.cdl3inside = {
     requires: [],
     create: (params) => {
@@ -96,7 +97,7 @@ methods.cdl3inside = {
             close: data.close
         });
     }
-}
+};
 methods.cdl3linestrike = {
     requires: [],
     create: (params) => {
@@ -111,7 +112,7 @@ methods.cdl3linestrike = {
             close: data.close
         });
     }
-}
+};
 methods.cdl3outside = {
     requires: [],
     create: (params) => {
@@ -126,7 +127,7 @@ methods.cdl3outside = {
             close: data.close
         });
     }
-}
+};
 methods.cdl3starsinsouth = {
     requires: [],
     create: (params) => {
@@ -141,7 +142,7 @@ methods.cdl3starsinsouth = {
             close: data.close
         });
     }
-}
+};
 methods.cdl3whitesoldiers = {
     requires: [],
     create: (params) => {
@@ -156,7 +157,7 @@ methods.cdl3whitesoldiers = {
             close: data.close
         });
     }
-}
+};
 methods.cdlabandonedbaby = {
     requires: ['optInPenetration'],
     create: (params) => {
@@ -172,7 +173,7 @@ methods.cdlabandonedbaby = {
             optInPenetration: params.optInPenetration
         });
     }
-}
+};
 methods.cdladvanceblock = {
     requires: [],
     create: (params) => {
@@ -187,7 +188,7 @@ methods.cdladvanceblock = {
             close: data.close
         });
     }
-}
+};
 methods.cdlbelthold = {
     requires: [],
     create: (params) => {
@@ -202,7 +203,7 @@ methods.cdlbelthold = {
             close: data.close
         });
     }
-}
+};
 methods.cdlbreakaway = {
     requires: [],
     create: (params) => {
@@ -217,7 +218,7 @@ methods.cdlbreakaway = {
             close: data.close
         });
     }
-}
+};
 methods.cdlclosingmarubozu = {
     requires: [],
     create: (params) => {
@@ -232,7 +233,7 @@ methods.cdlclosingmarubozu = {
             close: data.close
         });
     }
-}
+};
 methods.cdlconcealbabyswall = {
     requires: [],
     create: (params) => {
@@ -247,7 +248,7 @@ methods.cdlconcealbabyswall = {
             close: data.close
         });
     }
-}
+};
 methods.cdlcounterattack = {
     requires: [],
     create: (params) => {
@@ -262,7 +263,7 @@ methods.cdlcounterattack = {
             close: data.close
         });
     }
-}
+};
 methods.cdldarkcloudcover = {
     requires: ['optInPenetration'],
     create: (params) => {
@@ -278,7 +279,7 @@ methods.cdldarkcloudcover = {
             optInPenetration: params.optInPenetration
         });
     }
-}
+};
 methods.cdldoji = {
     requires: [],
     create: (params) => {
@@ -293,7 +294,7 @@ methods.cdldoji = {
             close: data.close
         });
     }
-}
+};
 methods.cdldojistar = {
     requires: [],
     create: (params) => {
@@ -308,7 +309,7 @@ methods.cdldojistar = {
             close: data.close
         });
     }
-}
+};
 methods.cdldragonflydoji = {
     requires: [],
     create: (params) => {
@@ -323,7 +324,7 @@ methods.cdldragonflydoji = {
             close: data.close
         });
     }
-}
+};
 methods.cdlengulfing = {
     requires: [],
     create: (params) => {
@@ -338,7 +339,7 @@ methods.cdlengulfing = {
             close: data.close
         });
     }
-}
+};
 methods.cdleveningdojistar = {
     requires: ['optInPenetration'],
     create: (params) => {
@@ -354,7 +355,7 @@ methods.cdleveningdojistar = {
             optInPenetration: params.optInPenetration
         });
     }
-}
+};
 methods.cdleveningstar = {
     requires: ['optInPenetration'],
     create: (params) => {
@@ -370,7 +371,7 @@ methods.cdleveningstar = {
             optInPenetration: params.optInPenetration
         });
     }
-}
+};
 methods.cdlgapsidesidewhite = {
     requires: [],
     create: (params) => {
@@ -385,7 +386,7 @@ methods.cdlgapsidesidewhite = {
             close: data.close
         });
     }
-}
+};
 methods.cdlgravestonedoji = {
     requires: [],
     create: (params) => {
@@ -400,7 +401,7 @@ methods.cdlgravestonedoji = {
             close: data.close
         });
     }
-}
+};
 methods.cdlhammer = {
     requires: [],
     create: (params) => {
@@ -415,7 +416,7 @@ methods.cdlhammer = {
             close: data.close
         });
     }
-}
+};
 methods.cdlhangingman = {
     requires: [],
     create: (params) => {
@@ -430,7 +431,7 @@ methods.cdlhangingman = {
             close: data.close
         });
     }
-}
+};
 methods.cdlharami = {
     requires: [],
     create: (params) => {
@@ -445,7 +446,7 @@ methods.cdlharami = {
             close: data.close
         });
     }
-}
+};
 methods.cdlharamicross = {
     requires: [],
     create: (params) => {
@@ -460,7 +461,7 @@ methods.cdlharamicross = {
             close: data.close
         });
     }
-}
+};
 methods.cdlhighwave = {
     requires: [],
     create: (params) => {
@@ -475,7 +476,7 @@ methods.cdlhighwave = {
             close: data.close
         });
     }
-}
+};
 methods.cdlhikkake = {
     requires: [],
     create: (params) => {
@@ -490,7 +491,7 @@ methods.cdlhikkake = {
             close: data.close
         });
     }
-}
+};
 methods.cdlhikkakemod = {
     requires: [],
     create: (params) => {
@@ -505,7 +506,7 @@ methods.cdlhikkakemod = {
             close: data.close
         });
     }
-}
+};
 methods.cdlhomingpigeon = {
     requires: [],
     create: (params) => {
@@ -520,7 +521,7 @@ methods.cdlhomingpigeon = {
             close: data.close
         });
     }
-}
+};
 methods.cdlidentical3crows = {
     requires: [],
     create: (params) => {
@@ -535,7 +536,7 @@ methods.cdlidentical3crows = {
             close: data.close
         });
     }
-}
+};
 methods.cdlinneck = {
     requires: [],
     create: (params) => {
@@ -550,7 +551,7 @@ methods.cdlinneck = {
             close: data.close
         });
     }
-}
+};
 methods.cdlinvertedhammer = {
     requires: [],
     create: (params) => {
@@ -565,7 +566,7 @@ methods.cdlinvertedhammer = {
             close: data.close
         });
     }
-}
+};
 methods.cdlkicking = {
     requires: [],
     create: (params) => {
@@ -580,7 +581,7 @@ methods.cdlkicking = {
             close: data.close
         });
     }
-}
+};
 methods.cdlkickingbylength = {
     requires: [],
     create: (params) => {
@@ -595,7 +596,7 @@ methods.cdlkickingbylength = {
             close: data.close
         });
     }
-}
+};
 methods.cdlladderbottom = {
     requires: [],
     create: (params) => {
@@ -610,7 +611,7 @@ methods.cdlladderbottom = {
             close: data.close
         });
     }
-}
+};
 methods.cdllongleggeddoji = {
     requires: [],
     create: (params) => {
@@ -625,7 +626,7 @@ methods.cdllongleggeddoji = {
             close: data.close
         });
     }
-}
+};
 methods.cdllongline = {
     requires: [],
     create: (params) => {
@@ -640,7 +641,7 @@ methods.cdllongline = {
             close: data.close
         });
     }
-}
+};
 methods.cdlmarubozu = {
     requires: [],
     create: (params) => {
@@ -655,7 +656,7 @@ methods.cdlmarubozu = {
             close: data.close
         });
     }
-}
+};
 methods.cdlmatchinglow = {
     requires: [],
     create: (params) => {
@@ -670,7 +671,7 @@ methods.cdlmatchinglow = {
             close: data.close
         });
     }
-}
+};
 methods.cdlmathold = {
     requires: ['optInPenetration'],
     create: (params) => {
@@ -686,7 +687,7 @@ methods.cdlmathold = {
             optInPenetration: params.optInPenetration
         });
     }
-}
+};
 methods.cdlmorningdojistar = {
     requires: ['optInPenetration'],
     create: (params) => {
@@ -702,7 +703,7 @@ methods.cdlmorningdojistar = {
             optInPenetration: params.optInPenetration
         });
     }
-}
+};
 methods.cdlmorningstar = {
     requires: ['optInPenetration'],
     create: (params) => {
@@ -718,7 +719,7 @@ methods.cdlmorningstar = {
             optInPenetration: params.optInPenetration
         });
     }
-}
+};
 methods.cdlonneck = {
     requires: [],
     create: (params) => {
@@ -733,7 +734,7 @@ methods.cdlonneck = {
             close: data.close
         });
     }
-}
+};
 methods.cdlpiercing = {
     requires: [],
     create: (params) => {
@@ -748,7 +749,7 @@ methods.cdlpiercing = {
             close: data.close
         });
     }
-}
+};
 methods.cdlrickshawman = {
     requires: [],
     create: (params) => {
@@ -763,7 +764,7 @@ methods.cdlrickshawman = {
             close: data.close
         });
     }
-}
+};
 methods.cdlrisefall3methods = {
     requires: [],
     create: (params) => {
@@ -778,7 +779,7 @@ methods.cdlrisefall3methods = {
             close: data.close
         });
     }
-}
+};
 methods.cdlseparatinglines = {
     requires: [],
     create: (params) => {
@@ -793,7 +794,7 @@ methods.cdlseparatinglines = {
             close: data.close
         });
     }
-}
+};
 methods.cdlshootingstar = {
     requires: [],
     create: (params) => {
@@ -808,7 +809,7 @@ methods.cdlshootingstar = {
             close: data.close
         });
     }
-}
+};
 methods.cdlshortline = {
     requires: [],
     create: (params) => {
@@ -823,7 +824,7 @@ methods.cdlshortline = {
             close: data.close
         });
     }
-}
+};
 methods.cdlspinningtop = {
     requires: [],
     create: (params) => {
@@ -838,7 +839,7 @@ methods.cdlspinningtop = {
             close: data.close
         });
     }
-}
+};
 methods.cdlstalledpattern = {
     requires: [],
     create: (params) => {
@@ -853,7 +854,7 @@ methods.cdlstalledpattern = {
             close: data.close
         });
     }
-}
+};
 methods.cdlsticksandwich = {
     requires: [],
     create: (params) => {
@@ -868,7 +869,7 @@ methods.cdlsticksandwich = {
             close: data.close
         });
     }
-}
+};
 methods.cdltakuri = {
     requires: [],
     create: (params) => {
@@ -883,7 +884,7 @@ methods.cdltakuri = {
             close: data.close
         });
     }
-}
+};
 methods.cdltasukigap = {
     requires: [],
     create: (params) => {
@@ -898,7 +899,7 @@ methods.cdltasukigap = {
             close: data.close
         });
     }
-}
+};
 methods.cdlthrusting = {
     requires: [],
     create: (params) => {
@@ -913,7 +914,7 @@ methods.cdlthrusting = {
             close: data.close
         });
     }
-}
+};
 methods.cdltristar = {
     requires: [],
     create: (params) => {
@@ -928,7 +929,7 @@ methods.cdltristar = {
             close: data.close
         });
     }
-}
+};
 methods.cdlunique3river = {
     requires: [],
     create: (params) => {
@@ -943,7 +944,7 @@ methods.cdlunique3river = {
             close: data.close
         });
     }
-}
+};
 methods.cdlupsidegap2crows = {
     requires: [],
     create: (params) => {
@@ -958,7 +959,7 @@ methods.cdlupsidegap2crows = {
             close: data.close
         });
     }
-}
+};
 methods.cdlxsidegap3methods = {
     requires: [],
     create: (params) => {
@@ -973,7 +974,7 @@ methods.cdlxsidegap3methods = {
             close: data.close
         });
     }
-}
+};
 
 //////////////////////////////Pattern Recognition//////////////////////////////
 
@@ -992,7 +993,7 @@ methods.accbands = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.ad = {
     requires: ['optInTimePeriod'],
@@ -1010,7 +1011,7 @@ methods.ad = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.adosc = {
     requires: ['optInFastPeriod', 'optInSlowPeriod'],
@@ -1029,7 +1030,7 @@ methods.adosc = {
             optInSlowPeriod: params.optInSlowPeriod
         });
     }
-}
+};
 
 methods.adx = {
     requires: ['optInTimePeriod'],
@@ -1046,7 +1047,7 @@ methods.adx = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.adxr = {
     requires: ['optInTimePeriod'],
@@ -1063,7 +1064,7 @@ methods.adxr = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.apo = {
     requires: ['optInFastPeriod', 'optInSlowPeriod', 'optInMAType'],
@@ -1080,7 +1081,7 @@ methods.apo = {
             optInMAType: params.optInMAType
         });
     }
-}
+};
 
 methods.aroon = {
     requires: ['optInTimePeriod'],
@@ -1096,7 +1097,7 @@ methods.aroon = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.aroonosc = {
     requires: ['optInTimePeriod'],
@@ -1112,7 +1113,7 @@ methods.aroonosc = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.atr = {
     requires: ['optInTimePeriod'],
@@ -1129,7 +1130,7 @@ methods.atr = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.avgprice = {
     requires: ['optInTimePeriod'],
@@ -1147,7 +1148,7 @@ methods.avgprice = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.bbands = {
     requires: ['optInTimePeriod', 'optInNbDevUp', 'optInNbDevDn', 'optInMAType'],
@@ -1165,7 +1166,7 @@ methods.bbands = {
             optInMAType: params.optInMAType
         });
     }
-}
+};
 
 ///////////////////////////////////////////////////////////////
 
@@ -1196,7 +1197,7 @@ methods.bop = {
             endIdx: data.high.length - 1
         });
     }
-}
+};
 
 methods.cci = {
     requires: ['optInTimePeriod'],
@@ -1213,7 +1214,7 @@ methods.cci = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.cmo = {
     requires: ['optInTimePeriod'],
@@ -1228,7 +1229,7 @@ methods.cmo = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 // this.correl = function(data_0, data_1, period) {
 //     return talibWrapper({
@@ -1254,7 +1255,7 @@ methods.dema = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.dx = {
     requires: ['optInTimePeriod'],
@@ -1271,7 +1272,7 @@ methods.dx = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.ema = {
     requires: ['optInTimePeriod'],
@@ -1286,7 +1287,7 @@ methods.ema = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.ht_dcperiod = {
     requires: [],
@@ -1300,7 +1301,7 @@ methods.ht_dcperiod = {
             endIdx: data.close.length - 1
         });
     }
-}
+};
 
 methods.ht_dcphase = {
     requires: [],
@@ -1314,7 +1315,7 @@ methods.ht_dcphase = {
             endIdx: data.close.length - 1
         });
     }
-}
+};
 
 methods.ht_phasor = {
     requires: [],
@@ -1328,7 +1329,7 @@ methods.ht_phasor = {
             endIdx: data.close.length - 1
         });
     }
-}
+};
 
 methods.ht_sine = {
     requires: [],
@@ -1342,7 +1343,7 @@ methods.ht_sine = {
             endIdx: data.close.length - 1
         });
     }
-}
+};
 
 
 methods.ht_trendline = {
@@ -1357,7 +1358,7 @@ methods.ht_trendline = {
             endIdx: data.close.length - 1
         });
     }
-}
+};
 
 methods.ht_trendmode = {
     requires: [],
@@ -1371,7 +1372,7 @@ methods.ht_trendmode = {
             endIdx: data.close.length - 1
         });
     }
-}
+};
 
 methods.imi = {
     requires: ['optInTimePeriod'],
@@ -1387,7 +1388,7 @@ methods.imi = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.kama = {
     requires: ['optInTimePeriod'],
@@ -1402,7 +1403,7 @@ methods.kama = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.linearreg = {
     requires: ['optInTimePeriod'],
@@ -1417,7 +1418,7 @@ methods.linearreg = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.linearreg_angle = {
     requires: ['optInTimePeriod'],
@@ -1432,7 +1433,7 @@ methods.linearreg_angle = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.linearreg_intercept = {
     requires: ['optInTimePeriod'],
@@ -1447,7 +1448,7 @@ methods.linearreg_intercept = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.linearreg_slope = {
     requires: ['optInTimePeriod'],
@@ -1462,7 +1463,7 @@ methods.linearreg_slope = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.ma = {
     requires: ['optInTimePeriod', 'optInMAType'],
@@ -1478,7 +1479,7 @@ methods.ma = {
             optInMAType: params.optInMAType
         });
     }
-}
+};
 
 methods.macd = {
     requires: ['optInFastPeriod', 'optInSlowPeriod', 'optInSignalPeriod'],
@@ -1495,7 +1496,7 @@ methods.macd = {
             optInSignalPeriod: params.optInSignalPeriod
         });
     }
-}
+};
 
 methods.macdext = {
     requires: [
@@ -1522,7 +1523,7 @@ methods.macdext = {
             optInSignalMAType: params.optInSignalMAType
         });
     }
-}
+};
 
 methods.macdfix = {
     requires: ['optInSignalPeriod'],
@@ -1537,7 +1538,7 @@ methods.macdfix = {
             optInSignalPeriod: params.optInSignalPeriod
         });
     }
-}
+};
 
 methods.mama = {
     requires: ['optInFastLimit', 'optInSlowLimit'],
@@ -1553,7 +1554,7 @@ methods.mama = {
             optInSlowLimit: params.optInSlowLimit
         });
     }
-}
+};
 
 methods.mavp = {
     requires: ['inPeriods', 'optInMinPeriod', 'optInMaxPeriod', 'optInMAType'],
@@ -1571,7 +1572,7 @@ methods.mavp = {
             optInMAType: params.optInMAType
         });
     }
-}
+};
 
 
 methods.max = {
@@ -1587,7 +1588,7 @@ methods.max = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 
 methods.maxindex = {
@@ -1603,7 +1604,7 @@ methods.maxindex = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.medprice = {
     requires: ['optInTimePeriod'],
@@ -1619,7 +1620,7 @@ methods.medprice = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.mfi = {
     requires: ['optInTimePeriod'],
@@ -1637,7 +1638,7 @@ methods.mfi = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.midpoint = {
     requires: ['optInTimePeriod'],
@@ -1652,7 +1653,7 @@ methods.midpoint = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.midprice = {
     requires: ['optInTimePeriod'],
@@ -1668,7 +1669,7 @@ methods.midprice = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.min = {
     requires: ['optInTimePeriod'],
@@ -1683,7 +1684,7 @@ methods.min = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.minindex = {
     requires: ['optInTimePeriod'],
@@ -1698,7 +1699,7 @@ methods.minindex = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.minmax = {
     requires: ['optInTimePeriod'],
@@ -1713,7 +1714,7 @@ methods.minmax = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.minmaxindex = {
     requires: ['optInTimePeriod'],
@@ -1728,7 +1729,7 @@ methods.minmaxindex = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.minus_di = {
     requires: ['optInTimePeriod'],
@@ -1745,7 +1746,7 @@ methods.minus_di = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.minus_dm = {
     requires: ['optInTimePeriod'],
@@ -1761,7 +1762,7 @@ methods.minus_dm = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.mom = {
     requires: ['optInTimePeriod'],
@@ -1776,7 +1777,7 @@ methods.mom = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.natr = {
     requires: ['optInTimePeriod'],
@@ -1793,7 +1794,7 @@ methods.natr = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.obv = {
     requires: [],
@@ -1808,7 +1809,7 @@ methods.obv = {
             endIdx: data.close.length - 1
         });
     }
-}
+};
 
 methods.plus_di = {
     requires: ['optInTimePeriod'],
@@ -1825,7 +1826,7 @@ methods.plus_di = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.plus_dm = {
     requires: ['optInTimePeriod'],
@@ -1841,7 +1842,7 @@ methods.plus_dm = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.ppo = {
     requires: ['optInFastPeriod', 'optInSlowPeriod', 'optInMAType'],
@@ -1858,7 +1859,7 @@ methods.ppo = {
             optInMAType: params.optInMAType
         });
     }
-}
+};
 
 methods.roc = {
     requires: ['optInTimePeriod'],
@@ -1873,7 +1874,7 @@ methods.roc = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.rocp = {
     requires: ['optInTimePeriod'],
@@ -1888,7 +1889,7 @@ methods.rocp = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.rocr = {
     requires: ['optInTimePeriod'],
@@ -1903,7 +1904,7 @@ methods.rocr = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.rocr100 = {
     requires: ['optInTimePeriod'],
@@ -1918,7 +1919,7 @@ methods.rocr100 = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.rsi = {
     requires: ['optInTimePeriod'],
@@ -1933,7 +1934,7 @@ methods.rsi = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.sar = {
     requires: ['optInAcceleration', 'optInMaximum'],
@@ -1950,7 +1951,7 @@ methods.sar = {
             optInMaximum: params.optInMaximum
         });
     }
-}
+};
 
 methods.sarext = {
     requires: [
@@ -1984,7 +1985,7 @@ methods.sarext = {
             optInAccelerationMaxShort: params.optInAccelerationMaxShort
         });
     }
-}
+};
 
 methods.sma = {
     requires: ['optInTimePeriod'],
@@ -1999,7 +2000,7 @@ methods.sma = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.stddev = {
     requires: ['optInTimePeriod', 'optInNbDev'],
@@ -2015,7 +2016,7 @@ methods.stddev = {
             optInNbDev: params.optInNbDev
         });
     }
-}
+};
 
 methods.stoch = {
     requires: [
@@ -2043,7 +2044,7 @@ methods.stoch = {
             optInSlowD_MAType: params.optInSlowD_MAType
         });
     }
-}
+};
 
 
 methods.stochf = {
@@ -2068,7 +2069,7 @@ methods.stochf = {
             optInFastD_MAType: params.optInFastD_MAType
         });
     }
-}
+};
 
 methods.stochrsi = {
     requires: [
@@ -2092,7 +2093,7 @@ methods.stochrsi = {
             optInFastD_MAType: params.optInFastD_MAType
         });
     }
-}
+};
 
 methods.t3 = {
     requires: [
@@ -2113,7 +2114,7 @@ methods.t3 = {
             optInVFactor: params.optInVFactor
         });
     }
-}
+};
 
 methods.tema = {
     requires: ['optInTimePeriod'],
@@ -2128,7 +2129,7 @@ methods.tema = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.trange = {
     requires: ['optInTimePeriod'],
@@ -2145,7 +2146,7 @@ methods.trange = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.trima = {
     requires: ['optInTimePeriod'],
@@ -2160,7 +2161,7 @@ methods.trima = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.trix = {
     requires: ['optInTimePeriod'],
@@ -2175,7 +2176,7 @@ methods.trix = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.tsf = {
     requires: ['optInTimePeriod'],
@@ -2190,7 +2191,7 @@ methods.tsf = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.typprice = {
     requires: ['optInTimePeriod'],
@@ -2207,7 +2208,7 @@ methods.typprice = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.ultosc = {
     requires: ['optInTimePeriod1', 'optInTimePeriod2', 'optInTimePeriod3'],
@@ -2226,7 +2227,7 @@ methods.ultosc = {
             optInTimePeriod3: params.optInTimePeriod3
         });
     }
-}
+};
 
 methods.variance = {
     requires: ['optInTimePeriod', 'optInNbDev'],
@@ -2242,7 +2243,7 @@ methods.variance = {
             optInNbDev: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.wclprice = {
     requires: ['optInTimePeriod'],
@@ -2259,7 +2260,7 @@ methods.wclprice = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.willr = {
     requires: ['optInTimePeriod'],
@@ -2276,7 +2277,7 @@ methods.willr = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 methods.wma = {
     requires: ['optInTimePeriod'],
@@ -2291,7 +2292,7 @@ methods.wma = {
             optInTimePeriod: params.optInTimePeriod
         });
     }
-}
+};
 
 module.exports = methods;
 

@@ -1,24 +1,24 @@
-const config = require('./vue/dist/UIconfig');
+let config = require('./vue/dist/UIconfig');
 
-const koa = require('koa');
-const serve = require('koa-static');
-const cors = require('koa-cors');
-const _ = require('lodash');
-const bodyParser = require('koa-bodyparser');
+let koa = require('koa');
+let serve = require('koa-static');
+let cors = require('koa-cors');
+let _ = require('lodash');
+let bodyParser = require('koa-bodyparser');
 
-const opn = require('opn');
-const server = require('http').createServer();
-const router = require('koa-router')();
-const ws = require('ws');
-const app = koa();
+let opn = require('opn');
+let server = require('http').createServer();
+let router = require('koa-router')();
+let ws = require('ws');
+let app = koa();
 
-const WebSocketServer = require('ws').Server;
-const wss = new WebSocketServer({ server: server });
+let WebSocketServer = require('ws').Server;
+let wss = new WebSocketServer({ server: server });
 
-const cache = require('./state/cache');
+let cache = require('./state/cache');
 
-const nodeCommand = _.last(process.argv[1].split('/'));
-const isDevServer = nodeCommand === 'server' || nodeCommand === 'server.js';
+let nodeCommand = _.last(process.argv[1].split('/'));
+let isDevServer = nodeCommand === 'server' || nodeCommand === 'server.js';
 
 wss.on('connection', ws => {
   ws.isAlive = true;
@@ -45,12 +45,12 @@ setInterval(() => {
 }, 10 * 1000);
 
 // broadcast function
-const broadcast = data => {
+let broadcast = data => {
   if(_.isEmpty(data)) {
     return;
   }
 
-  const payload = JSON.stringify(data);
+  let payload = JSON.stringify(data);
 
   wss.clients.forEach(ws => {
     ws.send(payload, err => {
@@ -60,12 +60,12 @@ const broadcast = data => {
     });
   }
   );
-}
+};
 cache.set('broadcast', broadcast);
 
 
-const ListManager = require('./state/listManager');
-const GekkoManager = require('./state/gekkoManager');
+let ListManager = require('./state/listManager');
+let GekkoManager = require('./state/gekkoManager');
 
 // initialize lists and dump into cache
 cache.set('imports', new ListManager);
@@ -74,17 +74,17 @@ cache.set('apiKeyManager', require('./apiKeyManager'));
 
 // setup API routes
 
-const WEBROOT = __dirname + '/';
-const ROUTE = n => WEBROOT + 'routes/' + n;
+let WEBROOT = __dirname + '/';
+let ROUTE = n => WEBROOT + 'routes/' + n;
 
 // attach routes
-const apiKeys = require(ROUTE('apiKeys'));
+let apiKeys = require(ROUTE('apiKeys'));
 router.get('/api/info', require(ROUTE('info')));
 router.get('/api/strategies', require(ROUTE('strategies')));
 router.get('/api/configPart/:part', require(ROUTE('configPart')));
 router.get('/api/apiKeys', apiKeys.get);
 
-const listWraper = require(ROUTE('list'));
+let listWraper = require(ROUTE('list'));
 router.get('/api/imports', listWraper('imports'));
 router.get('/api/gekkos', listWraper('gekkos'));
 router.get('/api/exchanges', require(ROUTE('exchanges')));
@@ -117,13 +117,9 @@ app
 server.timeout = config.api.timeout || 120000;
 server.on('request', app.callback());
 server.listen(config.api.port, config.api.host, '::', () => {
-  const host = `${config.ui.host}:${config.ui.port}${config.ui.path}`;
+  let host = `${config.ui.host}:${config.ui.port}${config.ui.path}`;
 
-  if(config.ui.ssl) {
-    var location = `https://${host}`;
-  } else {
-    var location = `http://${host}`;
-  }
+  let location = (config.ui.ssl) ? `https://${host}` : `http://${host}`;
 
   console.log('Serving Gekko UI on ' + location +  '\n');
 

@@ -1,11 +1,11 @@
-const WebClient = require('@slack/client').WebClient;
-const _ = require('lodash');
-const log = require('../core/log.js');
-const util = require('../core/util.js');
-const config = util.getConfig();
-const slackConfig = config.slack;
+let WebClient = require('@slack/client').WebClient;
+let _ = require('lodash');
+let log = require('../core/log.js');
+let util = require('../core/util.js');
+let config = util.getConfig();
+let slackConfig = config.slack;
 
-const Slack = function(done) {
+let Slack = function(done) {
     _.bindAll(this);
 
     this.slack;
@@ -18,9 +18,9 @@ const Slack = function(done) {
 Slack.prototype.setup = function(done) {
     this.slack = new WebClient(slackConfig.token);
 
-    const setupSlack = function(error, result) {
+    let setupSlack = function(error, result) {
         if(slackConfig.sendMessageOnStart){
-          const body = this.createResponse("#439FE0","Gekko started!") ;
+          let body = this.createResponse("#439FE0","Gekko started!") ;
           this.send(body);
         }else{
             log.debug('Skipping Send message on startup')
@@ -36,18 +36,18 @@ Slack.prototype.processCandle = function(candle, done) {
 };
 
 Slack.prototype.processAdvice = function(advice) {
-	if (advice.recommendation == 'soft' && slackConfig.muteSoft) return;
+	if (advice.recommendation === 'soft' && slackConfig.muteSoft) return;
 
-	const color = advice.recommendation === "long" ? "good" : (advice.recommendation === "short" ? "danger" : "warning");
-  const body = this.createResponse(color, "There is a new trend! The advice is to go `" + advice.recommendation + "`! Current price is `" + this.price + "`");
+	let color = advice.recommendation === "long" ? "good" : (advice.recommendation === "short" ? "danger" : "warning");
+  let body = this.createResponse(color, "There is a new trend! The advice is to go `" + advice.recommendation + "`! Current price is `" + this.price + "`");
 
   this.send(body);
 };
 
 Slack.prototype.processStratNotification = function({ content }) {
-  const body = this.createResponse('#909399', content);
+  let body = this.createResponse('#909399', content);
   this.send(body);
-}
+};
 
 Slack.prototype.send = function(content, done) {
     this.slack.chat.postMessage(slackConfig.channel, "", content, (error, response) => {
@@ -68,7 +68,7 @@ Slack.prototype.checkResults = function(error) {
 };
 
 Slack.prototype.createResponse = function(color, message) {
-  const template = {
+  return {
     "username": this.createUserName(),
     "icon_url": this.createIconUrl(),
     "attachments": [
@@ -80,8 +80,6 @@ Slack.prototype.createResponse = function(color, message) {
       }
     ]
   };
-
-  return template;
 };
 
 Slack.prototype.createUserName = function() {
@@ -89,7 +87,7 @@ Slack.prototype.createUserName = function() {
 };
 
 Slack.prototype.createIconUrl = function() {
-  const asset = config.watch.asset === "XBT" ? "btc" :config.watch.asset.toLowerCase();
+  let asset = config.watch.asset === "XBT" ? "btc" :config.watch.asset.toLowerCase();
   return "https://github.com/cjdowner/cryptocurrency-icons/raw/master/128/icon/" + asset + ".png";
 };
 

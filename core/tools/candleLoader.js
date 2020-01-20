@@ -1,28 +1,28 @@
 // TODO: properly handle a daterange for which no data is available.
 
-const batchSize = 1000;
+let batchSize = 1000;
 
-const _ = require('lodash');
-const fs = require('fs');
-const moment = require('moment');
+let _ = require('lodash');
+let fs = require('fs');
+let moment = require('moment');
 
-const util = require('../../core/util');
-const config = util.getConfig();
-const dirs = util.dirs();
-const log = require(dirs.core + '/log');
+let util = require('../../core/util');
+let config = util.getConfig();
+let dirs = util.dirs();
+let log = require(dirs.core + '/log');
 
-const adapter = config[config.adapter];
-const Reader = require(dirs.gekko + adapter.path + '/reader');
-const daterange = config.daterange;
+let adapter = config[config.adapter];
+let Reader = require(dirs.gekko + adapter.path + '/reader');
+let daterange = config.daterange;
 
-const CandleBatcher = require(dirs.core + 'candleBatcher');
+let CandleBatcher = require(dirs.core + 'candleBatcher');
 
-const to = moment.utc(daterange.to).startOf('minute');
-const from = moment.utc(daterange.from).startOf('minute');
-const toUnix = to.unix();
+let to = moment.utc(daterange.to).startOf('minute');
+let from = moment.utc(daterange.from).startOf('minute');
+let toUnix = to.unix();
 
 if(to <= from)
-  util.die('This daterange does not make sense.')
+  util.die('This daterange does not make sense.');
 
 if(!from.isValid())
   util.die('invalid `from`');
@@ -33,15 +33,15 @@ if(!to.isValid())
 let iterator = {
   from: from.clone(),
   to: from.clone().add(batchSize, 'm').subtract(1, 's')
-}
+};
 
-var DONE = false;
+let DONE = false;
 
-var result = [];
-var reader = new Reader();
-var batcher;
-var next;
-var doneFn = () => {
+let result = [];
+let reader = new Reader();
+let batcher;
+let next;
+let doneFn = () => {
   process.nextTick(() => {
     next(result);
   })
@@ -54,25 +54,25 @@ module.exports = function(candleSize, _next) {
     .on('candle', handleBatchedCandles);
 
   getBatch();
-}
+};
 
-const getBatch = () => {
+let getBatch = () => {
   reader.get(
     iterator.from.unix(),
     iterator.to.unix(),
     'full',
     handleCandles
   )
-}
+};
 
-const shiftIterator = () => {
+let shiftIterator = () => {
   iterator = {
     from: iterator.from.clone().add(batchSize, 'm'),
     to: iterator.from.clone().add(batchSize * 2, 'm').subtract(1, 's')
   }
-}
+};
 
-const handleCandles = (err, data) => {
+let handleCandles = (err, data) => {
   if(err) {
     console.error(err);
     util.die('Encountered an error..')
@@ -93,8 +93,8 @@ const handleCandles = (err, data) => {
     shiftIterator();
     getBatch();
   }
-}
+};
 
-const handleBatchedCandles = candle => {
+let handleBatchedCandles = candle => {
   result.push(candle);
-}
+};

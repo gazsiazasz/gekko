@@ -1,17 +1,17 @@
-var _ = require('lodash');
-var async = require('async');
-var Emitter = require('./emitter');
+let _ = require('lodash');
+let async = require('async');
+let Emitter = require('./emitter');
 
-var util = require(__dirname + '/util');
+let util = require(__dirname + '/util');
 
-var log = require(util.dirs().core + 'log');
+let log = require(util.dirs().core + 'log');
 
-var config = util.getConfig();
-var pluginDir = util.dirs().plugins;
-var gekkoMode = util.gekkoMode();
-var inherits = require('util').inherits;
+let config = util.getConfig();
+let pluginDir = util.dirs().plugins;
+let gekkoMode = util.gekkoMode();
+let inherits = require('util').inherits;
 
-var pluginHelper = {
+let pluginHelper = {
   // Checks whether we can load a module
 
   // @param Object plugin
@@ -21,13 +21,15 @@ var pluginHelper = {
   //    use the module.
   cannotLoad: function(plugin) {
 
-    // verify plugin dependencies are installed
-    if(_.has(plugin, 'dependencies'))
-      var error = false;
+    let error;
+// verify plugin dependencies are installed
+    if(_.has(plugin, 'dependencies')) {
+        error = false;
+      }
 
       _.each(plugin.dependencies, function(dep) {
         try {
-          var a = require(dep.module);
+          let _ = require(dep.module);
         }
         catch(e) {
           log.error('ERROR LOADING DEPENDENCY', dep.module);
@@ -57,7 +59,7 @@ var pluginHelper = {
     return error;
   },
   // loads a plugin
-  // 
+  //
   // @param Object plugin
   //    plugin config object
   // @param Function next
@@ -76,7 +78,7 @@ var pluginHelper = {
         'does not support the mode',
         gekkoMode + '.',
         'It has been disabled.'
-      )
+      );
       return next();
     }
 
@@ -84,18 +86,15 @@ var pluginHelper = {
     log.info('\t', plugin.name);
     log.info('\t', plugin.description);
 
-    var cannotLoad = pluginHelper.cannotLoad(plugin);
+    let cannotLoad = pluginHelper.cannotLoad(plugin);
     if(cannotLoad)
       return next(cannotLoad);
 
-    if(plugin.path)
-      var Constructor = require(pluginDir + plugin.path(config));
-    else
-      var Constructor = require(pluginDir + plugin.slug);
+    let Constructor = require(pluginDir + ((plugin.path) ? plugin.path(config) : plugin.slug));
 
     if(plugin.async) {
       inherits(Constructor, Emitter);
-      var instance = new Constructor(util.defer(function(err) {
+      let instance = new Constructor(util.defer(function(err) {
         next(err, instance);
       }), plugin);
       Emitter.call(instance);
@@ -103,18 +102,18 @@ var pluginHelper = {
       instance.meta = plugin;
     } else {
       inherits(Constructor, Emitter);
-      var instance = new Constructor(plugin);
+      let instance = new Constructor(plugin);
       Emitter.call(instance);
 
       instance.meta = plugin;
       _.defer(function() {
-        next(null, instance); 
+        next(null, instance);
       });
     }
 
     if(!plugin.silent)
       log.info('\n');
   }
-}
+};
 
 module.exports = pluginHelper;

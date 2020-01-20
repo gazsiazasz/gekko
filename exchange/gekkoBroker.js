@@ -5,19 +5,19 @@
   - the management of actual trades to "orders".
 */
 
-const _ = require('lodash');
-const async = require('async');
-const events = require('events');
-const moment = require('moment');
-const checker = require('./exchangeChecker');
-const errors = require('./exchangeErrors');
-const Portfolio = require('./portfolioManager');
-// const Market = require('./market');
-const orders = require('./orders');
-const Trigger = require('./trigger');
-const exchangeUtils = require('./exchangeUtils');
-const bindAll = exchangeUtils.bindAll;
-const isValidOrder = exchangeUtils.isValidOrder;
+let _ = require('lodash');
+let async = require('async');
+let events = require('events');
+let moment = require('moment');
+let checker = require('./exchangeChecker');
+let errors = require('./exchangeErrors');
+let Portfolio = require('./portfolioManager');
+// let Market = require('./market');
+let orders = require('./orders');
+let Trigger = require('./trigger');
+let exchangeUtils = require('./exchangeUtils');
+let bindAll = exchangeUtils.bindAll;
+let isValidOrder = exchangeUtils.isValidOrder;
 
 
 
@@ -40,11 +40,11 @@ class Broker {
       open: [],
       // contains all closed orders
       closed: []
-    }
+    };
 
-    const slug = config.exchange.toLowerCase();
+    let slug = config.exchange.toLowerCase();
 
-    const API = require('./wrappers/' + slug);
+    let API = require('./wrappers/' + slug);
 
     this.api = new API(config);
 
@@ -143,7 +143,7 @@ class Broker {
     if(!orders[type])
       throw new Error('Unknown order type');
 
-    const order = new orders[type]({
+    let order = new orders[type]({
       api: this.api,
       marketConfig: this.marketConfig,
       capabilities: this.capabilities

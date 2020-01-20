@@ -1,18 +1,18 @@
-var fork = require('child_process').fork;
+let fork = require('child_process').fork;
 
 module.exports = (mode, config, callback) => {
-  var debug = typeof v8debug === 'object';
+  let debug = typeof v8debug === 'object';
   if (debug) {
     process.execArgv = [];
   }
 
-  var child = fork(__dirname + '/child');
+  let child = fork(__dirname + '/child');
 
   // How we should handle client messages depends
   // on the mode of the Pipeline that is being ran.
-  var handle = require('./messageHandlers/' + mode + 'Handler')(callback);
+  let handle = require('./messageHandlers/' + mode + 'Handler')(callback);
 
-  var message = {
+  let message = {
     what: 'start',
     mode: mode,
     config: config
@@ -31,4 +31,4 @@ module.exports = (mode, config, callback) => {
   child.on('exit', handle.exit);
 
   return child;
-}
+};

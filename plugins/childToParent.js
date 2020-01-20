@@ -1,12 +1,12 @@
 // Small plugin that subscribes to some events, stores
 // them and sends it to the parent process.
 
-const log = require('../core/log');
-const _ = require('lodash');
-const subscriptions = require('../subscriptions');
-const config = require('../core/util').getConfig();
+let log = require('../core/log');
+let _ = require('lodash');
+let subscriptions = require('../subscriptions');
+let config = require('../core/util').getConfig();
 
-const ChildToParent = function() {
+let ChildToParent = function() {
 
   subscriptions
     // .filter(sub => config.childToParent.events.includes(sub.event))
@@ -19,6 +19,6 @@ const ChildToParent = function() {
       }
     }, this);
 
-}
+};
 
 module.exports = ChildToParent;

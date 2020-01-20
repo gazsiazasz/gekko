@@ -1,6 +1,6 @@
-var UIconfig = require('../vue/dist/UIconfig');
+let UIconfig = require('../vue/dist/UIconfig');
 
-var config = {};
+let config = {};
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //                          GENERAL SETTINGS
@@ -14,11 +14,11 @@ config.debug = true;
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 config.tradingAdvisor = {
-}
+};
 
 config.candleWriter = {
   enabled: false
-}
+};
 
 config.backtestResultExporter = {
   enabled: false,
@@ -29,11 +29,11 @@ config.backtestResultExporter = {
     stratCandles: true,
     trades: true
   }
-}
+};
 
 config.childToParent = {
   enabled: false,
-}
+};
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //                       CONFIGURING ADAPTER
@@ -51,7 +51,7 @@ config.sqlite = {
     module: 'sqlite3',
     version: '3.1.4'
   }]
-}
+};
 
   // Postgres adapter example config (please note: requires postgres >= 9.5):
 config.postgresql = {
@@ -64,7 +64,7 @@ config.postgresql = {
     module: 'pg',
     version: '7.4.3'
   }]
-}
+};
 
 // Mongodb adapter, requires mongodb >= 3.3 (no version earlier tested)
 config.mongodb = {
@@ -75,12 +75,12 @@ config.mongodb = {
     module: 'mongojs',
     version: '2.4.0'
   }]
-}
+};
 
 config.adviceWriter = {
   enabled: false,
   muteSoft: true,
-}
+};
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //                       CONFIGURING BACKTESTING
@@ -92,13 +92,13 @@ config.adviceWriter = {
 config.backtest = {
   daterange: 'scan',
   batchSize: 50
-}
+};
 
 config.importer = {
   daterange: {
     // NOTE: these dates are in UTC
     from: "2016-06-01 12:00:00"
   }
-}
+};
 
 module.exports = config;

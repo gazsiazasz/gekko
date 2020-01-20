@@ -6,18 +6,18 @@
 
 */
 
-var moment = require('moment');
-var fmt = require('util').format;
-var _ = require('lodash');
-var util = require('./util');
-var config = util.getConfig();
-var debug = config.debug;
-var silent = config.silent;
+let moment = require('moment');
+let fmt = require('util').format;
+let _ = require('lodash');
+let util = require('./util');
+let config = util.getConfig();
+let debug = config.debug;
+let silent = config.silent;
 
-var sendToParent = function() {
-  var send = method => (...args) => {
+let sendToParent = function() {
+  let send = method => (...args) => {
     process.send({log: method, message: args.join(' ')});
-  }
+  };
 
   return {
     error: send('error'),
@@ -25,9 +25,9 @@ var sendToParent = function() {
     info: send('info'),
     write: send('write')
   }
-}
+};
 
-var Log = function() {
+let Log = function() {
   _.bindAll(this);
   this.env = util.gekkoEnv();
 
@@ -42,7 +42,7 @@ Log.prototype = {
     if(!name)
       name = method.toUpperCase();
 
-    var message = moment().format('YYYY-MM-DD HH:mm:ss');
+    let message = moment().format('YYYY-MM-DD HH:mm:ss');
     message += ' (' + name + '):\t';
     message += fmt.apply(null, args);
 
@@ -58,16 +58,16 @@ Log.prototype = {
     this._write('info', arguments);
   },
   write: function() {
-    var args = _.toArray(arguments);
-    var message = fmt.apply(null, args);
+    let args = _.toArray(arguments);
+    let message = fmt.apply(null, args);
     this.output.info(message);
   }
-}
+};
 
 if(debug)
   Log.prototype.debug = function() {
-    this._write('info', arguments, 'DEBUG');  
-  }
+    this._write('info', arguments, 'DEBUG');
+  };
 else
   Log.prototype.debug = _.noop;
 

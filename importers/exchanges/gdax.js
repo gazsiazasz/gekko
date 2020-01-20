@@ -1,24 +1,24 @@
-const util = require('../../core/util.js');
-const _ = require('lodash');
-const moment = require('moment');
-const log = require('../../core/log');
+let util = require('../../core/util.js');
+let _ = require('lodash');
+let moment = require('moment');
+let log = require('../../core/log');
 
-const config = util.getConfig();
+let config = util.getConfig();
 
-const dirs = util.dirs();
+let dirs = util.dirs();
 
-const QUERY_DELAY = 350;
-const BATCH_SIZE = 100;
-const SCAN_ITER_SIZE = 50000;
-const BATCH_ITER_SIZE = BATCH_SIZE * 10;
+let QUERY_DELAY = 350;
+let BATCH_SIZE = 100;
+let SCAN_ITER_SIZE = 50000;
+let BATCH_ITER_SIZE = BATCH_SIZE * 10;
 
-const Fetcher = require(dirs.exchanges + 'gdax');
-const retry = require(dirs.exchanges + '../exchangeUtils').retry;
+let Fetcher = require(dirs.exchanges + 'gdax');
+let retry = require(dirs.exchanges + '../exchangeUtils').retry;
 
 Fetcher.prototype.getTrades = function(sinceTid, callback) {
   let lastScan = 0;
 
-  const handle = (err, data) => {
+  let handle = (err, data) => {
     if (err) return callback(err);
 
     let result = _.map(data, function(trade) {
@@ -33,7 +33,7 @@ Fetcher.prototype.getTrades = function(sinceTid, callback) {
     callback(null, result.reverse());
   };
 
-  const fetch = cb => this.gdax_public.getProductTrades(this.pair, { after: sinceTid, limit: BATCH_SIZE }, this.processResponse('getTrades', cb));
+  let fetch = cb => this.gdax_public.getProductTrades(this.pair, { after: sinceTid, limit: BATCH_SIZE }, this.processResponse('getTrades', cb));
   retry(null, fetch, handle);
 };
 
@@ -43,7 +43,7 @@ Fetcher.prototype.findFirstTrade = function(sinceTs, callback) {
 
   log.info(`Scanning for the first trade ID to start batching requests, may take a few minutes ...`);
 
-  const handle = (err, data) => {
+  let handle = (err, data) => {
     if (err) return callback(err);
 
     let m = moment.utc(_.first(data).time);
@@ -64,14 +64,14 @@ Fetcher.prototype.findFirstTrade = function(sinceTs, callback) {
     }
 
     setTimeout(() => {
-      const fetch = cb => this.gdax_public.getProductTrades(this.pair, { after: nextScanId, limit: 1 }, this.processResponse('getTrades', cb));
+      let fetch = cb => this.gdax_public.getProductTrades(this.pair, { after: nextScanId, limit: 1 }, this.processResponse('getTrades', cb));
       retry(null, fetch, handle);
     }, QUERY_DELAY);
-  }
+  };
 
-  const fetch = cb => this.gdax_public.getProductTrades(this.pair, { limit: 1 }, this.processResponse('getTrades', cb));
+  let fetch = cb => this.gdax_public.getProductTrades(this.pair, { limit: 1 }, this.processResponse('getTrades', cb));
   retry(null, fetch, handle);
-}
+};
 
 util.makeEventEmitter(Fetcher);
 
@@ -112,10 +112,10 @@ let fetch = () => {
 
       batchId = firstBatchId;
       fetcher.getTrades(batchId + 1, handleFetch);
-    }
+    };
     fetcher.findFirstTrade(from.valueOf(), process);
   }
-}
+};
 
 let handleFetch = (err, trades) => {
   if (err) {
@@ -128,7 +128,7 @@ let handleFetch = (err, trades) => {
     batch = trades.concat(batch);
 
     let last = moment.unix(_.first(trades).date).utc();
-    lastId = _.first(trades).tid
+    lastId = _.first(trades).tid;
 
     let latestTrade = _.last(trades);
     if (!latestId || latestTrade.tid > latestId) {
@@ -154,7 +154,7 @@ let handleFetch = (err, trades) => {
 
   fetcher.emit('trades', batch);
   batch = [];
-}
+};
 
 module.exports = function (daterange) {
 
@@ -165,4 +165,4 @@ module.exports = function (daterange) {
     bus: fetcher,
     fetch: fetch
   }
-}
+};

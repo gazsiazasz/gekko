@@ -1,7 +1,7 @@
 // required indicators
-var SMA = require('./SMA.js');
+let SMA = require('./SMA.js');
 
-var Indicator = function(settings) {
+let Indicator = function(settings) {
   this.input = 'candle';
   this.lastClose = 0;
   this.uo = 0;
@@ -14,16 +14,16 @@ var Indicator = function(settings) {
   this.secondHigh = new SMA(settings.second.period);
   this.thirdLow = new SMA(settings.third.period);
   this.thirdHigh = new SMA(settings.third.period);
-}
+};
 
 Indicator.prototype.update = function(candle) {
-  var close = candle.close;
-  var prevClose = this.lastClose;
-  var low = candle.low;
-  var high = candle.high;
+  let close = candle.close;
+  let prevClose = this.lastClose;
+  let low = candle.low;
+  let high = candle.high;
 
-  var bp = close - Math.min(low, prevClose);
-  var tr = Math.max(high, prevClose) - Math.min(low, prevClose);
+  let bp = close - Math.min(low, prevClose);
+  let tr = Math.max(high, prevClose) - Math.min(low, prevClose);
 
   this.firstLow.update(tr);
   this.secondLow.update(tr);
@@ -33,13 +33,13 @@ Indicator.prototype.update = function(candle) {
   this.secondHigh.update(bp);
   this.thirdHigh.update(bp);
 
-  var first = this.firstHigh.result / this.firstLow.result;
-  var second = this.secondHigh.result / this.secondLow.result;
-  var third = this.thirdHigh.result / this.thirdLow.result;
+  let first = this.firstHigh.result / this.firstLow.result;
+  let second = this.secondHigh.result / this.secondLow.result;
+  let third = this.thirdHigh.result / this.thirdLow.result;
 
   this.uo = 100 * (this.firstWeight * first + this.secondWeight * second + this.thirdWeight * third) / (this.firstWeight + this.secondWeight + this.thirdWeight);
 
   this.lastClose = close;
-}
+};
 
 module.exports = Indicator;

@@ -1,17 +1,17 @@
-var log = require('../core/log');
-var moment = require('moment');
-var _ = require('lodash');
-var config = require('../core/util').getConfig();
-var ircbot = config.ircbot;
-var utc = moment.utc;
+let log = require('../core/log');
+let moment = require('moment');
+let _ = require('lodash');
+let config = require('../core/util').getConfig();
+let ircbot = config.ircbot;
+let utc = moment.utc;
 
-var irc = require("irc");
+let irc = require("irc");
 
-var Actor = function() {
+let Actor = function() {
   _.bindAll(this);
 
   this.bot = new irc.Client(ircbot.server, ircbot.botName, {
-    channels: [ ircbot.channel ] 
+    channels: [ ircbot.channel ]
   });
 
   this.bot.addListener("message", this.verifyQuestion);
@@ -32,7 +32,7 @@ var Actor = function() {
   };
 
   this.rawCommands = _.keys(this.commands);
-}
+};
 
 Actor.prototype.processCandle = function(candle, done) {
   this.price = candle.close;
@@ -42,7 +42,7 @@ Actor.prototype.processCandle = function(candle, done) {
 };
 
 Actor.prototype.processAdvice = function(advice) {
-  if (advice.recommendation == "soft" && ircbot.muteSoft) return;
+  if (advice.recommendation === "soft" && ircbot.muteSoft) return;
   this.advice = advice.recommendation;
   this.adviceTime = utc();
 
@@ -53,16 +53,16 @@ Actor.prototype.processAdvice = function(advice) {
 Actor.prototype.verifyQuestion = function(from, to, text, message) {
   if(text in this.commands)
     this[this.commands[text]]();
-}
+};
 
 Actor.prototype.newAdvice = function() {
   this.bot.say(ircbot.channel, 'Guys! Important news!');
   this.emitAdvice();
-}
+};
 
 // sent advice over to the IRC channel
 Actor.prototype.emitAdvice = function() {
-  var message = [
+  let message = [
     'Advice for ',
     config.watch.exchange,
     ' ',
@@ -88,7 +88,7 @@ Actor.prototype.emitAdvice = function() {
 // sent price over to the IRC channel
 Actor.prototype.emitPrice = function() {
 
-  var message = [
+  let message = [
     'Current price at ',
     config.watch.exchange,
     ' ',
@@ -109,14 +109,14 @@ Actor.prototype.emitPrice = function() {
 
 // sent donation info over to the IRC channel
 Actor.prototype.emitDonation = function() {
-  var message = 'You want to donate? How nice of you! You can send your coins here:';
+  let message = 'You want to donate? How nice of you! You can send your coins here:';
   message += '\nBTC:\t13r1jyivitShUiv9FJvjLH7Nh1ZZptumwW';
 
   this.bot.say(ircbot.channel, message);
 };
 
 Actor.prototype.emitHelp = function() {
-  var message = _.reduce(
+  let message = _.reduce(
     this.rawCommands,
     function(message, command) {
       return message + ' ' + command + ',';
@@ -128,12 +128,12 @@ Actor.prototype.emitHelp = function() {
 
   this.bot.say(ircbot.channel, message);
 
-}
+};
 
 Actor.prototype.emitRealAdvice = function() {
   // http://www.examiner.com/article/uncaged-a-look-at-the-top-10-quotes-of-gordon-gekko
   // http://elitedaily.com/money/memorable-gordon-gekko-quotes/
-  var realAdvice = [
+  let realAdvice = [
     'I don\'t throw darts at a board. I bet on sure things. Read Sun-tzu, The Art of War. Every battle is won before it is ever fought.',
     'Ever wonder why fund managers can\'t beat the S&P 500? \'Cause they\'re sheep, and sheep get slaughtered.',
     'If you\'re not inside, you\'re outside!',
@@ -144,7 +144,7 @@ Actor.prototype.emitRealAdvice = function() {
   ];
 
   this.bot.say(ircbot.channel, _.first(_.shuffle(realAdvice)));
-}
+};
 
 Actor.prototype.logError = function(message) {
   log.error('IRC ERROR:', message);

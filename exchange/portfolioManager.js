@@ -2,10 +2,10 @@
   The Portfolio class holds data about the portfolio
 */
 
-const _ = require('lodash');
-const async = require('async');
-const errors = require('./exchangeErrors');
-// const EventEmitter = require('events');
+let _ = require('lodash');
+let async = require('async');
+let errors = require('./exchangeErrors');
+// let EventEmitter = require('events');
 
 class Portfolio {
   constructor(config, api) {
@@ -27,8 +27,8 @@ class Portfolio {
 
   // convert into the portfolio expected by the performanceAnalyzer
   convertBalances(asset,currency) { // rename?
-    var asset = _.find(this.balances, a => a.name === this.config.asset).amount;
-    var currency = _.find(this.balances, a => a.name === this.config.currency).amount;
+    asset = _.find(this.balances, a => a.name === this.config.asset).amount;
+    currency = _.find(this.balances, a => a.name === this.config.currency).amount;
 
     return {
       currency,
@@ -45,11 +45,11 @@ class Portfolio {
       }
 
       // only include the currency/asset of this market
-      const balances = [ this.config.currency, this.config.asset ]
+      this.balances = [this.config.currency, this.config.asset]
         .map(name => {
-          let item = _.find(fullPortfolio, {name});
+          let item = _.find(fullPortfolio, { name });
 
-          if(!item) {
+          if (!item) {
             // assume we have 0
             item = { name, amount: 0 };
           }
@@ -57,15 +57,13 @@ class Portfolio {
           return item;
         });
 
-      this.balances = balances;
-
       if(_.isFunction(callback))
         callback();
-    }
+    };
 
     this.api.getPortfolio(set);
   }
-  
+
   setFee(callback) {
     this.api.getFee((err, fee) => {
       if(err)
@@ -84,4 +82,4 @@ class Portfolio {
 
 }
 
-module.exports = Portfolio
+module.exports = Portfolio;

@@ -1,5 +1,5 @@
-const stats = require('stats-lite');
-const lodash = require('lodash');
+let stats = require('stats-lite');
+let lodash = require('lodash');
 
 
 // simply monkey patch the stats with other stuff we
@@ -9,9 +9,9 @@ const lodash = require('lodash');
 //
 // @param returns (array - list of returns)
 // @param rfreturn (number - risk free return)
-// 
+//
 stats.sharpe = (returns, rfreturn) => {
   return (stats.mean(returns) - rfreturn) / stats.stdev(returns);
-}
+};
 
 module.exports = stats;

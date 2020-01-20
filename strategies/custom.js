@@ -8,17 +8,17 @@
 // a 10% chance it will recommend to change your position (to either
 // long or short).
 
-var log = require('../core/log');
+let log = require('../core/log');
 
 // Let's create our own strat
-var strat = {};
+let strat = {};
 
 // Prepare everything our method needs
 strat.init = function() {
   this.input = 'candle';
   this.currentTrend = 'long';
   this.requiredHistory = 0;
-}
+};
 
 // What happens on every new candle?
 strat.update = function(candle) {
@@ -28,13 +28,13 @@ strat.update = function(candle) {
 
   // There is a 10% chance it is smaller than 0.1
   this.toUpdate = this.randomNumber < 0.1;
-}
+};
 
 // For debugging purposes.
 strat.log = function() {
   log.debug('calculated random number:');
   log.debug('\t', this.randomNumber.toFixed(3));
-}
+};
 
 // Based on the newly calculated
 // information, check if we should
@@ -58,6 +58,6 @@ strat.check = function() {
     this.advice('long');
 
   }
-}
+};
 
 module.exports = strat;

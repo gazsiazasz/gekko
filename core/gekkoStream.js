@@ -1,18 +1,18 @@
 // Small writable stream wrapper that
 // passes data to all `candleConsumers`.
 
-const Writable = require('stream').Writable;
-const _ = require('lodash');
-const async = require('async');
-const moment = require('moment');
+let Writable = require('stream').Writable;
+let _ = require('lodash');
+let async = require('async');
+let moment = require('moment');
 
-const util = require('./util');
-const env = util.gekkoEnv();
-const mode = util.gekkoMode();
-const config = util.getConfig();
-const log = require(util.dirs().core + 'log');
+let util = require('./util');
+let env = util.gekkoEnv();
+let mode = util.gekkoMode();
+let config = util.getConfig();
+let log = require(util.dirs().core + 'log');
 
-var Gekko = function(plugins) {
+let Gekko = function(plugins) {
   this.plugins = plugins;
   this.candleConsumers = plugins
     .filter(plugin => plugin.processCandle);
@@ -22,7 +22,7 @@ var Gekko = function(plugins) {
     .filter(p => p.meta.emits);
 
   this.finalize = _.bind(this.finalize, this);
-}
+};
 
 Gekko.prototype = Object.create(Writable.prototype, {
   constructor: { value: Gekko }
@@ -36,11 +36,11 @@ if(config.debug && mode !== 'importer') {
       return this.finalize();
     }
 
-    const start = moment();
-    var relayed = false;
-    var at = null;
+    let start = moment();
+    let relayed = false;
+    let at = null;
 
-    const timer = setTimeout(() => {
+    let timer = setTimeout(() => {
       if(!relayed)
         log.error([
           `The plugin "${at}" has not processed a candle for 1 second.`,
@@ -48,7 +48,7 @@ if(config.debug && mode !== 'importer') {
         ].join(' '));
     }, 1000);
 
-    const flushEvents = _.after(this.candleConsumers.length, () => {
+    let flushEvents = _.after(this.candleConsumers.length, () => {
       relayed = true;
       clearInterval(timer);
       this.flushDefferedEvents();
@@ -66,7 +66,7 @@ if(config.debug && mode !== 'importer') {
       return this.finalize();
     }
 
-    const flushEvents = _.after(this.candleConsumers.length, () => {
+    let flushEvents = _.after(this.candleConsumers.length, () => {
       this.flushDefferedEvents();
       _done();
     });
@@ -77,7 +77,7 @@ if(config.debug && mode !== 'importer') {
 }
 
 Gekko.prototype.flushDefferedEvents = function() {
-  const broadcasted = _.find(
+  let broadcasted = _.find(
     this.producers,
     producer => producer.broadcastDeferredEmit()
   );
@@ -87,10 +87,10 @@ Gekko.prototype.flushDefferedEvents = function() {
   // have fully broadcasted everything.
   if(broadcasted)
     this.flushDefferedEvents();
-}
+};
 
 Gekko.prototype.finalize = function() {
-  var tradingMethod = _.find(
+  let tradingMethod = _.find(
     this.candleConsumers,
     c => c.meta.name === 'Trading Advisor'
   );
@@ -99,7 +99,7 @@ Gekko.prototype.finalize = function() {
     return this.shutdown();
 
   tradingMethod.finish(this.shutdown.bind(this));
-}
+};
 
 Gekko.prototype.shutdown = function() {
   this.end();

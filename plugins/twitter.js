@@ -1,13 +1,13 @@
-var _ = require('lodash');
-var log = require('../core/log.js');
-var util = require('../core/util.js');
-var config = util.getConfig();
-var twitterConfig = config.twitter;
-var TwitterApi = require('twitter');
+let _ = require('lodash');
+let log = require('../core/log.js');
+let util = require('../core/util.js');
+let config = util.getConfig();
+let twitterConfig = config.twitter;
+let TwitterApi = require('twitter');
 
-require('dotenv').config()
+require('dotenv').config();
 
-var Twitter = function(done) {
+let Twitter = function(done) {
     _.bindAll(this);
 
     this.twitter;
@@ -18,24 +18,24 @@ var Twitter = function(done) {
 };
 
 Twitter.prototype.setup = function(done){
-    var setupTwitter = function (err, result) {
+    let setupTwitter = function (err, result) {
         this.client = new TwitterApi({
           consumer_key: twitterConfig.consumer_key,
           consumer_secret: twitterConfig.consumer_secret,
           access_token_key: twitterConfig.access_token_key,
           access_token_secret: twitterConfig.access_token_secret
         });
-      
+
         if(twitterConfig.sendMessageOnStart){
-            var exchange = config.watch.exchange;
-            var currency = config.watch.currency;
-            var asset = config.watch.asset;
-            var body = "Watching "
+            let exchange = config.watch.exchange;
+            let currency = config.watch.currency;
+            let asset = config.watch.asset;
+            let body = "Watching "
                 +exchange
                 +" "
                 +currency
                 +" "
-                +asset
+                +asset;
             this.mail(body);
         }else{
             log.debug('Skipping Send message on startup')
@@ -51,10 +51,10 @@ Twitter.prototype.processCandle = function(candle, done) {
 };
 
 Twitter.prototype.processAdvice = function(advice) {
-	if (advice.recommendation == "soft" && twitterConfig.muteSoft) return;
-	var text = [
+	if (advice.recommendation === "soft" && twitterConfig.muteSoft) return;
+	let text = [
         'New  ', config.watch.asset, ' trend. Attempting to ',
-        advice.recommendation == "short" ? "sell" : "buy",
+        advice.recommendation === "short" ? "sell" : "buy",
         ' @',
         this.price,
     ].join('');
@@ -70,7 +70,7 @@ Twitter.prototype.mail = function(content, done) {
       } else if(response && response.active){
           log.info('Twitter Message Sent')
       }
-    }); 
+    });
 };
 
 Twitter.prototype.checkResults = function(err) {

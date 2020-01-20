@@ -1,16 +1,16 @@
-const _ = require('lodash');
+let _ = require('lodash');
 
-const cache = require('../state/cache');
-const Logger = require('../state/logger');
-const apiKeyManager= cache.get('apiKeyManager');
-const gekkoManager = cache.get('gekkos');
+let cache = require('../state/cache');
+let Logger = require('../state/logger');
+let apiKeyManager= cache.get('apiKeyManager');
+let gekkoManager = cache.get('gekkos');
 
-const base = require('./baseConfig');
+let base = require('./baseConfig');
 
 // starts an import
 // requires a post body with a config object
 module.exports = function *() {
-  const mode = this.request.body.mode;
+  let mode = this.request.body.mode;
 
   let config = {};
 
@@ -19,7 +19,7 @@ module.exports = function *() {
   // Attach API keys
   if(config.trader && config.trader.enabled && !config.trader.key) {
 
-    const keys = apiKeyManager._getApiKeyPair(config.watch.exchange);
+    let keys = apiKeyManager._getApiKeyPair(config.watch.exchange);
 
     if(!keys) {
       this.body = 'No API keys found for this exchange.';
@@ -32,7 +32,5 @@ module.exports = function *() {
     );
   }
 
-  const state = gekkoManager.add({config, mode});
-
-  this.body = state;
-}
+  this.body = gekkoManager.add({ config, mode });
+};

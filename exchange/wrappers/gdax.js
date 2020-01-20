@@ -1,16 +1,16 @@
-const Gdax = require('gdax');
-const _ = require('lodash');
-const moment = require('moment');
+let Gdax = require('gdax');
+let _ = require('lodash');
+let moment = require('moment');
 
-const errors = require('../exchangeErrors');
-const retry = require('../exchangeUtils').retry;
+let errors = require('../exchangeErrors');
+let util = require('../exchangeUtils');
 
-const BATCH_SIZE = 100;
-const QUERY_DELAY = 350;
+let BATCH_SIZE = 100;
+let QUERY_DELAY = 350;
 
-const marketData = require('./coinbase-markets.json');
+let marketData = require('./coinbase-markets.json');
 
-const Trader = function(config) {
+let Trader = function(config) {
   this.post_only = true;
   this.use_sandbox = false;
   this.name = 'GDAX';
@@ -31,7 +31,7 @@ const Trader = function(config) {
     this.pair = [config.asset, config.currency].join('-').toUpperCase();
     this.post_only =
       typeof config.post_only !== 'undefined' ? config.post_only : true;
-    
+
     if (config.sandbox) {
       this.use_sandbox = config.sandbox;
     }
@@ -49,7 +49,7 @@ const Trader = function(config) {
   );
 };
 
-const recoverableErrors = [
+let recoverableErrors = [
   'SOCKETTIMEDOUT',
   'TIMEDOUT',
   'CONNRESET',
@@ -67,12 +67,12 @@ const recoverableErrors = [
   'ENETUNREACH'
 ];
 
-const includes = (str, list) => {
+let includes = (str, list) => {
   if(!_.isString(str))
     return false;
 
   return _.some(list, item => str.includes(item));
-}
+};
 
 Trader.prototype.processResponse = function(method, next) {
   return (error, response, body) => {
@@ -106,13 +106,13 @@ Trader.prototype.processResponse = function(method, next) {
 
     return next(undefined, body);
   }
-}
+};
 
 Trader.prototype.getPortfolio = function(callback) {
-  const result = (err, data) => {
+  let result = (err, data) => {
     if (err) return callback(err);
 
-    var portfolio = data.map(function(account) {
+    let portfolio = data.map(function(account) {
       return {
         name: account.currency.toUpperCase(),
         amount: parseFloat(account.available),
@@ -121,26 +121,26 @@ Trader.prototype.getPortfolio = function(callback) {
     callback(undefined, portfolio);
   };
 
-  const fetch = cb =>
+  let fetch = cb =>
     this.gdax.getAccounts(this.processResponse('getPortfolio', cb));
-  retry(null, fetch, result);
+  util.retry(null, fetch, result);
 };
 
 Trader.prototype.getTicker = function(callback) {
-  const result = (err, data) => {
+  let result = (err, data) => {
     if (err) return callback(err);
     callback(undefined, { bid: +data.bid, ask: +data.ask });
   };
 
-  const fetch = cb =>
+  let fetch = cb =>
     this.gdax_public.getProductTicker(this.pair, this.processResponse('getTicker', cb));
-  retry(null, fetch, result);
+  util.retry(null, fetch, result);
 };
 
 Trader.prototype.getFee = function(callback) {
   //https://www.gdax.com/fees
-  // const fee = this.asset == 'BTC' ? 0.0025 : 0.003;
-  const fee = 0;
+  // let fee = this.asset == 'BTC' ? 0.0025 : 0.003;
+  let fee = 0;
 
   //There is no maker fee, not sure if we need taker fee here
   //If post only is enabled, gdax only does maker trades which are free
@@ -148,22 +148,22 @@ Trader.prototype.getFee = function(callback) {
 };
 
 Trader.prototype.roundPrice = function(price) {
-  return this.getMaxDecimalsNumber(price, this.currency == 'BTC' ? 5 : 2);
-}
+  return this.getMaxDecimalsNumber(price, this.currency === 'BTC' ? 5 : 2);
+};
 
 Trader.prototype.roundAmount = function(amount) {
   return this.getMaxDecimalsNumber(amount);
-}
+};
 
 Trader.prototype.buy = function(amount, price, callback) {
-  const buyParams = {
-    price: this.getMaxDecimalsNumber(price, this.currency == 'BTC' ? 5 : 2),
+  let buyParams = {
+    price: this.getMaxDecimalsNumber(price, this.currency === 'BTC' ? 5 : 2),
     size: this.getMaxDecimalsNumber(amount),
     product_id: this.pair,
     post_only: this.post_only,
   };
 
-  const result = (err, data) => {
+  let result = (err, data) => {
     if (err) {
       console.log({buyParams}, err.message);
       return callback(err);
@@ -171,20 +171,20 @@ Trader.prototype.buy = function(amount, price, callback) {
     callback(undefined, data.id);
   };
 
-  const fetch = cb =>
+  let fetch = cb =>
     this.gdax.buy(buyParams, this.processResponse('buy', cb));
-  retry(null, fetch, result);
+  util.retry(null, fetch, result);
 };
 
 Trader.prototype.sell = function(amount, price, callback) {
-  const sellParams = {
-    price: this.getMaxDecimalsNumber(price, this.currency == 'BTC' ? 5 : 2),
+  let sellParams = {
+    price: this.getMaxDecimalsNumber(price, this.currency === 'BTC' ? 5 : 2),
     size: this.getMaxDecimalsNumber(amount),
     product_id: this.pair,
     post_only: this.post_only,
   };
 
-  const result = (err, data) => {
+  let result = (err, data) => {
     if (err) {
       console.log({sellParams}, err.message);
       return callback(err);
@@ -199,19 +199,19 @@ Trader.prototype.sell = function(amount, price, callback) {
     callback(undefined, data.id);
   };
 
-  const fetch = cb =>
+  let fetch = cb =>
     this.gdax.sell(sellParams, this.processResponse('sell', cb));
-  retry(null, fetch, result);
+  util.retry(null, fetch, result);
 };
 
 Trader.prototype.checkOrder = function(order, callback) {
-  const result = (err, data) => {
+  let result = (err, data) => {
     if (err) return callback(err);
 
     // @link:
     // https://stackoverflow.com/questions/48132078/available-gdax-order-statuses-and-meanings
-    var status = data.status;
-    if(status == 'pending') {
+    let status = data.status;
+    if(status === 'pending') {
       // technically not open yet, but will be soon
       return callback(undefined, { executed: false, open: true, filledAmount: 0 });
     } if (status === 'done' || status === 'settled') {
@@ -225,35 +225,35 @@ Trader.prototype.checkOrder = function(order, callback) {
     callback(new Error('Unknown status ' + status));
   };
 
-  const fetch = cb =>
+  let fetch = cb =>
     this.gdax.getOrder(order, this.processResponse('checkOrder', cb));
-  retry(null, fetch, result);
+  util.retry(null, fetch, result);
 };
 
 Trader.prototype.getOrder = function(order, callback) {
-  const result = (err, data) => {
+  let result = (err, data) => {
     if (err) return callback(err);
 
-    const price = parseFloat(data.price);
-    const amount = parseFloat(data.filled_size);
-    const date = moment(data.done_at);
-    const fees = {
+    let price = parseFloat(data.price);
+    let amount = parseFloat(data.filled_size);
+    let date = moment(data.done_at);
+    let fees = {
       // you always pay fee in the base currency on gdax
       [this.currency]: +data.fill_fees
     }
-    const feePercent = +data.fill_fees / price / amount * 100;
+    let feePercent = +data.fill_fees / price / amount * 100;
 
     callback(undefined, { price, amount, date, fees, feePercent });
   };
 
-  const fetch = cb =>
+  let fetch = cb =>
     this.gdax.getOrder(order, this.processResponse('getOrder', cb));
-  retry(null, fetch, result);
+  util.retry(null, fetch, result);
 };
 
 Trader.prototype.cancelOrder = function(order, callback) {
   // callback for cancelOrder should be true if the order was already filled, otherwise false
-  const result = (err, data) => {
+  let result = (err, data) => {
     if(err) {
       return callback(null, true);  // need to catch the specific error but usually an error on cancel means it was filled
     }
@@ -261,18 +261,18 @@ Trader.prototype.cancelOrder = function(order, callback) {
     return callback(null, false);
   };
 
-  const fetch = cb =>
+  let fetch = cb =>
     this.gdax.cancelOrder(order, this.processResponse('cancelOrder', cb));
-  retry(null, fetch, result);
+  util.retry(null, fetch, result);
 };
 
 Trader.prototype.getTrades = function(since, callback, descending) {
-  var lastScan = 0;
+  let lastScan = 0;
 
-  const handle = function(err, data) {
+  let handle = function(err, data) {
     if (err) return callback(err);
 
-    var result = _.map(data, function(trade) {
+    let result = _.map(data, function(trade) {
       return {
         tid: trade.trade_id,
         amount: parseFloat(trade.size),
@@ -282,8 +282,8 @@ Trader.prototype.getTrades = function(since, callback, descending) {
     });
 
     if (this.scanback) {
-      var last = _.last(data);
-      var first = _.first(data);
+      let last = _.last(data);
+      let first = _.first(data);
 
       // Try to find trade id matching the since date
       if (!this.scanbackTid) {
@@ -302,7 +302,7 @@ Trader.prototype.getTrades = function(since, callback, descending) {
                 },
                 this.processResponse('getTrades', cb)
               );
-            retry(
+            util.retry(
               retryForever,
               _.bind(handler, this),
               _.bind(process, this)
@@ -331,7 +331,7 @@ Trader.prototype.getTrades = function(since, callback, descending) {
 
         this.scanbackResults = this.scanbackResults.concat(result.reverse());
 
-        if (this.scanbackTid != first.trade_id) {
+        if (this.scanbackTid !== first.trade_id) {
           this.scanbackTid = first.trade_id;
           setTimeout(() => {
             let handler = cb =>
@@ -340,7 +340,7 @@ Trader.prototype.getTrades = function(since, callback, descending) {
                 { after: this.scanbackTid + BATCH_SIZE + 1, limit: BATCH_SIZE },
                 this.processResponse('getTrades', cb)
               );
-            retry(
+            util.retry(
               retryForever,
               _.bind(handler, this),
               _.bind(process, this)
@@ -370,7 +370,7 @@ Trader.prototype.getTrades = function(since, callback, descending) {
           { after: this.scanbackTid + BATCH_SIZE + 1, limit: BATCH_SIZE },
           this.processResponse('getTrades', cb)
         );
-      retry(
+      util.retry(
         retryForever,
         _.bind(handler, this),
         _.bind(process, this)
@@ -380,25 +380,25 @@ Trader.prototype.getTrades = function(since, callback, descending) {
     }
   }
 
-  const fetch = cb =>
+  let fetch = cb =>
     this.gdax_public.getProductTrades(
       this.pair,
       { limit: BATCH_SIZE },
       this.processResponse('getTrades', cb)
     );
-  retry(null, fetch, handle);
+  util.retry(null, fetch, handle);
 };
 
 Trader.prototype.getMaxDecimalsNumber = function(number, decimalLimit = 8) {
-  var decimalNumber = parseFloat(number);
+  let decimalNumber = parseFloat(number);
 
   // The ^-?\d*\. strips off any sign, integer portion, and decimal point
   // leaving only the decimal fraction.
   // The 0+$ strips off any trailing zeroes.
-  var decimalCount = (+decimalNumber).toString().replace(/^-?\d*\.?|0+$/g, '')
+  let decimalCount = (+decimalNumber).toString().replace(/^-?\d*\.?|0+$/g, '')
     .length;
 
-  var decimalMultiplier = 1;
+  let decimalMultiplier = 1;
   for (i = 0; i < decimalLimit; i++) {
     decimalMultiplier *= 10;
   }

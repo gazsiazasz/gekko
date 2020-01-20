@@ -1,18 +1,18 @@
-const _ = require('lodash');
+let _ = require('lodash');
 
-const util = require('../util');
-const dirs = util.dirs();
+let util = require('../util');
+let dirs = util.dirs();
 
-const exchangeChecker = require(dirs.gekko + 'exchange/exchangeChecker');
-const config = util.getConfig();
+let exchangeChecker = require(dirs.gekko + 'exchange/exchangeChecker');
+let config = util.getConfig();
 
-const slug = config.watch.exchange.toLowerCase();
-const exchange = exchangeChecker.getExchangeCapabilities(slug);
+let slug = config.watch.exchange.toLowerCase();
+let exchange = exchangeChecker.getExchangeCapabilities(slug);
 
 if(!exchange)
-  util.die(`Unsupported exchange: ${slug}`)
+  util.die(`Unsupported exchange: ${slug}`);
 
-const error = exchangeChecker.cantMonitor(config.watch);
+let error = exchangeChecker.cantMonitor(config.watch);
 if(error)
   util.die(error, true);
 

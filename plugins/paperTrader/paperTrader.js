@@ -1,17 +1,17 @@
-const _ = require('lodash');
+let _ = require('lodash');
 
-const util = require('../../core/util');
-const ENV = util.gekkoEnv();
+let util = require('../../core/util');
+let ENV = util.gekkoEnv();
 
-const config = util.getConfig();
-const calcConfig = config.paperTrader;
-const watchConfig = config.watch;
-const dirs = util.dirs();
-const log = require(dirs.core + 'log');
+let config = util.getConfig();
+let calcConfig = config.paperTrader;
+let watchConfig = config.watch;
+let dirs = util.dirs();
+let log = require(dirs.core + 'log');
 
-const TrailingStop = require(dirs.broker + 'triggers/trailingStop');
+let TrailingStop = require(dirs.broker + 'triggers/trailingStop');
 
-const PaperTrader = function() {
+let PaperTrader = function() {
   _.bindAll(this);
 
   if(calcConfig.feeUsing === 'maker') {
@@ -28,7 +28,7 @@ const PaperTrader = function() {
   this.portfolio = {
     asset: calcConfig.simulationBalance.asset,
     currency: calcConfig.simulationBalance.currency,
-  }
+  };
 
   this.balance = false;
 
@@ -42,20 +42,20 @@ const PaperTrader = function() {
   this.warmupCompleted = false;
 
   this.warmupCandle;
-}
+};
 
 PaperTrader.prototype.relayPortfolioChange = function() {
   this.deferredEmit('portfolioChange', {
     asset: this.portfolio.asset,
     currency: this.portfolio.currency
   });
-}
+};
 
 PaperTrader.prototype.relayPortfolioValueChange = function() {
   this.deferredEmit('portfolioValueChange', {
     balance: this.getBalance()
   });
-}
+};
 
 PaperTrader.prototype.extractFee = function(amount) {
   amount *= 1e8;
@@ -63,11 +63,11 @@ PaperTrader.prototype.extractFee = function(amount) {
   amount = Math.floor(amount);
   amount /= 1e8;
   return amount;
-}
+};
 
 PaperTrader.prototype.setStartBalance = function() {
   this.balance = this.getBalance();
-}
+};
 
 // after every succesfull trend ride we hopefully end up
 // with more BTC than we started with, this function
@@ -101,18 +101,18 @@ PaperTrader.prototype.updatePosition = function(what) {
     this.trades++;
   }
 
-  const effectivePrice = this.price * this.fee;
+  let effectivePrice = this.price * this.fee;
 
   return { cost, amount, effectivePrice };
-}
+};
 
 PaperTrader.prototype.getBalance = function() {
   return this.portfolio.currency + this.price * this.portfolio.asset;
-}
+};
 
 PaperTrader.prototype.now = function() {
   return this.candle.start.clone().add(1, 'minute');
-}
+};
 
 PaperTrader.prototype.processAdvice = function(advice) {
   let action;
@@ -163,7 +163,7 @@ PaperTrader.prototype.processAdvice = function(advice) {
     date: advice.date,
   });
 
-  const { cost, amount, effectivePrice } = this.updatePosition(advice.recommendation);
+  let { cost, amount, effectivePrice } = this.updatePosition(advice.recommendation);
 
   this.relayPortfolioChange();
   this.relayPortfolioValueChange();
@@ -181,10 +181,10 @@ PaperTrader.prototype.processAdvice = function(advice) {
     effectivePrice,
     feePercent: this.rawFee
   });
-}
+};
 
 PaperTrader.prototype.createTrigger = function(advice) {
-  const trigger = advice.trigger;
+  let trigger = advice.trigger;
 
   if(trigger && trigger.type === 'trailingStop') {
 
@@ -192,7 +192,7 @@ PaperTrader.prototype.createTrigger = function(advice) {
       return log.warn(`[Papertrader] ignoring trailing stop without trail value`);
     }
 
-    const triggerId = 'trigger-' + (++this.propogatedTriggers);
+    let triggerId = 'trigger-' + (++this.propogatedTriggers);
 
     this.deferredEmit('triggerCreated', {
       id: triggerId,
@@ -216,18 +216,18 @@ PaperTrader.prototype.createTrigger = function(advice) {
   } else {
     log.warn(`[Papertrader] Gekko does not know trigger with type "${trigger.type}".. Ignoring stop.`);
   }
-}
+};
 
 PaperTrader.prototype.onStopTrigger = function() {
 
-  const date = this.now();
+  let date = this.now();
 
   this.deferredEmit('triggerFired', {
     id: this.activeStopTrigger.id,
     date
   });
 
-  const { cost, amount, effectivePrice } = this.updatePosition('short');
+  let { cost, amount, effectivePrice } = this.updatePosition('short');
 
   this.relayPortfolioChange();
   this.relayPortfolioValueChange();
@@ -247,12 +247,12 @@ PaperTrader.prototype.onStopTrigger = function() {
   });
 
   delete this.activeStopTrigger;
-}
+};
 
 PaperTrader.prototype.processStratWarmupCompleted = function() {
   this.warmupCompleted = true;
   this.processCandle(this.warmupCandle, _.noop);
-}
+};
 
 PaperTrader.prototype.processCandle = function(candle, done) {
   if(!this.warmupCompleted) {
@@ -278,6 +278,6 @@ PaperTrader.prototype.processCandle = function(candle, done) {
   }
 
   done();
-}
+};
 
 module.exports = PaperTrader;

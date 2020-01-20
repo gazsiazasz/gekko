@@ -1,22 +1,22 @@
-const fs = require('fs');
-const _ = require('lodash');
-const toml = require('toml');
+let fs = require('fs');
+let _ = require('lodash');
+let toml = require('toml');
 
-const util = require('../util');
-const dirs = util.dirs();
+let util = require('../util');
+let dirs = util.dirs();
 
-const getTOML = function(fileName) {
-  var raw = fs.readFileSync(fileName);
+let getTOML = function(fileName) {
+  let raw = fs.readFileSync(fileName);
   return toml.parse(raw);
-}
+};
 
 // build a config object out of a directory of TOML files
 module.exports = function() {
-  const configDir = util.dirs().config;
+  let configDir = util.dirs().config;
 
   let _config = getTOML(configDir + 'general.toml');
   fs.readdirSync(configDir + 'plugins').forEach(function(pluginFile) {
-    let pluginName = _.first(pluginFile.split('.'))
+    let pluginName = _.first(pluginFile.split('.'));
     _config[pluginName] = getTOML(configDir + 'plugins/' + pluginFile);
   });
 
@@ -33,10 +33,10 @@ module.exports = function() {
     _config[strat] = getTOML(stratFile);
   }
 
-  const mode = util.gekkoMode();
+  let mode = util.gekkoMode();
 
   if(mode === 'backtest')
     _config.backtest = getTOML(configDir + 'backtest.toml');
 
   return _config;
-}
+};

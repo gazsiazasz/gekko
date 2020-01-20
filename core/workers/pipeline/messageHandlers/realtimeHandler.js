@@ -21,4 +21,4 @@ module.exports = cb => {
         cb(null, { done: true });
     }
   }
-}
+};

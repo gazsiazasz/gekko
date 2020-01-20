@@ -1,17 +1,17 @@
-const moment = require('moment');
-const util = require('../../core/util');
-const log = require('../../core/log');
-const _ = require('lodash');
-const retry = require('../../exchange/exchangeUtils').retry;
+let moment = require('moment');
+let util = require('../../core/util');
+let log = require('../../core/log');
+let _ = require('lodash');
+let retry = require('../../exchange/exchangeUtils').retry;
 
-const config = util.getConfig();
-const dirs = util.dirs();
-const Fetcher = require(dirs.exchanges + 'therocktrading');
+let config = util.getConfig();
+let dirs = util.dirs();
+let Fetcher = require(dirs.exchanges + 'therocktrading');
 
 Fetcher.prototype.getTrades = function(since, to, page, callback, descending) {
-  const handle = (err, data) => {
+  let handle = (err, data) => {
     if (err) return callback(err);
-    var trades = [];
+    let trades = [];
     if (_.isArray(data.trades)) {
       trades = _.map(data.trades, function(trade) {
         return {
@@ -35,30 +35,30 @@ Fetcher.prototype.getTrades = function(since, to, page, callback, descending) {
     page: page,
     order: "ASC",
     per_page: 200
-  }
-  const fetch = cb => this.therocktrading.trades(this.pair, options, this.processResponse('getTrades', cb));
+  };
+  let fetch = cb => this.therocktrading.trades(this.pair, options, this.processResponse('getTrades', cb));
   retry(null, fetch, handle);
 };
 
 util.makeEventEmitter(Fetcher);
 
-var end = false;
-var done = false;
-var from = false;
+let end = false;
+let done = false;
+let from = false;
 
-var page = 1;
+let page = 1;
 
-var fetcher = new Fetcher(config.watch);
+let fetcher = new Fetcher(config.watch);
 
-var fetch = () => {
+let fetch = () => {
     fetcher.import = true;
 
-    log.debug("IMPORTER: starting fetcher")
+    log.debug("IMPORTER: starting fetcher");
 
     fetcher.getTrades(from, end, page, handleFetch);
-}
+};
 
-var handleFetch = (err, trades) => {
+let handleFetch = (err, trades) => {
     if(!err && !trades.length) {
         console.log('no more trades');
         fetcher.emit('done');
@@ -75,7 +75,7 @@ var handleFetch = (err, trades) => {
     }
 
     fetcher.emit('trades', trades);
-}
+};
 
 module.exports = function (daterange) {
 
@@ -86,6 +86,4 @@ module.exports = function (daterange) {
         bus: fetcher,
         fetch: fetch
     }
-}
-
-
+};

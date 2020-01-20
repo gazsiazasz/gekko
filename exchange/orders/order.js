@@ -1,10 +1,10 @@
-const EventEmitter = require('events');
-const _ = require('lodash');
+let EventEmitter = require('events');
+let _ = require('lodash');
 
-const exchangeUtils = require('../exchangeUtils');
-const bindAll = exchangeUtils.bindAll;
-const isValidOrder = exchangeUtils.isValidOrder;
-const states = require('./states');
+let exchangeUtils = require('../exchangeUtils');
+let bindAll = exchangeUtils.bindAll;
+let isValidOrder = exchangeUtils.isValidOrder;
+let states = require('./states');
 
 // base order
 
@@ -24,7 +24,7 @@ class BaseOrder extends EventEmitter {
   }
 
   submit({side, amount, price, alreadyFilled}) {
-    const check = isValidOrder({
+    let check = isValidOrder({
       market: this.market,
       api: this.api,
       amount,

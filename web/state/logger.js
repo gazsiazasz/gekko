@@ -1,9 +1,9 @@
-const fs = require('fs');
-const _ = require('lodash');
+let fs = require('fs');
+let _ = require('lodash');
 
-const BASEPATH = __dirname + '/../../logs/';
+let BASEPATH = __dirname + '/../../logs/';
 
-const Logger = function(id) {
+let Logger = function(id) {
 
   this.fileName = `${id}.log`;
 
@@ -11,7 +11,7 @@ const Logger = function(id) {
   this.queue = [];
 
   _.bindAll(this);
-}
+};
 
 Logger.prototype.write = function(line) {
   if(!this.writing) {
@@ -23,7 +23,7 @@ Logger.prototype.write = function(line) {
     );
   } else
     this.queue.push(line);
-}
+};
 
 Logger.prototype.handleWriteCallback = function(err) {
   if(err)
@@ -33,6 +33,6 @@ Logger.prototype.handleWriteCallback = function(err) {
 
   if(_.size(this.queue))
     this.write(this.queue.shift())
-}
+};
 
 module.exports = Logger;

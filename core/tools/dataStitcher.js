@@ -1,26 +1,26 @@
-var _ = require('lodash');
-var fs = require('fs');
-var moment = require('moment');
+let _ = require('lodash');
+let fs = require('fs');
+let moment = require('moment');
 
-var util = require('../util');
-var config = util.getConfig();
-var dirs = util.dirs();
-var log = require(dirs.core + '/log');
+let util = require('../util');
+let config = util.getConfig();
+let dirs = util.dirs();
+let log = require(dirs.core + '/log');
 
-var Stitcher = function(batcher) {
+let Stitcher = function(batcher) {
   this.batcher = batcher;
-}
+};
 
 Stitcher.prototype.ago = function(ts) {
-  var now = moment().utc();
-  var then = moment.unix(ts).utc();
+  let now = moment().utc();
+  let then = moment.unix(ts).utc();
   return now.diff(then, 'minutes') + ' minutes ago';
-}
+};
 
 Stitcher.prototype.verifyExchange = function() {
   require(dirs.gekko + 'exchange/dependencyCheck');
-  const exchangeChecker = require(dirs.gekko + 'exchange/exchangeChecker');
-  const slug = config.watch.exchange.toLowerCase();
+  let exchangeChecker = require(dirs.gekko + 'exchange/exchangeChecker');
+  let slug = config.watch.exchange.toLowerCase();
   let exchange;
   try {
     exchange = exchangeChecker.getExchangeCapabilities(slug);
@@ -31,10 +31,10 @@ Stitcher.prototype.verifyExchange = function() {
   if(!exchange)
     util.die(`Unsupported exchange: ${slug}`);
 
-  var error = exchangeChecker.cantMonitor(config.watch);
+  let error = exchangeChecker.cantMonitor(config.watch);
   if(error)
     util.die(error, true);
-}
+};
 
 Stitcher.prototype.prepareHistoricalData = function(done) {
   this.verifyExchange();
@@ -47,9 +47,9 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
   if(config.tradingAdvisor.historySize === 0)
     return done();
 
-  var requiredHistory = config.tradingAdvisor.candleSize * config.tradingAdvisor.historySize;
-  var Reader = require(dirs.plugins + config.adapter + '/reader');
-  
+  let requiredHistory = config.tradingAdvisor.candleSize * config.tradingAdvisor.historySize;
+  let Reader = require(dirs.plugins + config.adapter + '/reader');
+
   this.reader = new Reader;
 
   log.info(
@@ -58,22 +58,22 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
     'minutes of historic data. Checking availablity..'
   );
 
-  var endTime = moment().utc().startOf('minute');
-  var idealStartTime = endTime.clone().subtract(requiredHistory, 'm');
-  
+  let endTime = moment().utc().startOf('minute');
+  let idealStartTime = endTime.clone().subtract(requiredHistory, 'm');
+
   this.reader.mostRecentWindow(idealStartTime, endTime, function(localData) {
     // now we know what data is locally available, what
     // data would we need from the exchange?
-    
+
     if(!localData) {
       log.info('\tNo usable local data available, trying to get as much as possible from the exchange..');
-      var idealExchangeStartTime = idealStartTime.clone();
-      var idealExchangeStartTimeTS = idealExchangeStartTime.unix();
+      let idealExchangeStartTime = idealStartTime.clone();
+      let idealExchangeStartTimeTS = idealExchangeStartTime.unix();
     }
     else if (idealStartTime.unix() < localData.from) {
       log.info('\tLocal data is still too recent, trying to get as much as possible from the exchange');
-      var idealExchangeStartTime = idealStartTime.clone();
-      var idealExchangeStartTimeTS = idealExchangeStartTime.unix();
+      let idealExchangeStartTime = idealStartTime.clone();
+      let idealExchangeStartTimeTS = idealExchangeStartTime.unix();
     }
     else {
       log.debug('\tAvailable local data:');
@@ -85,9 +85,9 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
 
 
       // make sure we grab back in history far enough
-      var secondsOverlap = 60 * 15; // 15 minutes
-      var idealExchangeStartTimeTS = localData.to - secondsOverlap;
-      var idealExchangeStartTime = moment.unix(idealExchangeStartTimeTS).utc();
+      let secondsOverlap = 60 * 15; // 15 minutes
+      let idealExchangeStartTimeTS = localData.to - secondsOverlap;
+      let idealExchangeStartTime = moment.unix(idealExchangeStartTimeTS).utc();
 
       // already set the
       util.setConfigProperty(
@@ -98,15 +98,15 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
     }
 
     // Limit the history Gekko can try to get from the exchange.
-    var minutesAgo = endTime.diff(idealExchangeStartTime, 'minutes');
-    var maxMinutesAgo = 4 * 60; // 4 hours
+    let minutesAgo = endTime.diff(idealExchangeStartTime, 'minutes');
+    let maxMinutesAgo = 4 * 60; // 4 hours
     if(minutesAgo > maxMinutesAgo) {
       log.info('\tPreventing Gekko from requesting', minutesAgo, 'minutes of history.');
       idealExchangeStartTime = endTime.clone().subtract(maxMinutesAgo, 'minutes');
       idealExchangeStartTimeTS = idealExchangeStartTime.unix();
-    } 
+    }
 
-    log.debug('\tFetching exchange data since', this.ago(idealExchangeStartTimeTS))
+    log.debug('\tFetching exchange data since', this.ago(idealExchangeStartTimeTS));
     this.checkExchangeTrades(idealExchangeStartTime, function(err, exchangeData) {
       log.debug('\tAvailable exchange data:');
       log.debug('\t\tfrom:', this.ago(exchangeData.from));
@@ -124,7 +124,7 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
         localData = false;
       }
 
-      var stitchable = localData && exchangeData.from <= localData.to;
+      let stitchable = localData && exchangeData.from <= localData.to;
       if(stitchable) {
         log.debug('\tStitching datasets');
 
@@ -142,7 +142,7 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
           log.info(
             '\tPartial history locally available, but',
             Math.round((localData.from - idealStartTime.unix()) / 60),
-            'minutes are missing.')
+            'minutes are missing.');
           log.info('\tSeeding the trading method with',
             'partial historical data (Gekko needs more time before',
             'it can give advice).'
@@ -150,8 +150,8 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
         }
 
         // seed all historic data up to the point the exchange can provide.
-        var from = localData.from;
-        var to = moment.unix(exchangeData.from).utc()
+        let from = localData.from;
+        let to = moment.unix(exchangeData.from).utc()
           .startOf('minute')
           .subtract(1, 'minute')
           .unix();
@@ -162,7 +162,7 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
         return this.seedLocalData(from, to, done);
 
       } else if(!stitchable) {
-        log.debug('\tUnable to stitch datasets.')
+        log.debug('\tUnable to stitch datasets.');
         // we cannot use any local data..
         log.info(
           '\tNot seeding locally available data to the trading method.'
@@ -183,20 +183,20 @@ Stitcher.prototype.prepareHistoricalData = function(done) {
 
     }.bind(this));
   }.bind(this));
-}
+};
 
 Stitcher.prototype.checkExchangeTrades = function(since, next) {
-  var provider = config.watch.exchange.toLowerCase();
-  var DataProvider = require(util.dirs().gekko + 'exchange/wrappers/' + provider);
+  let provider = config.watch.exchange.toLowerCase();
+  let DataProvider = require(util.dirs().gekko + 'exchange/wrappers/' + provider);
 
-  var exchangeConfig = config.watch;
+  let exchangeConfig = config.watch;
 
   // include trader config if trading is enabled
   if (_.isObject(config.trader) && config.trader.enabled) {
     exchangeConfig = _.extend(config.watch, config.trader);
   }
 
-  var watcher = new DataProvider(exchangeConfig);
+  let watcher = new DataProvider(exchangeConfig);
   watcher.getTrades(since, function(e, d) {
     if(e) {
       util.die(e.message);
@@ -213,7 +213,7 @@ Stitcher.prototype.checkExchangeTrades = function(since, next) {
       to: _.last(d).date
     })
   });
-}
+};
 
 Stitcher.prototype.seedLocalData = function(from, to, next) {
   this.reader.get(from, to, 'full', function(err, rows) {
@@ -228,6 +228,6 @@ Stitcher.prototype.seedLocalData = function(from, to, next) {
     next();
 
   }.bind(this));
-}
+};
 
 module.exports = Stitcher;
